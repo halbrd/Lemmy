@@ -1,0 +1,17 @@
+[Major] Emote NASDAQ
+[Major] Lemmy Radio
+Reminders
+LemmyCoin
+    Bounty Board
+Add/remove self from james list with commands
+Ruseman function
+Fix call logger
+Hybrid emotes
+Full Life Consequences emotes
+Personalized flood protection/timeouts
+!james ttt
+Put Lemmy on Github
+Lemmies Against Humanity
+Lemmafia
+Console log indentation
+[Emote] Spaghetti

@@ -1,0 +1,12 @@
+!lenny - Posts lennies
+&nbsp;&nbsp;&nbsp;&nbsp;[no flag]&nbsp;&nbsp;&nbsp;A random Lenny from a premade list
+&nbsp;&nbsp;&nbsp;&nbsp;-og&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The one and only
+&nbsp;&nbsp;&nbsp;&nbsp;-r&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A *truly* random Lenny (randomizer courtesy of Dragons_Ire)
+!correct - Posts the correct horse video
+!emotes - Lists all available emotes
+!stickers - Lists all available stickers (like emotes, but BIGGER)
+!8ball [question] - Ask a question, get a certified correct answer
+!userinfo [username] - Get some info about a user
+!channelinfo [channel name] - Get some info about a text channel
+!james [game tag] - Ping all the relevant users for a game
+&nbsp;&nbsp;&nbsp;&nbsp;-tags&nbsp;&nbsp;&nbsp;List all tags and associated users
