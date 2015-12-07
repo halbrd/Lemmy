@@ -1,4 +1,4 @@
-password = "arbiter1"
+password = "nicememe"
 
 import sys
 sys.path.append('modules')

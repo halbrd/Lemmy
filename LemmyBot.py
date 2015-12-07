@@ -31,6 +31,7 @@ class LemmyBot:
 			"userinfo": Lcmds.userinfo,
 			"channelinfo": Lcmds.channelinfo,
 			"james": Lcmds.james,
+			"happening": Lcmds.happening,
 			"logout": Lcmds.logout
 		}
 

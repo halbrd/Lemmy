@@ -15,3 +15,4 @@ Lemmies Against Humanity
 Lemmafia
 Console log indentation
 [Emote] Spaghetti
+Update help documentation

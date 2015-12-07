@@ -106,3 +106,6 @@ def james(client, res, msg, params):
 						response += user.mention() + " "
 				response += "for " + res.jamesConverter[params[0]]
 				client.send_message(msg.channel, response)
+
+def happening(client, res, msg, params):
+	client.send_message(msg.channel, "https://i.imgur.com/bYGOUHP.gif")
