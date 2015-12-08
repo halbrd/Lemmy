@@ -15,7 +15,10 @@ def GetNthFlag(n, params):
 	for i in range(0, len(params)):
 		if params[i][0] == "-":
 			if n == 1:
-				return params[i]
+				if i + 1 < len(params) and params[i + 1][0] != "-":
+					return [params[i], params[i + 1]]
+				else:
+					return [params[i], None]
 			else:
 				n -= 1
 	return None
@@ -33,3 +36,12 @@ def SendSticker(client, msg):
 def StripUnicode(string):
 	stripped = [c for c in string if 0 < ord(c) < 127]
 	return "".join(stripped)
+
+def IsAdmin(member):
+	return "administrator" in [role.name for role in member.roles]
+
+def IsModOrAbove(member):
+	return "administrator" in [role.name for role in member.roles] or "moderator" in [role.name for role in member.roles] or "robots" in [role.name for role in member.roles]
+
+def IsRole(role, member):
+	return role in [role.name for role in member.roles]
