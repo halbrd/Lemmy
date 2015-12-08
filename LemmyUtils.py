@@ -20,14 +20,14 @@ def GetNthFlag(n, params):
 				n -= 1
 	return None
 
-def SendEmote(client, msg, emoteName):
+def SendEmote(client, msg):
 	client.send_message(msg.channel, "__**" + msg.author.name + "**__")
-	client.send_file(msg.channel, "pics/emotes/" + emoteName + ".png")
+	client.send_file(msg.channel, "pics/emotes/" + msg.content + ".png")
 	client.delete_message(msg)
 
-def SendSticker(client, msg, stickerName):
+def SendSticker(client, msg):
 	client.send_message(msg.channel, "__**" + msg.author.name + "**__")
-	client.send_file(msg.channel, "pics/stickers/" + stickerName + ".png")
+	client.send_file(msg.channel, "pics/stickers/" + msg.content + ".png")
 	client.delete_message(msg)
 
 def StripUnicode(string):

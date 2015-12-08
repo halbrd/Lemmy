@@ -83,14 +83,14 @@ class LemmyBot:
 
 				elif msg.content in self.res.emotes and msg.author != self.client.user:
 					if self.floodProtectors["emote"].Ready(msg.author.id):
-						Lutils.SendEmote(self.client, msg, msg.content)
+						Lutils.SendEmote(self.client, msg)
 						self.floodProtectors["emote"].Sent(msg.author.id)
 					else:
 						self.client.delete_message(msg)
 
 				elif msg.content in self.res.stickers and msg.author != self.client.user:
 					if self.floodProtectors["sticker"].Ready(msg.author.id):
-						Lutils.SendSticker(self.client, msg, msg.content)
+						Lutils.SendSticker(self.client, msg)
 						self.floodProtectors["sticker"].Sent(msg.author.id)
 					else:
 						self.client.delete_message(msg)
