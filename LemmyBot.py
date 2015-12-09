@@ -32,6 +32,7 @@ class LemmyBot:
 			"channelinfo": Lcmds.channelinfo,
 			"james": Lcmds.james,
 			"happening": Lcmds.happening,
+			"ruseman": Lcmds.ruseman,
 			"logout": Lcmds.logout
 		}
 
@@ -103,12 +104,14 @@ class LemmyBot:
 
 		@self.client.event
 		def on_voice_state_update(member):
+			print("Voice state update started.")
 			channelList = []
 			for server in self.client.servers:
 				for channel in server.channels:
 					if channel.type == "voice":
 						channelList.append(channel)
 			responses = self.callLogger.UpdateStatuses(channelList)
+			print(str(len(responses)) + " call notifications to process.")
 
 			for response in responses:
 				channel = response[0]

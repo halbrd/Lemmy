@@ -203,3 +203,6 @@ def james(client, res, msg, params):
 
 def happening(client, res, msg, params):
 	client.send_message(msg.channel, "https://i.imgur.com/bYGOUHP.png")
+
+def ruseman(client, res, msg, params):
+	client.send_file(msg.channel, "pics/ruseman/" + random.choice(os.listdir("pics/ruseman/")))

@@ -9,4 +9,8 @@
 !userinfo [username] - Get some info about a user
 !channelinfo [channel name] - Get some info about a text channel
 !james [game tag] - Ping all the relevant users for a game
-&nbsp;&nbsp;&nbsp;&nbsp;-tags&nbsp;&nbsp;&nbsp;List all tags and associated users
+&nbsp;&nbsp;&nbsp;&nbsp;-tags&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;List all tags and associated users
+&nbsp;&nbsp;&nbsp;&nbsp;-join [tag]&nbsp;&nbsp;&nbsp;&nbsp;Subscribe to pings from the given tag
+&nbsp;&nbsp;&nbsp;&nbsp;-leave [tag]&nbsp;&nbsp;&nbsp;Unsubscribe from pings from the given tag
+!happening - Posts a high quality Ron Paul gif
+!ruseman - Posts a random statement of rusedness
