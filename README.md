@@ -1,6 +1,9 @@
 # Lemmy
 Your friendly neighbourhood Discord bot
 
+# Lemmy Reference Page
+Reference for the non-technical side of Lemmy can be found at http://lynq.me/lemmy/
+
 # Lemmy Basics
 LemmyBot.py - The central class that is Lemmy
 
