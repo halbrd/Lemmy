@@ -9,7 +9,6 @@ Put Lemmy on Github
 Lemmies Against Humanity
 Lemmafia
 Console log indentation
-Fix usernames with spaces as parameters
 Navigation buttons on this page
 [Emote] Spaghetti
 [Emote] Full Life Consequences

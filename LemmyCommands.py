@@ -10,6 +10,7 @@ from os import listdir
 from os.path import isfile, join
 import json
 import sqlite3
+import datetime
 
 def help(client, res, msg, params):
 	client.send_message(msg.channel, "http://lynq.me/lemmy")
@@ -28,11 +29,18 @@ def lenny(client, res, msg, params):
 		client.send_message(msg.channel, res.lenny)
 	elif flag == "-r":
 		client.send_message(msg.channel, RandomLenny.randomLenny())
+	#client.send_message(msg.channel, "This was sent without closing the script.")
 
 def logout(client, res, msg, params):
 	print("User with id " + str(msg.author.id) + " attempting to logout.")
 	if Lutils.IsAdmin(msg.author):
 		client.send_message(msg.channel, "Shutting down.")
+		client.logout()
+
+def restart(client, res, msg, params):
+	print("User with id " + str(msg.author.id) + " attempting to restart.")
+	if Lutils.IsAdmin(msg.author):
+		client.send_message(msg.channel, "Restarting.")
 		client.logout()
 
 def refresh(client, res, msg, params):
@@ -73,7 +81,15 @@ def userinfo(client, res, msg, params):
 		username = params[0]
 		user = Lutils.FindUserByName(msg.channel.server.members, username)
 		if user:
-			client.send_message(msg.channel, "**Username:** " + user.name + "\n**ID:** " + user.id + "\n**Avatar URL:** " + user.avatar_url())
+			message = "**Username:** " + user.name + "\n**ID:** " + user.id
+
+			balance = Lutils.GetLemmyCoinBalance(res, user)
+			if balance is not None:
+				message += "\n**LemmyCoin Balance:** L$" + str(balance)
+
+			message += "\n**Avatar URL:** " + user.avatar_url()
+
+			client.send_message(msg.channel, message)
 		else:
 			client.send_message(msg.channel, "User not found.")
 
@@ -146,7 +162,7 @@ def james(client, res, msg, params):
 							client.send_message(msg.channel, "New tag '" + split[0] + "' not created: No hash-separated display name was given.")
 						else:
 							tagName = split[0]
-							displayName = split[1].replace("_", " ")
+							displayName = split[1:]
 
 							if tagName in res.jamesDb:
 								client.send_message(msg.channel, "New tag '" + tagName + "' not created: Tag already exists.")
@@ -221,13 +237,71 @@ def register(client, res, msg, params):
 			else:
 				user = Lutils.FindUserById(msg.channel.server.members, userId)
 				if not user:
-					client.send_message(msg.channel, "User with id " + userId + " not registered to database: ID does not reference a Discord user.")
+					client.send_message(msg.channel, "User with id " + userId + " not registered to database: ID does not reference a Discord user on this server.")
 				else:
 					cursor.execute("INSERT INTO tblUser (UserId, LemmyCoinBalance) VALUES (?, 0)", (userId,))
 					res.sqlConnection.commit()
 					client.send_message(msg.channel, "User with id " + userId + " (" + user.mention() + ") successfully registered to database.")
 
-# def lemmycoin(client, res, msg, params):
-# 	flag = GetNthFlag(1, params)
-# 	if flag == "-balance":
-# 		
+def lemmycoin(client, res, msg, params):
+	flagpair = Lutils.GetNthFlagWith2Params(1, params)
+
+	if flagpair:
+		flag = flagpair[0]
+		param1 = flagpair[1]
+		param2 = flagpair[2]
+
+		if flag == "-balance":
+			user = None
+
+			if param1 is None:
+				user = msg.author
+			else:
+				targetUser = Lutils.FindUserByName(msg.channel.server.members, param1)
+				if targetUser is None:
+					client.send_message(msg.channel, "User '" + param1 + "' was not found on this Discord server.")
+				else:
+					user = targetUser
+
+			if user is not None:
+				balance = Lutils.GetLemmyCoinBalance(res, user)
+
+				if balance is None:
+					client.send_message(msg.channel, user.mention() + " does not have a LemmyCoin balance because they have not been registered in the database.")
+				else:
+					client.send_message(msg.channel, user.mention() + " has a LemmyCoin balance of L$" + str(balance) + ".")
+
+		elif flag == "-pay":
+			if param1 is not None:
+				target = Lutils.FindUserByName(msg.channel.server.members, param1)
+				if target is None:
+					client.send_message(msg.channel, "LemmyCoins not sent: User '" + param1 + "' was not found on this server.")
+				elif param2 is None:
+					client.send_message(msg.channel, "No LemmyCoins paid to " + target.name + ": No amount was specified.")
+				else:
+					try:
+						amount = float(param2)
+					except ValueError:
+						client.send_message(msg.channel, "No LemmyCoins paid to " + target.name + ": Amount was incorrectly formatted.")
+					else:
+						if amount <= 0:
+							client.send_message(msg.channel, "No LemmyCoins paid to " + target.name + ": Amount must be greater than zero.")
+						else:
+							cursor = res.sqlConnection.cursor()
+							cursor.execute("SELECT COUNT(*) FROM tblUser WHERE UserId = ?", (target.id,))
+							result = cursor.fetchone()[0]
+
+							if result == 0:
+								client.send_message(msg.channel, "No LemmyCoins paid to " + target.name + ": " + target.name + " has not been registered in the database.")
+							else:
+								cursor.execute("SELECT LemmyCoinBalance FROM tblUser WHERE UserId = ?", (msg.author.id,))
+								senderBalance = cursor.fetchone()[0]
+
+								if senderBalance < amount:
+									client.send_message(msg.channel, "No LemmyCoins paid to " + target.name + ": " + msg.author.mention() + " does not have enough LemmyCoins in their account to make the payment.")
+								else:
+									cursor.execute("UPDATE tblUser SET LemmyCoinBalance = LemmyCoinBalance - ? WHERE UserId = ?", (amount, msg.author.id))
+									cursor.execute("UPDATE tblUser SET LemmyCoinBalance = LemmyCoinBalance + ? WHERE UserId = ?", (amount, target.id))
+									cursor.execute("INSERT INTO tblLemmyCoinPayment (DateTime, SenderId, ReceiverId, Amount) VALUES (?, ?, ?, ?)", (datetime.datetime.now(), msg.author.id, target.id, amount))
+									res.sqlConnection.commit()
+									client.send_message(msg.channel, "**L$" + str(amount) + "** successfully sent to " + target.mention() + " by " + msg.author.mention() + ".")

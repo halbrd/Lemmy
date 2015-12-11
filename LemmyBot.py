@@ -34,8 +34,9 @@ class LemmyBot:
 			"happening": Lcmds.happening,
 			"ruseman": Lcmds.ruseman,
 			"register": Lcmds.register,
-			#"lemmycoin": Lcmds.lemmycoin,
+			"lemmycoin": Lcmds.lemmycoin,
 			"logout": Lcmds.logout
+			#"restart": Lcmds.restart
 		}
 
 		self.floodProtectors = {
@@ -74,12 +75,12 @@ class LemmyBot:
 		def on_message(msg):
 			if msg.content:
 				if msg.channel.is_private:
-					print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] " + msg.author.name + " => (private channel): " + msg.content)
+					print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] " + msg.author.name + " => (private channel): " + Lutils.RemoveUnicode(msg.content))
 				else:
-					print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] " + msg.author.name + " => " + msg.channel.name + ": " + msg.content)
+					print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] " + msg.author.name + " => " + msg.channel.name + ": " + Lutils.RemoveUnicode(msg.content))
 
 				if msg.content[0] == "!":
-					dmsg = Lutils.GetDecomposedMessage(msg.content)
+					dmsg = Lutils.ParseMessage(msg.content)
 
 					if dmsg.command in self.funcMap:
 						self.funcMap[dmsg.command](self.client, self.res, msg, dmsg.params)
