@@ -41,6 +41,15 @@ def GetNthFlagWith2Params(n, params):
 				n -= 1
 	return None
 
+def GetNthFlagWithAllParams(n, params):
+	for i in range(0, len(params)):
+		if params[i][0] == "-":
+			if n == 1:
+				return params[i:]
+			else:
+				n -= 1
+	return None
+
 def SendEmote(client, msg):
 	client.send_message(msg.channel, "__**" + msg.author.name + "**__")
 	client.send_file(msg.channel, "pics/emotes/" + msg.content + ".png")

@@ -157,12 +157,15 @@ def james(client, res, msg, params):
 					if not gameTag:
 						client.send_message(msg.channel, "No new tag created: No tag name was specified.")
 					else:
-						split = gameTag.split("#")
+						flagRecalc = Lutils.GetNthFlagWithAllParams(1, params)
+						flag = flagRecalc[0]
+						dataString = " ".join(flagRecalc[1:])
+						split = dataString.split("#")
 						if len(split) < 2:
 							client.send_message(msg.channel, "New tag '" + split[0] + "' not created: No hash-separated display name was given.")
 						else:
 							tagName = split[0]
-							displayName = split[1:]
+							displayName = split[1]
 
 							if tagName in res.jamesDb:
 								client.send_message(msg.channel, "New tag '" + tagName + "' not created: Tag already exists.")
