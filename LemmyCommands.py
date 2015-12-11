@@ -31,7 +31,7 @@ def lenny(client, res, msg, params):
 
 def logout(client, res, msg, params):
 	print("User with id " + str(msg.author.id) + " attempting to logout.")
-	if msg.author.id == "77041679726551040":
+	if Lutils.IsAdmin(msg.author):
 		client.send_message(msg.channel, "Shutting down.")
 		client.logout()
 
@@ -193,10 +193,11 @@ def james(client, res, msg, params):
 		# No flags in message
 		else:
 			if len(params) > 0:
+				print("Params, no flags")
 				if params[0] in res.jamesDb:
 					response = "Pinging "
 					for userId in res.jamesDb[params[0]]:
-						user = Lutils.FindUserbyId(msg.channel.server.members, userId)
+						user = Lutils.FindUserById(msg.channel.server.members, userId)
 						if user is not None:
 							response += user.mention() + " "
 					response += "for " + res.jamesConverter[params[0]]
