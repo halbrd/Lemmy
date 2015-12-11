@@ -1,3 +1,5 @@
+import discord
+
 class DecomposedMessage:
 	def __init__(self, command, params):
 		self.command = command
@@ -45,3 +47,9 @@ def IsModOrAbove(member):
 
 def IsRole(role, member):
 	return role in [role.name for role in member.roles]
+
+def FindUserByName(members, username):
+	return discord.utils.find(lambda m: m.name == username, members)
+
+def FindUserById(members, userId):
+	return discord.utils.find(lambda m: m.id == userId, members)

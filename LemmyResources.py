@@ -2,6 +2,7 @@ import os
 from os import listdir
 from os.path import isfile, join
 import json
+import sqlite3
 
 class LemmyResources:
 	def __init__(self):
@@ -60,3 +61,10 @@ class LemmyResources:
 			print("ERROR loading JamesConverter! (" + str(e) + ")")
 		else:
 			print("JamesConverter loaded with " + str(len(self.jamesConverter)) + " games.")
+
+		try:
+			self.sqlConnection = sqlite3.connect("db/sqlite/lemmy.db")
+		except Exception as e:
+			print("ERROR connecting to database! (" + str(e) + ")")
+		else:
+			print("Database connection established.")

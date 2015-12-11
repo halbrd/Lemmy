@@ -9,6 +9,7 @@ import os
 from os import listdir
 from os.path import isfile, join
 import json
+import sqlite3
 
 def help(client, res, msg, params):
 	client.send_message(msg.channel, "http://lynq.me/lemmy")
@@ -70,7 +71,7 @@ def eightball(client, res, msg, params):
 def userinfo(client, res, msg, params):
 	if len(params) > 0:
 		username = params[0]
-		user = discord.utils.find(lambda m: m.name == username, msg.channel.server.members)
+		user = Lutils.FindUserByName(msg.channel.server.members, username)
 		if user:
 			client.send_message(msg.channel, "**Username:** " + user.name + "\n**ID:** " + user.id + "\n**Avatar URL:** " + user.avatar_url())
 		else:
@@ -99,7 +100,7 @@ def james(client, res, msg, params):
 				for key in res.jamesDb:
 					response += "\n" + key + " (" + res.jamesConverter[key] + ")"
 					for userId in res.jamesDb[key]:
-						user = discord.utils.find(lambda m: m.id == userId, msg.channel.server.members)
+						user = Lutils.FindUserById(msg.channel.server.members, userId)
 						response += "\n> " + user.name
 					response += "\n"
 				response += "```"
@@ -195,7 +196,7 @@ def james(client, res, msg, params):
 				if params[0] in res.jamesDb:
 					response = "Pinging "
 					for userId in res.jamesDb[params[0]]:
-						user = discord.utils.find(lambda m: m.id == userId, msg.channel.server.members)
+						user = Lutils.FindUserbyId(msg.channel.server.members, userId)
 						if user is not None:
 							response += user.mention() + " "
 					response += "for " + res.jamesConverter[params[0]]
@@ -206,3 +207,26 @@ def happening(client, res, msg, params):
 
 def ruseman(client, res, msg, params):
 	client.send_file(msg.channel, "pics/ruseman/" + random.choice(os.listdir("pics/ruseman/")))
+
+def register(client, res, msg, params):
+	if Lutils.IsAdmin(msg.author):
+		if len(params) > 0:
+			userId = params[0]
+			
+			cursor = res.sqlConnection.cursor()
+			cursor.execute("SELECT COUNT(*) FROM tblUser WHERE UserId = ?", (userId,))
+			if cursor.fetchone()[0] > 0:
+				client.send_message(msg.channel, "User with id " + userId + " not registered to database: User already exists in database.")
+			else:
+				user = Lutils.FindUserById(msg.channel.server.members, userId)
+				if not user:
+					client.send_message(msg.channel, "User with id " + userId + " not registered to database: ID does not reference a Discord user.")
+				else:
+					cursor.execute("INSERT INTO tblUser (UserId, LemmyCoinBalance) VALUES (?, 0)", (userId,))
+					res.sqlConnection.commit()
+					client.send_message(msg.channel, "User with id " + userId + " (" + user.mention() + ") successfully registered to database.")
+
+# def lemmycoin(client, res, msg, params):
+# 	flag = GetNthFlag(1, params)
+# 	if flag == "-balance":
+# 		
