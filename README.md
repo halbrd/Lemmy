@@ -26,3 +26,6 @@ hBot.py - The old, atrocious code
 /modules - Non-central imported Python files used by Lemmy
 
 /pics - Images used by Lemmy
+
+# Lemmy Licence
+Um... You can use Lemmy's code if you want. Just attribute somewhere if you copy lots of it and don't use it for evil.

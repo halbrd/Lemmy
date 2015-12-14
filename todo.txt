@@ -5,7 +5,6 @@ LemmyCoin
     Bounty Board
 Hybrid emotes
 Personalized flood protection/timeouts
-Put Lemmy on Github
 Lemmies Against Humanity
 Lemmafia
 Console log indentation

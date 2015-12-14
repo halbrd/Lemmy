@@ -242,7 +242,7 @@ def register(client, res, msg, params):
 				if not user:
 					client.send_message(msg.channel, "User with id " + userId + " not registered to database: ID does not reference a Discord user on this server.")
 				else:
-					cursor.execute("INSERT INTO tblUser (UserId, LemmyCoinBalance) VALUES (?, 0)", (userId,))
+					cursor.execute("INSERT INTO tblUser (UserId, LemmyCoinBalance) VALUES (?, 10)", (userId,))
 					res.sqlConnection.commit()
 					client.send_message(msg.channel, "User with id " + userId + " (" + user.mention() + ") successfully registered to database.")
 

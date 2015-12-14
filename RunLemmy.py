@@ -6,3 +6,4 @@ password = input("Enter password\n> ")
 
 lemmy = LemmyBot.LemmyBot(username, password)
 lemmy.Start()
+input("Lemmy run aborted.")
