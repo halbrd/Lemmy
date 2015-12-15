@@ -45,7 +45,11 @@ def GetNthFlagWithAllParams(n, params):
 	for i in range(0, len(params)):
 		if params[i][0] == "-":
 			if n == 1:
-				return params[i:]
+				ret = [params[i]]
+				while i+1 < len(params) and params[i+1][0] != "-":
+					ret.append(params[i+1])
+					i += 1
+				return ret
 			else:
 				n -= 1
 	return None

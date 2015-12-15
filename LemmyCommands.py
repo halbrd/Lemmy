@@ -158,22 +158,19 @@ def james(client, res, msg, params):
 						client.send_message(msg.channel, "No new tag created: No tag name was specified.")
 					else:
 						flagRecalc = Lutils.GetNthFlagWithAllParams(1, params)
-						flag = flagRecalc[0]
-						dataString = " ".join(flagRecalc[1:])
-						split = dataString.split("#")
-						if len(split) < 2:
-							client.send_message(msg.channel, "New tag '" + split[0] + "' not created: No hash-separated display name was given.")
+						if len(flagRecalc) < 3:
+							client.send_message(msg.channel, "New tag '" + flagRecalc[1] + "' not created: No display name was given.")
 						else:
-							tagName = split[0]
-							displayName = split[1]
+							tag = flagRecalc[1]
+							displayName = " ".join(flagRecalc[2:])
 
-							if tagName in res.jamesDb:
-								client.send_message(msg.channel, "New tag '" + tagName + "' not created: Tag already exists.")
+							if tag in res.jamesDb:
+								client.send_message(msg.channel, "New tag '" + tag + "' not created: Tag already exists.")
 							else:
 								update = True
-								res.jamesDb[tagName] = []
-								res.jamesConverter[tagName] = displayName
-								client.send_message(msg.channel, "New tag '" + tagName + "' successfully created with display name '" + displayName + "'.")
+								res.jamesDb[tag] = []
+								res.jamesConverter[tag] = displayName
+								client.send_message(msg.channel, "New tag '" + tag + "' successfully created with display name '" + displayName + "'.")
 
 			elif flag == "-delete":
 				if not Lutils.IsModOrAbove(msg.author):
@@ -308,3 +305,6 @@ def lemmycoin(client, res, msg, params):
 									cursor.execute("INSERT INTO tblLemmyCoinPayment (DateTime, SenderId, ReceiverId, Amount) VALUES (?, ?, ?, ?)", (datetime.datetime.now(), msg.author.id, target.id, amount))
 									res.sqlConnection.commit()
 									client.send_message(msg.channel, "**L$" + str(amount) + "** successfully sent to " + target.mention() + " by " + msg.author.mention() + ".")
+
+def nicememe(client, res, msg, params):
+	client.send_file(msg.channel, "pics/nicememe.png")

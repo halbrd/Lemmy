@@ -14,3 +14,4 @@
 &nbsp;&nbsp;&nbsp;&nbsp;-leave [tag]&nbsp;&nbsp;&nbsp;Unsubscribe from pings from the given tag
 !happening - Posts a high quality Ron Paul gif
 !ruseman - Posts a random statement of rusedness
+!nicememe - Posts Obama's Memeage Seal of Approval

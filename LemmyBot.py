@@ -35,6 +35,7 @@ class LemmyBot:
 			"ruseman": Lcmds.ruseman,
 			"register": Lcmds.register,
 			"lemmycoin": Lcmds.lemmycoin,
+			"nicememe": Lcmds.nicememe,
 			"logout": Lcmds.logout
 			#"restart": Lcmds.restart
 		}
