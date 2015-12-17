@@ -83,8 +83,8 @@ class LemmyBot:
 				if msg.content[0] == "!":
 					dmsg = Lutils.ParseMessage(msg.content)
 
-					if dmsg.command in self.funcMap:
-						self.funcMap[dmsg.command](self.client, self.res, msg, dmsg.params)
+					if dmsg.command.lower() in self.funcMap:
+						self.funcMap[dmsg.command.lower()](self.client, self.res, msg, dmsg.params)
 
 				elif msg.content in self.res.emotes and msg.author != self.client.user:
 					if self.floodProtectors["emote"].Ready(msg.author.id):

@@ -2,12 +2,13 @@
 [Major] Lemmy Radio
 Reminders
 LemmyCoin
-    Bounty Board
+&nbsp;&nbsp;&nbsp;&nbsp;Bounty Board
+!vote
 Hybrid emotes
 Personalized flood protection/timeouts
 Lemmies Against Humanity
 Lemmafia
 Console log indentation
 Navigation buttons on this page
-[Emote] Spaghetti
+TogetherTube command
 [Emote] Full Life Consequences
