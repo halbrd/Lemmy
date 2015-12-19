@@ -308,3 +308,12 @@ def lemmycoin(client, res, msg, params):
 
 def nicememe(client, res, msg, params):
 	client.send_file(msg.channel, "pics/nicememe.png")
+
+def channelids(client, res, msg, params):
+	ret = ""
+	for channel in msg.channel.server.channels:
+		ret += channel.name + " : " + channel.id + "\n"
+	client.send_message(msg.channel, ret)
+
+def serverid(client, res, msg, params):
+	client.send_message(msg.channel, msg.channel.server.name + ": " + msg.channel.server.id)

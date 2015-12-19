@@ -25,7 +25,7 @@ class LemmyBot:
 			"stickers": Lcmds.stickers,
 			"lenny": Lcmds.lenny,
 			"refresh": Lcmds.refresh,
-			"F5": Lcmds.refresh,
+			"f5": Lcmds.refresh,
 			"correct": Lcmds.correct,
 			"8ball": Lcmds.eightball,
 			"userinfo": Lcmds.userinfo,
@@ -36,6 +36,8 @@ class LemmyBot:
 			"register": Lcmds.register,
 			"lemmycoin": Lcmds.lemmycoin,
 			"nicememe": Lcmds.nicememe,
+			"channelids": Lcmds.channelids,
+			"serverid": Lcmds.serverid,
 			"logout": Lcmds.logout
 			#"restart": Lcmds.restart
 		}
@@ -63,6 +65,9 @@ class LemmyBot:
 			print("Successfully logged in.")
 			print("USERNAME: " + username)
 			print("PASSWORD: " + "".join(["*" for x in password]))
+
+			#for channel in 
+
 			print("\n==========================\n= Listening For Messages =\n==========================\n")
 
 			channelList = []
@@ -118,7 +123,12 @@ class LemmyBot:
 			for response in responses:
 				channel = response[0]
 				timeString = response[1]
-				self.client.send_message(discord.utils.find(lambda m: m.name == "lemmybot", channel.server.channels), "Call ended in " + Lutils.StripUnicode(channel.name).strip() + ", duration " + timeString)
+
+				if channel.server.id in self.res.voiceToTextChannelMaps:
+					textChannelId = self.res.voiceToTextChannelMaps[channel.server.id][channel.id]
+					if textChannelId is not None:
+						textChannel = discord.utils.find(lambda m: m.id == textChannelId, channel.server.channels)
+						self.client.send_message(textChannel if textChannel is not None else channel.server.get_default_channel(), "Call ended in " + Lutils.StripUnicode(channel.name).strip() + ", duration " + timeString)
 
 	def Start(self):
 		self.client.run()
