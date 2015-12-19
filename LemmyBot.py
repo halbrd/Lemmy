@@ -50,7 +50,7 @@ class LemmyBot:
 		self.callLogger = None
 
 		self.client = discord.Client()
-		print("\n========================\n= Logging Into Discord =\n========================\n")
+		print(Lutils.TitleBox("Logging Into Discord"))
 		
 		print("Attempting to log in.")
 		try:
@@ -66,9 +66,49 @@ class LemmyBot:
 			print("USERNAME: " + username)
 			print("PASSWORD: " + "".join(["*" for x in password]))
 
-			#for channel in 
+			print(Lutils.TitleBox("Checking Channel Mapping"))
 
-			print("\n==========================\n= Listening For Messages =\n==========================\n")
+			warnings = False
+			for server in self.client.servers:
+
+				# Server hasn't been mapped at all
+				if server.id not in self.res.voiceToTextChannelMaps and server.id not in self.res.textToVoiceChannelMaps:
+					print("Warning! Server " + server.name + " does not have its voice or text channels mapped.")
+					warnings = True
+
+				# Server has had text channels mapped, but not voice channels
+				elif server.id not in self.res.voiceToTextChannelMaps:
+					print("Warning! Server " + server.name + " does not have its voice channels mapped.")
+					warnings = True
+					for channel in server.channels:
+						if channel.type == "text" and channel.id not in self.res.textToVoiceChannelMaps[server.id]:
+							print("  Warning! Server " + server.name + "'s text channel " + channel.name + " has not been mapped to a voice channel (or None).")
+
+				# Server has had voice channels mapped, but not text channels
+				elif server.id not in self.res.textToVoiceChannelMaps:
+					print("Warning! Server " + server.name + " does not have its text channels mapped.")
+					warnings = True
+					for channel in server.channels:
+						if channel.type == "voice" and channel.id not in self.res.voiceToTextChannelMaps[server.id]:
+							print("  Warning! Server " + server.name + "'s voice channel " + Lutils.StripUnicode(channel.name).strip() + " has not been mapped to a text channel (or None).")
+
+				# Server has had voice and text channels mapped
+				else:
+					print("Server " + server.name + " has its voice and text channels mapped.")
+					for channel in server.channels:
+						if channel.type == "text" and channel.id not in self.res.textToVoiceChannelMaps[server.id]:
+							print("Warning! Server " + server.name + "'s text channel " + channel.name + " has not been mapped to a voice channel (or None).")
+							warnings = True
+					for channel in server.channels:
+						if channel.type == "voice" and channel.id not in self.res.voiceToTextChannelMaps[server.id]:
+							print("Warning! Server " + server.name + "'s voice channel " + Lutils.StripUnicode(channel.name).strip() + " has not been mapped to a text channel (or None).")
+							warnings = True
+
+			if not warnings:
+				print("All channels of all servers have been mapped.")
+				
+
+			print(Lutils.TitleBox("Listening For Messages"))
 
 			channelList = []
 			for server in self.client.servers:

@@ -91,3 +91,6 @@ def GetLemmyCoinBalance(res, user):
 
 def RemoveUnicode(string):
 	return "".join([i if ord(i) < 128 else ' ' for i in string])
+
+def TitleBox(string):
+	return "\n" + "".join(["=" for _ in range(len(string) + 4)]) + "\n= " + string + " =\n" + "".join(["=" for _ in range(len(string) + 4)]) + "\n"

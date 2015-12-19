@@ -1,3 +1,7 @@
+# Lemmy's stuff
+import LemmyUtils as Lutils
+
+# Other stuff
 import os
 from os import listdir
 from os.path import isfile, join
@@ -17,7 +21,7 @@ class LemmyResources:
 
 
 	def Load(self):
-		print("\n=====================\n= Loading Resources =\n=====================\n")
+		print(Lutils.TitleBox("Loading Resources"))
 		
 		self.lenny = "( ͡° ͜ʖ ͡°)"
 		print("Loaded Lenny.")
@@ -86,7 +90,7 @@ class LemmyResources:
 
 		self.textToVoiceChannelMaps = {
 			"77041788564545536": { # Better Than Skype
-				"77041788564545536": "110179496002338816", # everything
+			 	"77041788564545536": "110179496002338816", # everything
 				"77046593114615808": "77050951277486080", # csgo
 				"77303335920611328": "77306055939325952", # leagueoflegends
 				"77683668360892416": "77683791056863232", # tdeacmc
