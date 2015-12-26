@@ -1,5 +1,6 @@
 [Major] Emote NASDAQ
 [Major] Lemmy Radio
+!togethertube
 Reminders
 LemmyCoin
 &nbsp;&nbsp;&nbsp;&nbsp;Bounty Board
@@ -11,4 +12,5 @@ Lemmafia
 Console log indentation
 Navigation buttons on this page
 TogetherTube command
+Add lemmy.db to .gitignore
 [Emote] Full Life Consequences

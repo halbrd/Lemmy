@@ -35,6 +35,7 @@ class LemmyBot:
 			"ruseman": Lcmds.ruseman,
 			"register": Lcmds.register,
 			"lemmycoin": Lcmds.lemmycoin,
+			"l$": Lcmds.lemmycoin,
 			"nicememe": Lcmds.nicememe,
 			"channelids": Lcmds.channelids,
 			"serverid": Lcmds.serverid,
@@ -55,8 +56,8 @@ class LemmyBot:
 		print("Attempting to log in.")
 		try:
 			self.client.login(username, password)
-		except:
-			print("ERROR logging into Discord!")
+		except Exception as e:
+			print("ERROR logging into Discord! (" + str(e) + ")")
 			input("Press any key to exit.\n")
 			quit()
 

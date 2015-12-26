@@ -126,29 +126,30 @@ def james(client, res, msg, params):
 				if not gameTag:
 					client.send_message(msg.channel, msg.author.mention() + " was not added to any tag: No tag was specified.")
 				else:
-					if gameTag in res.jamesDb:
+					if not gameTag in res.jamesDb:
+						client.send_message(msg.channel, msg.author.mention() + " was not added to '" + gameTag + "': No such tag exists.")
+					else:
 						if msg.author.id in res.jamesDb[gameTag]:
 							client.send_message(msg.channel, msg.author.mention() + " was not added to '" + gameTag + "': User is already in '" + gameTag + "'.")
 						else:
 							update = True
 							res.jamesDb[gameTag].append(msg.author.id)
 							client.send_message(msg.channel, msg.author.mention() + " was successfully added to '" + gameTag + "'.")
-					else:
-						client.send_message(msg.channel, msg.author.mention() + " was not added to '" + gameTag + "': No such tag exists.")
+						
 
 			elif flag == "-leave":
 				if not gameTag:
 					client.send_message(msg.channel, msg.author.mention() + " was not removed from any tag: No tag was specified.")
 				else:
-					if gameTag in res.jamesDb:
-						if msg.author.id in res.jamesDb[gameTag]:
+					if not gameTag in res.jamesDb:
+						client.send_message(msg.channel, msg.author.mention() + " was not removed from '" + gameTag + "': No such tag exists.")
+					else:
+						if not msg.author.id in res.jamesDb[gameTag]:
+							client.send_message(msg.channel, msg.author.mention() + " was not removed from '" + gameTag + "': User is not in '" + gameTag + "'.")
+						else:
 							update = True
 							res.jamesDb[gameTag] = [x for x in res.jamesDb[gameTag] if x != msg.author.id]
 							client.send_message(msg.channel, msg.author.mention() + " was successfully removed from '" + gameTag + "'.")
-						else:
-							client.send_message(msg.channel, msg.author.mention() + " was not removed from '" + gameTag + "': User is not in '" + gameTag + "'.")
-					else:
-						client.send_message(msg.channel, msg.author.mention() + " was not removed from '" + gameTag + "': No such tag exists.")
 
 			elif flag == "-create":
 				if not Lutils.IsModOrAbove(msg.author):
@@ -186,8 +187,6 @@ def james(client, res, msg, params):
 							client.send_message(msg.channel, "Tag '" + gameTag + "' successfully deleted.")
 						else:
 							client.send_message(msg.channel, "Tag '" + gameTag + "' not deleted: Tag does not exist.")
-							
-
 
 			if update:
 				try:
@@ -209,13 +208,13 @@ def james(client, res, msg, params):
 		# No flags in message
 		else:
 			if len(params) > 0:
-				print("Params, no flags")
 				if params[0] in res.jamesDb:
 					response = "Pinging "
 					for userId in res.jamesDb[params[0]]:
 						user = Lutils.FindUserById(msg.channel.server.members, userId)
 						if user is not None:
-							response += user.mention() + " "
+							if user.status != "offline" and user != msg.author:
+								response += user.mention() + " "
 					response += "for " + res.jamesConverter[params[0]]
 					client.send_message(msg.channel, response)
 
