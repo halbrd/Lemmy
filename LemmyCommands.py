@@ -224,23 +224,23 @@ def happening(client, res, msg, params):
 def ruseman(client, res, msg, params):
 	client.send_file(msg.channel, "pics/ruseman/" + random.choice(os.listdir("pics/ruseman/")))
 
-def register(client, res, msg, params):
-	if Lutils.IsAdmin(msg.author):
-		if len(params) > 0:
-			userId = params[0]
+# def register(client, res, msg, params):
+# 	if Lutils.IsAdmin(msg.author):
+# 		if len(params) > 0:
+# 			userId = params[0]
 			
-			cursor = res.sqlConnection.cursor()
-			cursor.execute("SELECT COUNT(*) FROM tblUser WHERE UserId = ?", (userId,))
-			if cursor.fetchone()[0] > 0:
-				client.send_message(msg.channel, "User with id " + userId + " not registered to database: User already exists in database.")
-			else:
-				user = Lutils.FindUserById(msg.channel.server.members, userId)
-				if not user:
-					client.send_message(msg.channel, "User with id " + userId + " not registered to database: ID does not reference a Discord user on this server.")
-				else:
-					cursor.execute("INSERT INTO tblUser (UserId, LemmyCoinBalance) VALUES (?, 10)", (userId,))
-					res.sqlConnection.commit()
-					client.send_message(msg.channel, "User with id " + userId + " (" + user.mention() + ") successfully registered to database.")
+# 			cursor = res.sqlConnection.cursor()
+# 			cursor.execute("SELECT COUNT(*) FROM tblUser WHERE UserId = ?", (userId,))
+# 			if cursor.fetchone()[0] > 0:
+# 				client.send_message(msg.channel, "User with id " + userId + " not registered to database: User already exists in database.")
+# 			else:
+# 				user = Lutils.FindUserById(msg.channel.server.members, userId)
+# 				if not user:
+# 					client.send_message(msg.channel, "User with id " + userId + " not registered to database: ID does not reference a Discord user on this server.")
+# 				else:
+# 					cursor.execute("INSERT INTO tblUser (UserId, LemmyCoinBalance) VALUES (?, 10)", (userId,))
+# 					res.sqlConnection.commit()
+# 					client.send_message(msg.channel, "User with id " + userId + " (" + user.mention() + ") successfully registered to database.")
 
 def lemmycoin(client, res, msg, params):
 	flagpair = Lutils.GetNthFlagWith2Params(1, params)
@@ -250,7 +250,7 @@ def lemmycoin(client, res, msg, params):
 		param1 = flagpair[1]
 		param2 = flagpair[2]
 
-		if flag == "-balance":
+		if flag == "-balance" or flag == "-b":
 			user = None
 
 			if param1 is None:
@@ -270,7 +270,7 @@ def lemmycoin(client, res, msg, params):
 				else:
 					client.send_message(msg.channel, user.mention() + " has a LemmyCoin balance of L$" + str(balance) + ".")
 
-		elif flag == "-pay":
+		elif flag == "-pay" or flag == "-p":
 			if param1 is not None:
 				target = Lutils.FindUserByName(msg.channel.server.members, param1)
 				if target is None:

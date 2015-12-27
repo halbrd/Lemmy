@@ -18,6 +18,7 @@ class LemmyResources:
 		self.jamesConverter = None
 		self.voiceToTextChannelMap = None
 		self.textToVoiceChannelMap = None
+		self.sqlConnection = None
 
 
 	def Load(self):

@@ -33,8 +33,8 @@ class LemmyBot:
 			"james": Lcmds.james,
 			"happening": Lcmds.happening,
 			"ruseman": Lcmds.ruseman,
-			"register": Lcmds.register,
 			"lemmycoin": Lcmds.lemmycoin,
+			"lc": Lcmds.lemmycoin,
 			"l$": Lcmds.lemmycoin,
 			"nicememe": Lcmds.nicememe,
 			"channelids": Lcmds.channelids,
@@ -67,8 +67,8 @@ class LemmyBot:
 			print("USERNAME: " + username)
 			print("PASSWORD: " + "".join(["*" for x in password]))
 
-			print(Lutils.TitleBox("Checking Channel Mapping"))
 
+			print(Lutils.TitleBox("Checking Channel Mapping"))
 			warnings = False
 			for server in self.client.servers:
 
@@ -107,16 +107,37 @@ class LemmyBot:
 
 			if not warnings:
 				print("All channels of all servers have been mapped.")
-				
 
-			print(Lutils.TitleBox("Listening For Messages"))
 
+			print(Lutils.TitleBox("Registering Users"))
+			members = []
+			for server in self.client.servers:
+				for member in server.members:
+					members.append(member)
+
+			cursor = self.res.sqlConnection.cursor()
+
+			for member in members:
+				cursor.execute("SELECT * FROM tblUser WHERE UserId = ?", (member.id,))
+				if len(cursor.fetchall()) == 0:
+					print("Registering new user '" + member.name + "'.")
+					cursor.execute("INSERT INTO tblUser VALUES (?, 10)", (member.id,))
+				self.res.sqlConnection.commit()
+
+			print(Lutils.TitleBox("Initializing Call Logger"))
 			channelList = []
 			for server in self.client.servers:
 				for channel in server.channels:
 					if channel.type == "voice":
 						channelList.append(channel)
 			self.callLogger = CallLogger(channelList)
+			print("Call Logger initialized with the following channels:")
+			for channel in channelList:
+				print("[" + Lutils.StripUnicode(channel.server.name) + "] " + Lutils.StripUnicode(channel.name))
+
+
+			print(Lutils.TitleBox("Listening For Messages"))
+
 
 		@self.client.event
 		def on_message(msg):
