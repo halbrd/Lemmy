@@ -1,3 +1,6 @@
+import logging
+logging.basicConfig(level=logging.INFO)
+
 username = "halbrd@outlook.com"
 
 import LemmyBot
