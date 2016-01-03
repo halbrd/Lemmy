@@ -12,6 +12,7 @@ from os.path import isfile, join
 import json
 import sqlite3
 import datetime
+from PIL import Image
 
 async def help(client, res, msg, params):
 	await client.send_message(msg.channel, "http://lynq.me/lemmy")
@@ -314,3 +315,28 @@ async def channelids(client, res, msg, params):
 
 async def serverid(client, res, msg, params):
 	await client.send_message(msg.channel, msg.channel.server.name + ": " + msg.channel.server.id)
+
+async def combine(client, res, msg, params):
+	# This command is deprecated, since it's a native feature of the bot
+	allEmotes = True
+	for param in params:
+		if param not in res.emotes and param not in res.stickers:
+			allEmotes = False
+
+	if allEmotes:
+		images = []
+		for param in params:
+			try:
+				images.append(Image.open("pics/emotes/" + param + ".png"))
+			except IOError:
+				images.append(Image.open("pics/stickers/" + param + ".png"))
+
+	Lutils.CombineImages(images)
+
+	await client.send_file(msg.channel, "pics/result.png")
+
+async def choose(client, res, msg, params):
+	options = " ".join(params).split(" or ")
+	options = [x for x in options if x != ""]
+	if len(options) > 0:
+		await client.send_message(msg.channel, msg.author.mention + "\n```\n" + random.choice(options) + "\n```")

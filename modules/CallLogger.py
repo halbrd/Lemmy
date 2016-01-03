@@ -1,4 +1,5 @@
 import datetime
+import discord
 
 class CallLogger:
 	def __init__(self, channels):

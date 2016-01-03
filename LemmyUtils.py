@@ -1,6 +1,7 @@
 import discord
 import asyncio
 import shlex
+from PIL import Image
 
 class DecomposedMessage:
 	def __init__(self, command, params):
@@ -95,3 +96,21 @@ def RemoveUnicode(string):
 
 def TitleBox(string):
 	return "\n" + "".join(["=" for _ in range(len(string) + 4)]) + "\n= " + string + " =\n" + "".join(["=" for _ in range(len(string) + 4)]) + "\n"
+
+def CombineImages(images):
+	width = 0
+	for image in images:
+		width += image.size[0]
+
+	height = max([image.size[1] for image in images])
+
+	result = Image.new("RGBA", (width, height))
+	
+	i = 0
+	horizontalPointer = 0
+	while i < len(images):
+		result.paste(images[i], (horizontalPointer, 0))
+		horizontalPointer += images[i].size[0]
+		i += 1
+
+	result.save("pics/result.png")

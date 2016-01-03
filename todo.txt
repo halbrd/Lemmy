@@ -6,12 +6,12 @@ Reminders
 LemmyCoin
 &nbsp;&nbsp;&nbsp;&nbsp;Bounty Board
 !vote
-Hybrid emotes
 Personalized flood protection/timeouts
 Lemmies Against Humanity
 Lemmafia
 Console log indentation
 Navigation buttons on this page
-TogetherTube command
-Add lemmy.db to .gitignore
+Change !serverid to !serverinfo
+Clean up hybrid-emote-related code
+Make /db strictly for instantial data (unique to each instance of a bot (move the lennies somewhere else))
 [Emote] Full Life Consequences

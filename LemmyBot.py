@@ -13,6 +13,10 @@ import discord
 import asyncio
 import datetime
 import codecs
+import shlex
+import os
+import re
+from PIL import Image
 
 class LemmyBot:
 	def __init__(self, username, password):
@@ -41,6 +45,7 @@ class LemmyBot:
 			"l$": Lcmds.lemmycoin,
 			"channelids": Lcmds.channelids,
 			"serverid": Lcmds.serverid,
+			"choose": Lcmds.choose,
 			"logout": Lcmds.logout
 			#"restart": Lcmds.restart
 		}
@@ -130,7 +135,6 @@ class LemmyBot:
 			for channel in channelList:
 				print("[" + Lutils.StripUnicode(channel.server.name) + "] " + Lutils.StripUnicode(channel.name.strip()))
 
-
 			print(Lutils.TitleBox("Listening For Messages"))
 
 
@@ -142,9 +146,11 @@ class LemmyBot:
 				else:
 					print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] " + msg.author.name + " => " + msg.channel.name + ": " + Lutils.RemoveUnicode(msg.content))
 
+				# Remove this later
 				if msg.content.startswith("!"):
 					await self.client.send_message(msg.channel, '"!" has been replaced by "?>"" as the command operator (eg. ?>lenny).')
-
+				#
+				
 				if msg.content.startswith(self.commandSymbol):
 					dmsg = Lutils.ParseMessage(msg.content[len(self.commandSymbol):])
 
@@ -164,6 +170,32 @@ class LemmyBot:
 						self.floodProtectors["sticker"].Sent(msg.author.id)
 					else:
 						await self.client.delete_message(msg)
+
+				else:
+					imageMatch = "("
+					imageMatch += "|".join(self.res.emotes)
+					imageMatch += "|".join(self.res.stickers)
+					imageMatch += ")"
+
+					if re.match(imageMatch + "( " + imageMatch + ")+", msg.content):
+						imageTerms = msg.content.split()
+						images = []
+						for imageTerm in imageTerms:
+							# I'm *really* sorry about these next 4 lines.
+							try:
+								images.append(Image.open("pics/emotes/" + imageTerm + ".png"))
+							except IOError:
+								images.append(Image.open("pics/stickers/" + imageTerm + ".png"))
+
+						# This saves the combined image as pics/result.png
+						Lutils.CombineImages(images)
+
+						await self.client.send_message(msg.channel, "__**" + msg.author.name + "**__")
+						await self.client.send_file(msg.channel, "pics/result.png")
+
+						os.remove("pics/result.png")
+
+
 
 			else:
 				if msg.channel.is_private:
