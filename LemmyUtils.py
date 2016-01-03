@@ -1,4 +1,5 @@
 import discord
+import asyncio
 import shlex
 
 class DecomposedMessage:
@@ -7,8 +8,8 @@ class DecomposedMessage:
 		self.params = params
 
 def ParseMessage(message):
-	if message[0] == "!":
-		message = message[1:]
+	# if message[0] == "!":
+	# 	message = message[1:]
 	decompArray = shlex.split(message)
 	decomp = DecomposedMessage(decompArray[0], decompArray[1:])
 
@@ -54,15 +55,15 @@ def GetNthFlagWithAllParams(n, params):
 				n -= 1
 	return None
 
-def SendEmote(client, msg):
-	client.send_message(msg.channel, "__**" + msg.author.name + "**__")
-	client.send_file(msg.channel, "pics/emotes/" + msg.content + ".png")
-	client.delete_message(msg)
+async def SendEmote(client, msg):
+	await client.send_message(msg.channel, "__**" + msg.author.name + "**__")
+	await client.send_file(msg.channel, "pics/emotes/" + msg.content + ".png")
+	await client.delete_message(msg)
 
-def SendSticker(client, msg):
-	client.send_message(msg.channel, "__**" + msg.author.name + "**__")
-	client.send_file(msg.channel, "pics/stickers/" + msg.content + ".png")
-	client.delete_message(msg)
+async def SendSticker(client, msg):
+	await client.send_message(msg.channel, "__**" + msg.author.name + "**__")
+	await client.send_file(msg.channel, "pics/stickers/" + msg.content + ".png")
+	await client.delete_message(msg)
 
 def StripUnicode(string):
 	stripped = [c for c in string if 0 < ord(c) < 127]

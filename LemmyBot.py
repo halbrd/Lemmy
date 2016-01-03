@@ -10,6 +10,7 @@ from CallLogger import CallLogger
 
 # Other stuff
 import discord
+import asyncio
 import datetime
 import codecs
 
@@ -17,6 +18,8 @@ class LemmyBot:
 	def __init__(self, username, password):
 		self.res = Lres.LemmyResources()
 		self.res.Load()
+
+		self.commandSymbol = "?>"
 
 		# Map of function names to their equivalent function pointers
 		self.funcMap = {
@@ -36,7 +39,6 @@ class LemmyBot:
 			"lemmycoin": Lcmds.lemmycoin,
 			"lc": Lcmds.lemmycoin,
 			"l$": Lcmds.lemmycoin,
-			"nicememe": Lcmds.nicememe,
 			"channelids": Lcmds.channelids,
 			"serverid": Lcmds.serverid,
 			"logout": Lcmds.logout
@@ -51,18 +53,11 @@ class LemmyBot:
 		self.callLogger = None
 
 		self.client = discord.Client()
-		print(Lutils.TitleBox("Logging Into Discord"))
-		
-		print("Attempting to log in.")
-		try:
-			self.client.login(username, password)
-		except Exception as e:
-			print("ERROR logging into Discord! (" + str(e) + ")")
-			input("Press any key to exit.\n")
-			quit()
+
+		print(Lutils.TitleBox("Registering Events"))
 
 		@self.client.event
-		def on_ready():
+		async def on_ready():
 			print("Successfully logged in.")
 			print("USERNAME: " + username)
 			print("PASSWORD: " + "".join(["*" for x in password]))
@@ -82,7 +77,7 @@ class LemmyBot:
 					print("Warning! Server " + server.name + " does not have its voice channels mapped.")
 					warnings = True
 					for channel in server.channels:
-						if channel.type == "text" and channel.id not in self.res.textToVoiceChannelMaps[server.id]:
+						if channel.type == discord.ChannelType.text and channel.id not in self.res.textToVoiceChannelMaps[server.id]:
 							print("  Warning! Server " + server.name + "'s text channel " + channel.name + " has not been mapped to a voice channel (or None).")
 
 				# Server has had voice channels mapped, but not text channels
@@ -90,18 +85,18 @@ class LemmyBot:
 					print("Warning! Server " + server.name + " does not have its text channels mapped.")
 					warnings = True
 					for channel in server.channels:
-						if channel.type == "voice" and channel.id not in self.res.voiceToTextChannelMaps[server.id]:
+						if channel.type == discord.ChannelType.voice and channel.id not in self.res.voiceToTextChannelMaps[server.id]:
 							print("  Warning! Server " + server.name + "'s voice channel " + Lutils.StripUnicode(channel.name).strip() + " has not been mapped to a text channel (or None).")
 
 				# Server has had voice and text channels mapped
 				else:
 					print("Server " + server.name + " has its voice and text channels mapped.")
 					for channel in server.channels:
-						if channel.type == "text" and channel.id not in self.res.textToVoiceChannelMaps[server.id]:
+						if channel.type == discord.ChannelType.text and channel.id not in self.res.textToVoiceChannelMaps[server.id]:
 							print("Warning! Server " + server.name + "'s text channel " + channel.name + " has not been mapped to a voice channel (or None).")
 							warnings = True
 					for channel in server.channels:
-						if channel.type == "voice" and channel.id not in self.res.voiceToTextChannelMaps[server.id]:
+						if channel.type == discord.ChannelType.voice and channel.id not in self.res.voiceToTextChannelMaps[server.id]:
 							print("Warning! Server " + server.name + "'s voice channel " + Lutils.StripUnicode(channel.name).strip() + " has not been mapped to a text channel (or None).")
 							warnings = True
 
@@ -128,44 +123,47 @@ class LemmyBot:
 			channelList = []
 			for server in self.client.servers:
 				for channel in server.channels:
-					if channel.type == "voice":
+					if channel.type == discord.ChannelType.voice:
 						channelList.append(channel)
 			self.callLogger = CallLogger(channelList)
 			print("Call Logger initialized with the following channels:")
 			for channel in channelList:
-				print("[" + Lutils.StripUnicode(channel.server.name) + "] " + Lutils.StripUnicode(channel.name))
+				print("[" + Lutils.StripUnicode(channel.server.name) + "] " + Lutils.StripUnicode(channel.name.strip()))
 
 
 			print(Lutils.TitleBox("Listening For Messages"))
 
 
 		@self.client.event
-		def on_message(msg):
+		async def on_message(msg):
 			if msg.content:
 				if msg.channel.is_private:
 					print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] " + msg.author.name + " => (private channel): " + Lutils.RemoveUnicode(msg.content))
 				else:
 					print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] " + msg.author.name + " => " + msg.channel.name + ": " + Lutils.RemoveUnicode(msg.content))
 
-				if msg.content[0] == "!":
-					dmsg = Lutils.ParseMessage(msg.content)
+				if msg.content.startswith("!"):
+					await self.client.send_message(msg.channel, '"!" has been replaced by "?>"" as the command operator (eg. ?>lenny).')
+
+				if msg.content.startswith(self.commandSymbol):
+					dmsg = Lutils.ParseMessage(msg.content[len(self.commandSymbol):])
 
 					if dmsg.command.lower() in self.funcMap:
-						self.funcMap[dmsg.command.lower()](self.client, self.res, msg, dmsg.params)
+						await self.funcMap[dmsg.command.lower()](self.client, self.res, msg, dmsg.params)
 
 				elif msg.content in self.res.emotes and msg.author != self.client.user:
 					if self.floodProtectors["emote"].Ready(msg.author.id):
-						Lutils.SendEmote(self.client, msg)
+						await Lutils.SendEmote(self.client, msg)
 						self.floodProtectors["emote"].Sent(msg.author.id)
 					else:
-						self.client.delete_message(msg)
+						await self.client.delete_message(msg)
 
 				elif msg.content in self.res.stickers and msg.author != self.client.user:
 					if self.floodProtectors["sticker"].Ready(msg.author.id):
-						Lutils.SendSticker(self.client, msg)
+						await Lutils.SendSticker(self.client, msg)
 						self.floodProtectors["sticker"].Sent(msg.author.id)
 					else:
-						self.client.delete_message(msg)
+						await self.client.delete_message(msg)
 
 			else:
 				if msg.channel.is_private:
@@ -174,11 +172,11 @@ class LemmyBot:
 					print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] " + msg.author.name + " => " + msg.channel.name + ": (Non-text message or file)")
 
 		@self.client.event
-		def on_voice_state_update(member):
+		async def on_voice_state_update(before, after):
 			channelList = []
 			for server in self.client.servers:
 				for channel in server.channels:
-					if channel.type == "voice":
+					if channel.type == discord.ChannelType.voice:
 						channelList.append(channel)
 			responses = self.callLogger.UpdateStatuses(channelList)
 
@@ -190,7 +188,14 @@ class LemmyBot:
 					textChannelId = self.res.voiceToTextChannelMaps[channel.server.id][channel.id]
 					if textChannelId is not None:
 						textChannel = discord.utils.find(lambda m: m.id == textChannelId, channel.server.channels)
-						self.client.send_message(textChannel if textChannel is not None else channel.server.get_default_channel(), "Call ended in " + Lutils.StripUnicode(channel.name).strip() + ", duration " + timeString)
+						await self.client.send_message(textChannel if textChannel is not None else channel.server.get_default_channel(), "Call ended in " + Lutils.StripUnicode(channel.name).strip() + ", duration " + timeString)
 
-	def Start(self):
-		self.client.run()
+		print(Lutils.TitleBox("Logging Into Discord"))
+		
+		print("Attempting to log in.")
+		try:
+			self.client.run(username, password)
+		except Exception as e:
+			print("ERROR logging into Discord! (" + str(e) + ")")
+			input("Press enter to exit.\n")
+			quit()

@@ -1,12 +1,11 @@
 import logging
 logging.basicConfig(level=logging.INFO)
 
-username = "halbrd@outlook.com"
-
 import LemmyBot
 
-password = input("Enter password\n> ")
+with open("credentials.txt") as f:
+	username = f.readline().strip()
+	password = f.readline().strip()
 
 lemmy = LemmyBot.LemmyBot(username, password)
-lemmy.Start()
 input("Lemmy run aborted.")

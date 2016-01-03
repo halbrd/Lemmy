@@ -1,5 +1,6 @@
 [Major] Emote NASDAQ
 [Major] Lemmy Radio
+[Major] Implement command parsing with finite state machines
 !togethertube
 Reminders
 LemmyCoin

@@ -11,7 +11,7 @@ class CallLogger:
 		responses = []
 
 		for channel in channels:
-			if channel.type == "voice":
+			if channel.type == discord.ChannelType.voice:
 				if not channel.id in self.db:
 					self.db[channel.id] = None
 				else:
