@@ -14,217 +14,374 @@ import sqlite3
 import datetime
 from PIL import Image
 
-async def help(client, res, msg, params):
-	await client.send_message(msg.channel, "http://lynq.me/lemmy")
+async def help(self, msg, dmsg):
+	await self.client.send_message(msg.channel, "http://lynq.me/lemmy")
 
-async def emotes(client, res, msg, params):
-	await client.send_message(msg.channel, "http://lynq.me/lemmy/#emotes")
+async def emotes(self, msg, dmsg):
+	await self.client.send_message(msg.channel, "http://lynq.me/lemmy/#emotes")
 
-async def stickers(client, res, msg, params):
-	await client.send_message(msg.channel, "http://lynq.me/lemmy/#stickers")
+async def stickers(self, msg, dmsg):
+	await self.client.send_message(msg.channel, "http://lynq.me/lemmy/#stickers")
 
-async def lenny(client, res, msg, params):
-	flag = Lutils.GetNthFlag(1, params)
-	if flag == None:
-		await client.send_message(msg.channel, res.lennies[random.randint(0, len(res.lennies)-1)])
-	elif flag == "-og":
-		await client.send_message(msg.channel, res.lenny)
-	elif flag == "-r":
-		await client.send_message(msg.channel, RandomLenny.randomLenny())
-	#await client.send_message(msg.channel, "This was sent without closing the script.")
+async def lenny(self, msg, dmsg):
+	if len(dmsg.flags) == 0:
+		await self.client.send_message(msg.channel, self.res.lennies[random.randint(0, len(self.res.lennies)-1)])
+	elif dmsg.flags[0][0] == "-og":
+		await self.client.send_message(msg.channel, self.res.lenny)
+	elif dmsg.flags[0][0] == "-r":
+		await self.client.send_message(msg.channel, RandomLenny.randomLenny())
 
-async def logout(client, res, msg, params):
-	print("User with id " + str(msg.author.id) + " attempting to logout.")
-	if Lutils.IsAdmin(msg.author):
-		await client.send_message(msg.channel, "Shutting down.")
-		client.logout()
+async def logout(self, msg, dmsg):
+	print("User with id " + str(msg.author.id) + " attempting to initiate logout.")
+	if not Lutils.IsAdmin(msg.author):
+		await self.client.send_message(msg.channel, "Error: User is not admin.")
+	else:
+		await self.client.send_message(msg.channel, "Shutting down.")
+		await self.client.logout()
 
-async def restart(client, res, msg, params):
-	print("User with id " + str(msg.author.id) + " attempting to restart.")
-	if Lutils.IsAdmin(msg.author):
-		await client.send_message(msg.channel, "Restarting.")
-		client.logout()
-
-async def refresh(client, res, msg, params):
+async def refresh(self, msg, dmsg):
 	refreshedEmotes = [ os.path.splitext(f)[0] for f in listdir("pics/emotes") if isfile(join("pics/emotes",f)) ]
 	refreshedStickers = [ os.path.splitext(f)[0] for f in listdir("pics/stickers") if isfile(join("pics/stickers",f)) ]
 
-	newEmotes = [item for item in refreshedEmotes if item not in res.emotes]
-	newStickers = [item for item in refreshedStickers if item not in res.stickers]
+	newEmotes = [item for item in refreshedEmotes if item not in self.res.emotes]
+	newStickers = [item for item in refreshedStickers if item not in self.res.stickers]
 
-	res.emotes = refreshedEmotes
-	res.stickers = refreshedStickers
+	self.res.emotes = refreshedEmotes
+	self.res.stickers = refreshedStickers
 
 	if len(newEmotes) > 0:
-		await client.send_message(msg.channel, "__**New emotes:**__")
+		await self.client.send_message(msg.channel, "__**New emotes:**__")
 
 		for emote in newEmotes:
-			await client.send_message(msg.channel, emote)
-			await client.send_file(msg.channel, "pics/emotes/" + emote + ".png")
+			await self.client.send_message(msg.channel, emote)
+			await self.client.send_file(msg.channel, "pics/emotes/" + emote + ".png")
 
 	if len(newStickers) > 0:
-		await client.send_message(msg.channel, "__**New stickers:**__")
+		await self.client.send_message(msg.channel, "__**New stickers:**__")
 
 		for sticker in newStickers:
-			await client.send_message(msg.channel, sticker)
-			await client.send_file(msg.channel, "pics/stickers/" + sticker + ".png")
+			await self.client.send_message(msg.channel, sticker)
+			await self.client.send_file(msg.channel, "pics/stickers/" + sticker + ".png")
 
-	client.delete_message(msg)
+	await self.client.delete_message(msg)
 
-async def correct(client, res, msg, params):
-	await client.send_message(msg.channel, "https://youtu.be/OoZN3CAVczs")
+async def correct(self, msg, dmsg):
+	await self.client.send_message(msg.channel, "https://youtu.be/OoZN3CAVczs")
 
-async def eightball(client, res, msg, params):
+async def eightball(self, msg, dmsg):
 	responses = ["It is certain.", "It is decidedly so.", "Without a doubt.", "Yes, definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Signs point to yes.", "Reply hazy try again.", "Ask again later.", "Better not tell you now.", "Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very doubtful."]
-	await client.send_message(msg.channel, msg.author.mention + " :8ball: " + responses[random.randint(0, len(responses)-1)])
+	await self.client.send_message(msg.channel, msg.author.mention + " :8ball: " + random.choice(responses))
 
-async def userinfo(client, res, msg, params):
-	if len(params) > 0:
-		username = params[0]
+async def userinfo(self, msg, dmsg):
+	if len(dmsg.params) > 0:
+		username = dmsg.params[0]
 		user = Lutils.FindUserByName(msg.channel.server.members, username)
-		if user:
-			message = "**Username:** " + user.name + "\n**ID:** " + user.id
+		if not user:
+			await self.client.send_message(msg.channel, "User not found.")
+		else:
+			message = "**Username:** " + user.name + "\n**ID:** " + user.id + "\n**Join date:** " + str(user.joined_at)
 
-			balance = Lutils.GetLemmyCoinBalance(res, user)
+			balance = Lutils.GetLemmyCoinBalance(self.res, user)
 			if balance is not None:
 				message += "\n**LemmyCoin Balance:** L$" + str(balance)
 
-			message += "\n**Avatar URL:** " + user.avatar_url()
+			message += "\n**Avatar URL:** " + user.avatar_url
 
-			await client.send_message(msg.channel, message)
-		else:
-			await client.send_message(msg.channel, "User not found.")
+			if user.voice_channel is not None:
+				message += "\nCurrently talking in " + user.voice_channel.mention + "."
 
-async def channelinfo(client, res, msg, params):
-	if len(params) > 0:
-		channelName = params[0]
+			# if user.game_id is not None:
+			# 	message += "\nCurrent playing " + str(user.game_id) + "."
+
+			await self.client.send_message(msg.channel, message)
+
+async def channelinfo(self, msg, dmsg):
+	if len(dmsg.params) > 0:
+		channelName = dmsg.params[0]
 		channel = discord.utils.find(lambda m: m.name == channelName, [x for x in msg.channel.server.channels if x.type == discord.ChannelType.text])
 		if channel:
-			await client.send_message(msg.channel, "**Channel name: **" + channel.mention + "\n**ID: **" + channel.id)
+			await self.client.send_message(msg.channel, "**Channel name: **" + channel.mention + "\n**ID: **" + channel.id)
 		else:
-			await client.send_message(msg.channel, "Channel not found.")
+			await self.client.send_message(msg.channel, "Channel not found.")
 
-async def james(client, res, msg, params):
-	if len(params) > 0:
-		flagPair = Lutils.GetNthFlag(1, params)
-		
-		if flagPair:
-			update = False
-			flag = flagPair[0]
-			gameTag = flagPair[1]
+async def james(self, msg, dmsg):
+	if len(dmsg.params) > 0:
+		if dmsg.params[0] in self.res.jamesDb:
+			response = msg.author.mention  + " pinging "
+			for userId in self.res.jamesDb[dmsg.params[0]]:
+				user = Lutils.FindUserById(msg.channel.server.members, userId)
+				if user is not None:
+					if user.status != discord.Status.offline and user != msg.author:
+						response += user.mention + " "
+			response += "for " + self.res.jamesConverter[dmsg.params[0]]
+			await self.client.send_message(msg.channel, response)
 
-			if flag == "-tags":
-				response = "```"
-				for key in res.jamesDb:
-					response += "\n" + key + " (" + res.jamesConverter[key] + ")"
-					for userId in res.jamesDb[key]:
-						user = Lutils.FindUserById(msg.channel.server.members, userId)
-						response += "\n> " + user.name
-					response += "\n"
-				response += "```"
-				await client.send_message(msg.channel, response)
+	for fullFlag in dmsg.flags:
+		flag = fullFlag[0]
+		flagParams = fullFlag[1:] if len(fullFlag) > 1 else []
+		update = False
 
-			elif flag == "-join":
-				if not gameTag:
-					await client.send_message(msg.channel, msg.author.mention + " was not added to any tag: No tag was specified.")
+		if flag == "-tags":
+			response = "```"
+			for key in self.res.jamesDb:
+				response += "\n" + key + " (" + self.res.jamesConverter[key] + ")"
+				for userId in self.res.jamesDb[key]:
+					user = Lutils.FindUserById(msg.channel.server.members, userId)
+					response += "\n> " + user.name
+				response += "\n"
+			response += "```"
+			await self.client.send_message(msg.channel, response)
+
+		elif flag == "-join":
+			if len(flagParams) == 0:
+				await self.client.send_message(msg.channel, msg.author.mention + " was not added to any tag: No tag was specified.")
+			else:
+				gameTag = flagParams[0]
+				if not gameTag in self.res.jamesDb:
+					await self.client.send_message(msg.channel, msg.author.mention + " was not added to '" + gameTag + "': No such tag exists.")
 				else:
-					if not gameTag in res.jamesDb:
-						await client.send_message(msg.channel, msg.author.mention + " was not added to '" + gameTag + "': No such tag exists.")
+					if msg.author.id in self.res.jamesDb[gameTag]:
+						await self.client.send_message(msg.channel, msg.author.mention + " was not added to '" + gameTag + "': User is already in '" + gameTag + "'.")
 					else:
-						if msg.author.id in res.jamesDb[gameTag]:
-							await client.send_message(msg.channel, msg.author.mention + " was not added to '" + gameTag + "': User is already in '" + gameTag + "'.")
+						update = True
+						self.res.jamesDb[gameTag].append(msg.author.id)
+						await self.client.send_message(msg.channel, msg.author.mention + " was successfully added to '" + gameTag + "'.")
+					
+		elif flag == "-leave":
+			if len(flagParams) == 0:
+				await self.client.send_message(msg.channel, msg.author.mention + " was not removed from any tag: No tag was specified.")
+			else:
+				gameTag = flagParams[0]
+				if not gameTag in self.res.jamesDb:
+					await self.client.send_message(msg.channel, msg.author.mention + " was not removed from '" + gameTag + "': No such tag exists.")
+				else:
+					if not msg.author.id in self.res.jamesDb[gameTag]:
+						await self.client.send_message(msg.channel, msg.author.mention + " was not removed from '" + gameTag + "': User is not in '" + gameTag + "'.")
+					else:
+						update = True
+						self.res.jamesDb[gameTag] = [x for x in self.res.jamesDb[gameTag] if x != msg.author.id]
+						await self.client.send_message(msg.channel, msg.author.mention + " was successfully removed from '" + gameTag + "'.")
+
+		elif flag == "-create":
+			if not Lutils.IsModOrAbove(msg.author):
+				await self.client.send_message(msg.channel, "No new tag created: User is not moderator or above.")
+			else:
+				if len(flagParams) == 0:
+					await self.client.send_message(msg.channel, "No new tag created: No tag name was specified.")
+				else:
+					if len(flagParams) == 1:
+						await self.client.send_message(msg.channel, "New tag '" + flagParams[0] + "' not created: No display name was given.")
+					else:
+						gameTag = flagParams[0]
+						displayName = " ".join(flagParams[1:])
+
+						if gameTag in self.res.jamesDb:
+							await self.client.send_message(msg.channel, "New tag '" + gameTag + "' not created: Tag already exists.")
 						else:
 							update = True
-							res.jamesDb[gameTag].append(msg.author.id)
-							await client.send_message(msg.channel, msg.author.mention + " was successfully added to '" + gameTag + "'.")
-						
+							self.res.jamesDb[gameTag] = []
+							self.res.jamesConverter[gameTag] = displayName
+							await self.client.send_message(msg.channel, "New tag '" + gameTag + "' successfully created with display name '" + displayName + "'.")
 
-			elif flag == "-leave":
-				if not gameTag:
-					await client.send_message(msg.channel, msg.author.mention + " was not removed from any tag: No tag was specified.")
+		elif flag == "-delete":
+			if not Lutils.IsModOrAbove(msg.author):
+				await self.client.send_message(msg.channel, "No tag deleted: User is not moderator or above.")
+			else:
+				if len(flagParams) == 0:
+					await self.client.send_message(msg.channel, "No tag deleted: No tag name was specified.")
 				else:
-					if not gameTag in res.jamesDb:
-						await client.send_message(msg.channel, msg.author.mention + " was not removed from '" + gameTag + "': No such tag exists.")
+					gameTag = flagParams[0]
+					if not gameTag in self.res.jamesDb:
+						await self.client.send_message(msg.channel, "Tag '" + gameTag + "' not deleted: Tag does not exist.")
 					else:
-						if not msg.author.id in res.jamesDb[gameTag]:
-							await client.send_message(msg.channel, msg.author.mention + " was not removed from '" + gameTag + "': User is not in '" + gameTag + "'.")
-						else:
-							update = True
-							res.jamesDb[gameTag] = [x for x in res.jamesDb[gameTag] if x != msg.author.id]
-							await client.send_message(msg.channel, msg.author.mention + " was successfully removed from '" + gameTag + "'.")
+						update = True
+						self.res.jamesDb.pop(gameTag, None)
+						self.res.jamesConverter.pop(gameTag, None)
+						await self.client.send_message(msg.channel, "Tag '" + gameTag + "' successfully deleted.")						
 
-			elif flag == "-create":
-				if not Lutils.IsModOrAbove(msg.author):
-					await client.send_message(msg.channel, "No new tag created: User is not moderator or above.")
+		if update:
+			try:
+				with open("db/jamesDb.json", "w") as f:
+					json.dump(self.res.jamesDb, f)
+			except Exception as e:
+				print("ERROR updating JamesDb! (" + str(e) + ")")
+			else:
+				print("JamesDb updated with " + str(len(self.res.jamesDb)) + " games.")
+
+			try:
+				with open("db/jamesConverter.json", "w") as f:
+					json.dump(self.res.jamesConverter, f)
+			except Exception as e:
+				print("ERROR updating JamesConverter! (" + str(e) + ")")
+			else:
+				print("JamesConverter updated with " + str(len(self.res.jamesConverter)) + " games.")
+
+async def happening(self, msg, dmsg):
+	await self.client.send_message(msg.channel, "https://i.imgur.com/bYGOUHP.png")
+
+async def ruseman(self, msg, dmsg):
+	await self.client.send_file(msg.channel, "pics/ruseman/" + random.choice(os.listdir("pics/ruseman/")))
+
+async def lemmycoin(self, msg, dmsg):
+	for fullFlag in dmsg.flags:
+		flag = fullFlag[0]
+		param1 = fullFlag[1] if len(fullFlag) > 1 else None
+		param2 = fullFlag[2] if len(fullFlag) > 2 else None
+
+		if flag == "-balance" or flag == "-b":
+			user = None
+
+			if param1 is None:
+				user = msg.author
+			else:
+				targetUser = Lutils.FindUserByName(msg.channel.server.members, param1)
+				if targetUser is None:
+					await self.client.send_message(msg.channel, "User '" + param1 + "' was not found on this Discord server.")
 				else:
-					if not gameTag:
-						await client.send_message(msg.channel, "No new tag created: No tag name was specified.")
-					else:
-						flagRecalc = Lutils.GetNthFlagWithAllParams(1, params)
-						if len(flagRecalc) < 3:
-							await client.send_message(msg.channel, "New tag '" + flagRecalc[1] + "' not created: No display name was given.")
-						else:
-							tag = flagRecalc[1]
-							displayName = " ".join(flagRecalc[2:])
+					user = targetUser
 
-							if tag in res.jamesDb:
-								await client.send_message(msg.channel, "New tag '" + tag + "' not created: Tag already exists.")
+			if user is not None:
+				balance = Lutils.GetLemmyCoinBalance(self.res, user)
+
+				if balance is None:
+					await self.client.send_message(msg.channel, user.mention + " does not have a LemmyCoin balance because they have not been registered in the database.")
+				else:
+					await self.client.send_message(msg.channel, user.mention + " has a LemmyCoin balance of L$" + str(balance) + ".")
+
+		elif flag == "-pay" or flag == "-p":
+			if param1 is not None:
+				target = Lutils.FindUserByName(msg.channel.server.members, param1)
+				if target is None:
+					await self.client.send_message(msg.channel, "LemmyCoins not sent: User '" + param1 + "' was not found on this server.")
+				elif param2 is None:
+					await self.client.send_message(msg.channel, "No LemmyCoins paid to " + target.name + ": No amount was specified.")
+				else:
+					try:
+						amount = float(param2)
+					except ValueError:
+						await self.client.send_message(msg.channel, "No LemmyCoins paid to " + target.name + ": Amount was incorrectly formatted.")
+					else:
+						if amount <= 0:
+							await self.client.send_message(msg.channel, "No LemmyCoins paid to " + target.name + ": Amount must be greater than zero.")
+						else:
+							cursor = self.res.sqlConnection.cursor()
+							cursor.execute("SELECT COUNT(*) FROM tblUser WHERE UserId = ?", (target.id,))
+							result = cursor.fetchone()[0]
+
+							if result == 0:
+								await self.client.send_message(msg.channel, "No LemmyCoins paid to " + target.name + ": " + target.name + " has not been registered in the database.")
 							else:
-								update = True
-								res.jamesDb[tag] = []
-								res.jamesConverter[tag] = displayName
-								await client.send_message(msg.channel, "New tag '" + tag + "' successfully created with display name '" + displayName + "'.")
+								cursor.execute("SELECT LemmyCoinBalance FROM tblUser WHERE UserId = ?", (msg.author.id,))
+								senderBalance = cursor.fetchone()[0]
 
-			elif flag == "-delete":
-				if not Lutils.IsModOrAbove(msg.author):
-					await client.send_message(msg.channel, "No tag deleted: User is not moderator or above.")
-				else:
-					if not gameTag:
-						await client.send_message(msg.channel, "No tag deleted: No tag name was specified.")
-					else:
-						if gameTag in res.jamesDb:
-							update = True
-							res.jamesDb.pop(gameTag, None)
-							res.jamesConverter.pop(gameTag, None)
-							await client.send_message(msg.channel, "Tag '" + gameTag + "' successfully deleted.")
-						else:
-							await client.send_message(msg.channel, "Tag '" + gameTag + "' not deleted: Tag does not exist.")
+								if senderBalance < amount:
+									await self.client.send_message(msg.channel, "No LemmyCoins paid to " + target.name + ": " + msg.author.mention + " does not have enough LemmyCoins in their account to make the payment.")
+								else:
+									cursor.execute("UPDATE tblUser SET LemmyCoinBalance = LemmyCoinBalance - ? WHERE UserId = ?", (amount, msg.author.id))
+									cursor.execute("UPDATE tblUser SET LemmyCoinBalance = LemmyCoinBalance + ? WHERE UserId = ?", (amount, target.id))
+									cursor.execute("INSERT INTO tblLemmyCoinPayment (DateTime, SenderId, ReceiverId, Amount) VALUES (?, ?, ?, ?)", (datetime.datetime.now(), msg.author.id, target.id, amount))
+									self.res.sqlConnection.commit()
+									await self.client.send_message(msg.channel, "**L$" + str(amount) + "** successfully sent to " + target.mention + " by " + msg.author.mention + ".")
 
-			if update:
-				try:
-					with open("db/jamesDb.json", "w") as f:
-						json.dump(res.jamesDb, f)
-				except Exception as e:
-					print("ERROR updating JamesDb! (" + str(e) + ")")
-				else:
-					print("JamesDb updated with " + str(len(res.jamesDb)) + " games.")
+async def channelids(self, msg, dmsg):
+	ret = ""
+	for channel in msg.channel.server.channels:
+		ret += channel.name + " : " + channel.id + "\n"
+	await self.client.send_message(msg.channel, ret)
 
-				try:
-					with open("db/jamesConverter.json", "w") as f:
-						json.dump(res.jamesConverter, f)
-				except Exception as e:
-					print("ERROR updating JamesConverter! (" + str(e) + ")")
-				else:
-					print("JamesConverter updated with " + str(len(res.jamesConverter)) + " games.")
+async def serverinfo(self, msg, dmsg):
+	#await self.client.send_message(msg.channel, msg.channel.server.name + ": " + msg.channel.server.id)
+	server = msg.server
+	response = "**Name:** " + server.name
+	response += "\n**Region:** " + str(server.region)
+	response += "\n**Owner:** " + server.owner.name
+	response += "\n**Population:** " + str(len(server.members)) + " (" + str(len([member for member in server.members if member.status != discord.Status.offline])) + " currently online)"
+	response += "\n**Roles:** "
+	for role in server.roles:
+		response += "\n  " + ("everyone" if role.name == "@everyone" else role.name)
+	response += "\n**Default channel:** " + server.default_channel.name
+	response += "\n**AFK channel:** " + server.afk_channel.name
+	response += "\n**AFK timeout length:** " + str(server.afk_timeout) + " minutes"
+	response += "\n**Icon URL:** " + server.icon_url
 
-		# No flags in message
-		else:
-			if len(params) > 0:
-				if params[0] in res.jamesDb:
-					response = msg.author.mention  + " pinging "
-					for userId in res.jamesDb[params[0]]:
-						user = Lutils.FindUserById(msg.channel.server.members, userId)
-						if user is not None:
-							if user.status != "offline" and user != msg.author:
-								response += user.mention + " "
-					response += "for " + res.jamesConverter[params[0]]
-					await client.send_message(msg.channel, response)
 
-async def happening(client, res, msg, params):
-	await client.send_message(msg.channel, "https://i.imgur.com/bYGOUHP.png")
+	await self.client.send_message(msg.channel, response)
 
-async def ruseman(client, res, msg, params):
-	await client.send_file(msg.channel, "pics/ruseman/" + random.choice(os.listdir("pics/ruseman/")))
+async def choose(self, msg, dmsg):
+	params = ["OR" if x.lower() == "or" else x for x in dmsg.params]
+	options = " ".join(params).split(" OR ")
+	options = [x for x in options if x != ""]
+	if len(options) > 0:
+		# await self.client.send_message(msg.channel, msg.author.mention + "\n```\n" + random.choice(options) + "\n```")
+		await self.client.send_message(msg.channel, msg.author.mention + "   `" + random.choice(options) + "`")
+
+# async def radio(self, msg, dmsg):
+# 	# radioChannel = discord.utils.find(lambda m: m.id == "133010408377286656", msg.server.channels)
+# 	# if not radioChannel:
+# 	# 	await client.send_message(msg.channel, "Radio channel not found.")
+# 	# else:
+# 	# 	voice = await client.join_voice_channel(radioChannel)
+# 	# 	player = voice.create_ffmpeg_player("audio/songs/sirens_in_the_distance.mp3")
+# 	# 	player.start()
+
+# 	flag = Lutils.GetNthFlagWithAllParams(1, params)[0]
+# 	flagParams = Lutils.GetNthFlagWithAllParams(1, params)[1:]
+
+# 	if flag == "-quick":
+# 		musicDir = "N:\Cafe Del Mar"
+# 		await client.send_message(msg.channel, "Queueing directory " + musicDir)
+# 		res.radio.QueueDirectory(musicDir)
+# 		await client.send_message(msg.channel, "Directory queued. New queue size: " + str(res.radio.queue.qsize()))
+		
+# 		res.radio.ShuffleQueue()
+# 		await client.send_message(msg.channel, "Queue shuffled.")
+
+# 		radioChannel = res.radio.GetRadioChannel()
+# 		voice = await client.join_voice_channel(radioChannel)
+# 		res.radio.SetVoiceConnection(voice)
+# 		while not res.radio.queue.empty():
+# 			res.radio.StartNextSong()
+# 			#await client.send_message(res.radio.GetInfoChannel(), res.radio.GetCurrentSong())
+
+# 	elif flag == "-queuedir":
+# 		await client.send_message(msg.channel, "Queueing directory " + flagParams[0])
+# 		res.radio.QueueDirectory(flagParams[0])
+# 		await client.send_message(msg.channel, "Directory queued. New queue size: " + str(res.radio.queue.qsize()))
+
+# 	elif flag == "-shuffle":
+# 		res.radio.ShuffleQueue()
+# 		await client.send_message(msg.channel, "Queue shuffled.")
+
+# 	elif flag == "-play":
+# 		radioChannel = res.radio.GetRadioChannel()
+# 		voice = await client.join_voice_channel(radioChannel)
+# 		res.radio.SetVoiceConnection(voice)
+# 		while not res.radio.queue.empty():
+# 			res.radio.StartNextSong()
+# 			#await client.send_message(res.radio.GetInfoChannel(), res.radio.GetCurrentSong())
+
+# 	elif flag == "-stop":
+# 		res.radio.StopPlayer()
+
+# 	elif flag == "-pause":
+# 		res.radio.PausePlayer()
+
+# 	elif flag == "-resume":
+# 		res.radio.ResumePlayer()
+
+# 	elif flag == "-clear":
+# 		res.radio.ClearQueue()
+# 		await client.send_message(msg.channel, "Queue cleared. [DEBUG] len(queue)=" + str(res.radio.queue.qsize()))
+
+# 	# elif flag == "-nowplaying":
+# 	# 	await client.send_message(msg.channel, res.radio.GetCurrentSong())
+
+# 	elif flag == "-viewqueue":
+# 		await client.send_message(msg.channel, res.radio.ViewQueue())
+
+#####################
+# Archived commands #
+#####################
 
 # def register(client, res, msg, params):
 # 	if Lutils.IsAdmin(msg.author):
@@ -244,99 +401,25 @@ async def ruseman(client, res, msg, params):
 # 					res.sqlConnection.commit()
 # 					await client.send_message(msg.channel, "User with id " + userId + " (" + user.mention + ") successfully registered to database.")
 
-async def lemmycoin(client, res, msg, params):
-	flagpair = Lutils.GetNthFlagWith2Params(1, params)
+# async def combine(self, msg, dmsg):
+# 	# This command is deprecated, since it's a native feature of the bot
+# 	allEmotes = True
+# 	for param in params:
+# 		if param not in res.emotes and param not in res.stickers:
+# 			allEmotes = False
 
-	if flagpair:
-		flag = flagpair[0]
-		param1 = flagpair[1]
-		param2 = flagpair[2]
+# 	if allEmotes:
+# 		images = []
+# 		for param in params:
+# 			try:
+# 				images.append(Image.open("pics/emotes/" + param + ".png"))
+# 			except IOError:
+# 				images.append(Image.open("pics/stickers/" + param + ".png"))
 
-		if flag == "-balance" or flag == "-b":
-			user = None
+# 	Lutils.CombineImages(images)
 
-			if param1 is None:
-				user = msg.author
-			else:
-				targetUser = Lutils.FindUserByName(msg.channel.server.members, param1)
-				if targetUser is None:
-					await client.send_message(msg.channel, "User '" + param1 + "' was not found on this Discord server.")
-				else:
-					user = targetUser
+# 	await client.send_file(msg.channel, "pics/result.png")
 
-			if user is not None:
-				balance = Lutils.GetLemmyCoinBalance(res, user)
-
-				if balance is None:
-					await client.send_message(msg.channel, user.mention + " does not have a LemmyCoin balance because they have not been registered in the database.")
-				else:
-					await client.send_message(msg.channel, user.mention + " has a LemmyCoin balance of L$" + str(balance) + ".")
-
-		elif flag == "-pay" or flag == "-p":
-			if param1 is not None:
-				target = Lutils.FindUserByName(msg.channel.server.members, param1)
-				if target is None:
-					await client.send_message(msg.channel, "LemmyCoins not sent: User '" + param1 + "' was not found on this server.")
-				elif param2 is None:
-					await client.send_message(msg.channel, "No LemmyCoins paid to " + target.name + ": No amount was specified.")
-				else:
-					try:
-						amount = float(param2)
-					except ValueError:
-						await client.send_message(msg.channel, "No LemmyCoins paid to " + target.name + ": Amount was incorrectly formatted.")
-					else:
-						if amount <= 0:
-							await client.send_message(msg.channel, "No LemmyCoins paid to " + target.name + ": Amount must be greater than zero.")
-						else:
-							cursor = res.sqlConnection.cursor()
-							cursor.execute("SELECT COUNT(*) FROM tblUser WHERE UserId = ?", (target.id,))
-							result = cursor.fetchone()[0]
-
-							if result == 0:
-								await client.send_message(msg.channel, "No LemmyCoins paid to " + target.name + ": " + target.name + " has not been registered in the database.")
-							else:
-								cursor.execute("SELECT LemmyCoinBalance FROM tblUser WHERE UserId = ?", (msg.author.id,))
-								senderBalance = cursor.fetchone()[0]
-
-								if senderBalance < amount:
-									await client.send_message(msg.channel, "No LemmyCoins paid to " + target.name + ": " + msg.author.mention + " does not have enough LemmyCoins in their account to make the payment.")
-								else:
-									cursor.execute("UPDATE tblUser SET LemmyCoinBalance = LemmyCoinBalance - ? WHERE UserId = ?", (amount, msg.author.id))
-									cursor.execute("UPDATE tblUser SET LemmyCoinBalance = LemmyCoinBalance + ? WHERE UserId = ?", (amount, target.id))
-									cursor.execute("INSERT INTO tblLemmyCoinPayment (DateTime, SenderId, ReceiverId, Amount) VALUES (?, ?, ?, ?)", (datetime.datetime.now(), msg.author.id, target.id, amount))
-									res.sqlConnection.commit()
-									await client.send_message(msg.channel, "**L$" + str(amount) + "** successfully sent to " + target.mention + " by " + msg.author.mention + ".")
-
-async def channelids(client, res, msg, params):
-	ret = ""
-	for channel in msg.channel.server.channels:
-		ret += channel.name + " : " + channel.id + "\n"
-	await client.send_message(msg.channel, ret)
-
-async def serverid(client, res, msg, params):
-	await client.send_message(msg.channel, msg.channel.server.name + ": " + msg.channel.server.id)
-
-async def combine(client, res, msg, params):
-	# This command is deprecated, since it's a native feature of the bot
-	allEmotes = True
-	for param in params:
-		if param not in res.emotes and param not in res.stickers:
-			allEmotes = False
-
-	if allEmotes:
-		images = []
-		for param in params:
-			try:
-				images.append(Image.open("pics/emotes/" + param + ".png"))
-			except IOError:
-				images.append(Image.open("pics/stickers/" + param + ".png"))
-
-	Lutils.CombineImages(images)
-
-	await client.send_file(msg.channel, "pics/result.png")
-
-async def choose(client, res, msg, params):
-	options = " ".join(params).split(" or ")
-	options = [x for x in options if x != ""]
-	if len(options) > 0:
-		await client.send_message(msg.channel, msg.author.mention + "\n```\n" + random.choice(options) + "\n```")
+# async def tts(self, msg, dmsg):
+# 	await self.client.send_message(msg.channel, msg.content[5:], tts=True)
+# 	await self.client.delete_message(msg)

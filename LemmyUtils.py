@@ -2,59 +2,36 @@ import discord
 import asyncio
 import shlex
 from PIL import Image
+import random
+import datetime
+import re
 
 class DecomposedMessage:
-	def __init__(self, command, params):
+	def __init__(self, command, params, flags):
 		self.command = command
 		self.params = params
+		self.flags = flags
 
-def ParseMessage(message):
-	# if message[0] == "!":
-	# 	message = message[1:]
-	decompArray = shlex.split(message)
-	decomp = DecomposedMessage(decompArray[0], decompArray[1:])
+def ParseMessage(messageText):
+	decomposedArray = shlex.split(messageText)
+	
+	command = decomposedArray[0].lower()
+	
+	params = []
+	i = 1
+	while i < len(decomposedArray) and decomposedArray[i][0] != "-":
+		params.append(decomposedArray[i])
+		i += 1
 
-	return decomp
+	flags = []
+	while i < len(decomposedArray):
+		if decomposedArray[i][0] == "-" and not re.fullmatch("-\d+(.\d+)?", decomposedArray[i]):
+			flags.append([decomposedArray[i].lower()])
+		else:
+			flags[-1].append(decomposedArray[i])
+		i += 1
 
-def GetNthFlag(n, params):
-	for i in range(0, len(params)):
-		if params[i][0] == "-":
-			if n == 1:
-				if i + 1 < len(params) and params[i + 1][0] != "-":
-					return [params[i], params[i + 1]]
-				else:
-					return [params[i], None]
-			else:
-				n -= 1
-	return None
-
-def GetNthFlagWith2Params(n, params):
-	for i in range(0, len(params)):
-		if params[i][0] == "-":
-			if n == 1:
-				if i + 1 < len(params) and params[i + 1][0] != "-":
-					ret = [params[i], params[i + 1], None]
-					if i + 2 < len(params) and params[i + 2][0] != "-":
-						ret[2] = params[i + 2]
-					return ret
-				else:
-					return [params[i], None, None]
-			else:
-				n -= 1
-	return None
-
-def GetNthFlagWithAllParams(n, params):
-	for i in range(0, len(params)):
-		if params[i][0] == "-":
-			if n == 1:
-				ret = [params[i]]
-				while i+1 < len(params) and params[i+1][0] != "-":
-					ret.append(params[i+1])
-					i += 1
-				return ret
-			else:
-				n -= 1
-	return None
+	return DecomposedMessage(command, params, flags)
 
 async def SendEmote(client, msg):
 	await client.send_message(msg.channel, "__**" + msg.author.name + "**__")
@@ -114,3 +91,58 @@ def CombineImages(images):
 		i += 1
 
 	result.save("pics/result.png")
+
+def LogEmoteUse(res, sender, emote):
+	cursor = res.sqlConnection.cursor()
+	newId = random.uniform(0.0, 1.0)
+	cursor.execute("INSERT INTO tblEmoteUse (DateTime, UserId, Emote) VALUES (?, ?, ?)", (datetime.datetime.now(), sender.id, emote))
+	res.sqlConnection.commit()
+
+async def LogMessage(msg):
+	metadata = "[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] " + msg.author.name + " => " + ("(private channel)" if msg.channel.is_private else msg.channel.name) + ": "
+	tab = "".join([" " for _ in range(len(metadata))])
+	print(metadata + ("(Non-text message or file)" if not msg.content else RemoveUnicode(msg.content).replace("\n", "\n" + tab)))
+
+##################
+# Archived Utils #
+##################
+
+# def GetNthFlag(n, params):
+# 	for i in range(0, len(params)):
+# 		if params[i][0] == "-":
+# 			if n == 1:
+# 				if i + 1 < len(params) and params[i + 1][0] != "-":
+# 					return [params[i], params[i + 1]]
+# 				else:
+# 					return [params[i], None]
+# 			else:
+# 				n -= 1
+# 	return None
+
+# def GetNthFlagWith2Params(n, params):
+# 	for i in range(0, len(params)):
+# 		if params[i][0] == "-":
+# 			if n == 1:
+# 				if i + 1 < len(params) and params[i + 1][0] != "-":
+# 					ret = [params[i], params[i + 1], None]
+# 					if i + 2 < len(params) and params[i + 2][0] != "-":
+# 						ret[2] = params[i + 2]
+# 					return ret
+# 				else:
+# 					return [params[i], None, None]
+# 			else:
+# 				n -= 1
+# 	return None
+
+# def GetNthFlagWithAllParams(n, params):
+# 	for i in range(0, len(params)):
+# 		if params[i][0] == "-":
+# 			if n == 1:
+# 				ret = [params[i]]
+# 				while i+1 < len(params) and params[i+1][0] != "-":
+# 					ret.append(params[i+1])
+# 					i += 1
+# 				return ret
+# 			else:
+# 				n -= 1
+# 	return None

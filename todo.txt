@@ -3,15 +3,12 @@
 [Major] Implement command parsing with finite state machines
 !togethertube
 Reminders
-LemmyCoin
-&nbsp;&nbsp;&nbsp;&nbsp;Bounty Board
+LemmyCoin Bounty Board
 !vote
 Personalized flood protection/timeouts
-Lemmies Against Humanity
-Lemmafia
-Console log indentation
-Navigation buttons on this page
-Change !serverid to !serverinfo
 Clean up hybrid-emote-related code
 Make /db strictly for instantial data (unique to each instance of a bot (move the lennies somewhere else))
+!twitch (with api calls)
+Add constants (BTS ID, Lemmy ID, etc)
+Fix crash on message "!"
 [Emote] Full Life Consequences

@@ -5,6 +5,7 @@ sys.path.append('modules')
 import LemmyUtils as Lutils
 import LemmyCommands as Lcmds
 import LemmyResources as Lres
+from LemmyRadio import LemmyRadio
 from FloodProtector import FloodProtector
 from CallLogger import CallLogger
 
@@ -20,34 +21,61 @@ from PIL import Image
 
 class LemmyBot:
 	def __init__(self, username, password):
+		if not discord.opus.is_loaded():
+			discord.opus.load_opus('libopus-0.dll')
+
 		self.res = Lres.LemmyResources()
 		self.res.Load()
 
-		self.commandSymbol = "?>"
+		self.help = Lcmds.help
+		self.emotes = Lcmds.emotes
+		self.stickers = Lcmds.stickers
+		self.lenny = Lcmds.lenny
+		self.refresh = Lcmds.refresh
+		self.correct = Lcmds.correct
+		self.eightball = Lcmds.eightball
+		self.userinfo = Lcmds.userinfo
+		self.channelinfo = Lcmds.channelinfo
+		self.james = Lcmds.james
+		self.happening = Lcmds.happening
+		self.ruseman = Lcmds.ruseman
+		self.lemmycoin = Lcmds.lemmycoin
+		self.channelids = Lcmds.channelids
+		self.serverinfo = Lcmds.serverinfo
+		self.choose = Lcmds.choose
+		#self.radio = Lcmds.radio
+		#self.tts = Lcmds.tts
+		self.logout = Lcmds.logout
 
 		# Map of function names to their equivalent function pointers
 		self.funcMap = {
-			"help": Lcmds.help,
-			"emotes": Lcmds.emotes,
-			"stickers": Lcmds.stickers,
-			"lenny": Lcmds.lenny,
-			"refresh": Lcmds.refresh,
-			"f5": Lcmds.refresh,
-			"correct": Lcmds.correct,
-			"8ball": Lcmds.eightball,
-			"userinfo": Lcmds.userinfo,
-			"channelinfo": Lcmds.channelinfo,
-			"james": Lcmds.james,
-			"happening": Lcmds.happening,
-			"ruseman": Lcmds.ruseman,
-			"lemmycoin": Lcmds.lemmycoin,
-			"lc": Lcmds.lemmycoin,
-			"l$": Lcmds.lemmycoin,
-			"channelids": Lcmds.channelids,
-			"serverid": Lcmds.serverid,
-			"choose": Lcmds.choose,
-			"logout": Lcmds.logout
-			#"restart": Lcmds.restart
+			"help": self.help,
+			"emotes": self.emotes,
+			"stickers": self.stickers,
+			"lenny": self.lenny,
+			"refresh": self.refresh,
+			"f5": self.refresh,
+			"correct": self.correct,
+			"8ball": self.eightball,
+			"userinfo": self.userinfo,
+			"channelinfo": self.channelinfo,
+			"james": self.james,
+			"happening": self.happening,
+			"ruseman": self.ruseman,
+			"lemmycoin": self.lemmycoin,
+			"lc": self.lemmycoin,
+			"l$": self.lemmycoin,
+			"channelids": self.channelids,
+			"serverinfo": self.serverinfo,
+			"choose": self.choose,
+			#"radio": self.radio,
+			#"tts": self.tts,
+			"logout": self.logout
+		}
+		
+		self.symbolMap = {
+			"77041788564545536": "!",   # Better Than Skype
+			"77041897784225792": "!"   # blue87
 		}
 
 		self.floodProtectors = {
@@ -67,6 +95,12 @@ class LemmyBot:
 			print("USERNAME: " + username)
 			print("PASSWORD: " + "".join(["*" for x in password]))
 
+			print(Lutils.TitleBox("Checking Command Symbols"))
+			for server in self.client.servers:
+				if server.id in self.symbolMap:
+					print("Server '" + server.name + "' has been assigned the command symbol '" + self.symbolMap[server.id] + "'.")
+				else:
+					print("Warning! Server '" + server.name + "' has no command symbol assigned to it.")
 
 			print(Lutils.TitleBox("Checking Channel Mapping"))
 			warnings = False
@@ -74,35 +108,35 @@ class LemmyBot:
 
 				# Server hasn't been mapped at all
 				if server.id not in self.res.voiceToTextChannelMaps and server.id not in self.res.textToVoiceChannelMaps:
-					print("Warning! Server " + server.name + " does not have its voice or text channels mapped.")
+					print("Warning! Server '" + server.name + "' does not have its voice or text channels mapped.")
 					warnings = True
 
 				# Server has had text channels mapped, but not voice channels
 				elif server.id not in self.res.voiceToTextChannelMaps:
-					print("Warning! Server " + server.name + " does not have its voice channels mapped.")
+					print("Warning! Server '" + server.name + "' does not have its voice channels mapped.")
 					warnings = True
 					for channel in server.channels:
 						if channel.type == discord.ChannelType.text and channel.id not in self.res.textToVoiceChannelMaps[server.id]:
-							print("  Warning! Server " + server.name + "'s text channel " + channel.name + " has not been mapped to a voice channel (or None).")
+							print("  Warning! Server '" + server.name + "'s text channel " + channel.name + " has not been mapped to a voice channel (or None).")
 
 				# Server has had voice channels mapped, but not text channels
 				elif server.id not in self.res.textToVoiceChannelMaps:
-					print("Warning! Server " + server.name + " does not have its text channels mapped.")
+					print("Warning! Server '" + server.name + "' does not have its text channels mapped.")
 					warnings = True
 					for channel in server.channels:
 						if channel.type == discord.ChannelType.voice and channel.id not in self.res.voiceToTextChannelMaps[server.id]:
-							print("  Warning! Server " + server.name + "'s voice channel " + Lutils.StripUnicode(channel.name).strip() + " has not been mapped to a text channel (or None).")
+							print("  Warning! Server '" + server.name + "'s voice channel " + Lutils.StripUnicode(channel.name).strip() + " has not been mapped to a text channel (or None).")
 
 				# Server has had voice and text channels mapped
 				else:
-					print("Server " + server.name + " has its voice and text channels mapped.")
+					print("Server '" + server.name + "' has its voice and text channels mapped.")
 					for channel in server.channels:
 						if channel.type == discord.ChannelType.text and channel.id not in self.res.textToVoiceChannelMaps[server.id]:
-							print("Warning! Server " + server.name + "'s text channel " + channel.name + " has not been mapped to a voice channel (or None).")
+							print("Warning! Server '" + server.name + "'s text channel " + channel.name + " has not been mapped to a voice channel (or None).")
 							warnings = True
 					for channel in server.channels:
 						if channel.type == discord.ChannelType.voice and channel.id not in self.res.voiceToTextChannelMaps[server.id]:
-							print("Warning! Server " + server.name + "'s voice channel " + Lutils.StripUnicode(channel.name).strip() + " has not been mapped to a text channel (or None).")
+							print("Warning! Server '" + server.name + "'s voice channel " + Lutils.StripUnicode(channel.name).strip() + " has not been mapped to a text channel (or None).")
 							warnings = True
 
 			if not warnings:
@@ -140,68 +174,63 @@ class LemmyBot:
 
 		@self.client.event
 		async def on_message(msg):
-			if msg.content:
-				if msg.channel.is_private:
-					print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] " + msg.author.name + " => (private channel): " + Lutils.RemoveUnicode(msg.content))
+			await Lutils.LogMessage(msg)
+
+			# Message is a command
+			if msg.content.startswith(self.symbolMap[msg.server.id]) and msg.author != self.client.user:
+				dmsg = Lutils.ParseMessage(msg.content[len(self.symbolMap[msg.server.id]):])
+
+				if dmsg.command in self.funcMap:
+					await self.funcMap[dmsg.command](self, msg, dmsg)
+
+			# Message is an emote
+			elif msg.content in self.res.emotes and msg.author != self.client.user:
+				if self.floodProtectors["emote"].Ready(msg.author.id):
+					await Lutils.SendEmote(self.client, msg)
+					self.floodProtectors["emote"].Sent(msg.author.id)
+					Lutils.LogEmoteUse(self.res, msg.author, msg.content)
 				else:
-					print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] " + msg.author.name + " => " + msg.channel.name + ": " + Lutils.RemoveUnicode(msg.content))
+					await self.client.delete_message(msg)
 
-				# Remove this later
-				if msg.content.startswith("!"):
-					await self.client.send_message(msg.channel, '"!" has been replaced by "?>"" as the command operator (eg. ?>lenny).')
-				#
-				
-				if msg.content.startswith(self.commandSymbol):
-					dmsg = Lutils.ParseMessage(msg.content[len(self.commandSymbol):])
-
-					if dmsg.command.lower() in self.funcMap:
-						await self.funcMap[dmsg.command.lower()](self.client, self.res, msg, dmsg.params)
-
-				elif msg.content in self.res.emotes and msg.author != self.client.user:
-					if self.floodProtectors["emote"].Ready(msg.author.id):
-						await Lutils.SendEmote(self.client, msg)
-						self.floodProtectors["emote"].Sent(msg.author.id)
-					else:
-						await self.client.delete_message(msg)
-
-				elif msg.content in self.res.stickers and msg.author != self.client.user:
-					if self.floodProtectors["sticker"].Ready(msg.author.id):
-						await Lutils.SendSticker(self.client, msg)
-						self.floodProtectors["sticker"].Sent(msg.author.id)
-					else:
-						await self.client.delete_message(msg)
-
+			# Message is a sticker
+			elif msg.content in self.res.stickers and msg.author != self.client.user:
+				if self.floodProtectors["sticker"].Ready(msg.author.id):
+					await Lutils.SendSticker(self.client, msg)
+					self.floodProtectors["sticker"].Sent(msg.author.id)
+					Lutils.LogEmoteUse(self.res, msg.author, msg.content)
 				else:
-					imageMatch = "("
-					imageMatch += "|".join(self.res.emotes)
-					imageMatch += "|".join(self.res.stickers)
-					imageMatch += ")"
-
-					if re.match(imageMatch + "( " + imageMatch + ")+", msg.content):
-						imageTerms = msg.content.split()
-						images = []
-						for imageTerm in imageTerms:
-							# I'm *really* sorry about these next 4 lines.
-							try:
-								images.append(Image.open("pics/emotes/" + imageTerm + ".png"))
-							except IOError:
-								images.append(Image.open("pics/stickers/" + imageTerm + ".png"))
-
-						# This saves the combined image as pics/result.png
-						Lutils.CombineImages(images)
-
-						await self.client.send_message(msg.channel, "__**" + msg.author.name + "**__")
-						await self.client.send_file(msg.channel, "pics/result.png")
-
-						os.remove("pics/result.png")
-
-
+					await self.client.delete_message(msg)
 
 			else:
-				if msg.channel.is_private:
-					print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] " + msg.author.name + " => (private channel): (Non-text message or file)")
-				else:
-					print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] " + msg.author.name + " => " + msg.channel.name + ": (Non-text message or file)")
+				imageMatch = "("
+				imageMatch += "|".join(self.res.emotes)
+				imageMatch += "|".join(self.res.stickers)
+				imageMatch += ")"
+
+				# Message is a hybrid emote
+				if re.match(imageMatch + "( " + imageMatch + ")+", msg.content):
+					imageTerms = msg.content.split()
+					images = []
+					for imageTerm in imageTerms:
+						# I'm *really* sorry about these next 4 lines.
+						try:
+							images.append(Image.open("pics/emotes/" + imageTerm + ".png"))
+						except IOError:
+							images.append(Image.open("pics/stickers/" + imageTerm + ".png"))
+
+					# This saves the combined image as pics/result.png
+					Lutils.CombineImages(images)
+
+					await self.client.send_message(msg.channel, "__**" + msg.author.name + "**__")
+					await self.client.send_file(msg.channel, "pics/result.png")
+
+					os.remove("pics/result.png")
+
+					await self.client.delete_message(msg)
+
+					for image in imageTerms:
+						Lutils.LogEmoteUse(self.res, msg.author, image)
+						
 
 		@self.client.event
 		async def on_voice_state_update(before, after):

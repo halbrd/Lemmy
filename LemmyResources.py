@@ -1,5 +1,6 @@
 # Lemmy's stuff
 import LemmyUtils as Lutils
+from LemmyRadio import LemmyRadio
 
 # Other stuff
 import os
@@ -19,6 +20,7 @@ class LemmyResources:
 		self.voiceToTextChannelMap = None
 		self.textToVoiceChannelMap = None
 		self.sqlConnection = None
+		self.radio = None
 
 
 	def Load(self):
@@ -100,7 +102,7 @@ class LemmyResources:
 				"78040207236005888": None, # nintendo
 				"78040100348366848": None, # masseffect
 				"77557134866264064": None, # announcements
-				"104509204580024320": None # testing
+				"134272864999178241": None # radio
 			}
 		}
 		print("Text to voice channel map loaded with " + str(len(self.textToVoiceChannelMaps)) + " servers mapped.")
