@@ -202,7 +202,7 @@ async def james(self, msg, dmsg):
 		if update:
 			try:
 				with open("db/jamesDb.json", "w") as f:
-					json.dump(self.res.jamesDb, f)
+					json.dump(self.res.jamesDb, f, indent=4)
 			except Exception as e:
 				print("ERROR updating JamesDb! (" + str(e) + ")")
 			else:
@@ -210,7 +210,7 @@ async def james(self, msg, dmsg):
 
 			try:
 				with open("db/jamesConverter.json", "w") as f:
-					json.dump(self.res.jamesConverter, f)
+					json.dump(self.res.jamesConverter, f, indent=4)
 			except Exception as e:
 				print("ERROR updating JamesConverter! (" + str(e) + ")")
 			else:
@@ -314,6 +314,10 @@ async def choose(self, msg, dmsg):
 	if len(options) > 0:
 		# await self.client.send_message(msg.channel, msg.author.mention + "\n```\n" + random.choice(options) + "\n```")
 		await self.client.send_message(msg.channel, msg.author.mention + "   `" + random.choice(options) + "`")
+
+async def playgame(self, msg, dmsg):
+	await self.client.change_status(game=(discord.Game(name=" ".join(dmsg.params)) if len(dmsg.params) > 0 else None))
+
 
 # async def radio(self, msg, dmsg):
 # 	# radioChannel = discord.utils.find(lambda m: m.id == "133010408377286656", msg.server.channels)

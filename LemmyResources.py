@@ -20,7 +20,6 @@ class LemmyResources:
 		self.voiceToTextChannelMap = None
 		self.textToVoiceChannelMap = None
 		self.sqlConnection = None
-		self.radio = None
 
 
 	def Load(self):

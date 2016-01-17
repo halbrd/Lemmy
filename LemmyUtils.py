@@ -15,7 +15,7 @@ class DecomposedMessage:
 def ParseMessage(messageText):
 	decomposedArray = shlex.split(messageText)
 	
-	command = decomposedArray[0].lower()
+	command = decomposedArray[0].lower() if len(decomposedArray) > 0 else None
 	
 	params = []
 	i = 1
@@ -100,6 +100,18 @@ def LogEmoteUse(res, sender, emote):
 
 async def LogMessage(msg):
 	metadata = "[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] " + msg.author.name + " => " + ("(private channel)" if msg.channel.is_private else msg.channel.name) + ": "
+	tab = "".join([" " for _ in range(len(metadata))])
+	print(metadata + ("(Non-text message or file)" if not msg.content else RemoveUnicode(msg.content).replace("\n", "\n" + tab)))
+
+async def LogMessageEdit(before, after):
+	metadata = "[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] " + before.author.name + " /> " + ("(private channel)" if before.channel.is_private else before.channel.name) + ": "
+	tab = "".join([" " for _ in range(len(metadata))])
+	print(metadata + ("(Non-text message or file)" if not before.content else RemoveUnicode(before.content).replace("\n", "\n" + tab)))
+	print(tab[:-3] + "└> ", end="")
+	print("(Non-text message or file)" if not after.content else RemoveUnicode(after.content).replace("\n", "\n" + tab))
+
+async def LogMessageDelete(msg):
+	metadata = "[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] " + msg.author.name + " x> " + ("(private channel)" if msg.channel.is_private else msg.channel.name) + ": "
 	tab = "".join([" " for _ in range(len(metadata))])
 	print(metadata + ("(Non-text message or file)" if not msg.content else RemoveUnicode(msg.content).replace("\n", "\n" + tab)))
 

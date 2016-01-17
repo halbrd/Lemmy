@@ -1,14 +1,15 @@
 [Major] Emote NASDAQ
 [Major] Lemmy Radio
 [Major] Implement command parsing with finite state machines
-!togethertube
-Reminders
-LemmyCoin Bounty Board
-!vote
-Personalized flood protection/timeouts
-Clean up hybrid-emote-related code
-Make /db strictly for instantial data (unique to each instance of a bot (move the lennies somewhere else))
-!twitch (with api calls)
-Add constants (BTS ID, Lemmy ID, etc)
-Fix crash on message "!"
+[Core] Personalized flood protection/timeouts
+[Core] User purge
+[Core] Add constants (BTS ID, Lemmy ID, etc)
+[Command] !togethertube
+[Command] !vote
+[Command] !reminder
+[Command] !twitch (with api calls)
+[Function] LemmyCoin Bounty Board
+[Bug] Fix private messages
+[ToDo] Clean up hybrid-emote-related code
+[ToDo] Make /db strictly for instantial data (unique to each instance of a bot (move the lennies somewhere else))
 [Emote] Full Life Consequences

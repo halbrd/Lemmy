@@ -45,6 +45,7 @@ class LemmyBot:
 		self.choose = Lcmds.choose
 		#self.radio = Lcmds.radio
 		#self.tts = Lcmds.tts
+		self.playgame = Lcmds.playgame
 		self.logout = Lcmds.logout
 
 		# Map of function names to their equivalent function pointers
@@ -70,6 +71,7 @@ class LemmyBot:
 			"choose": self.choose,
 			#"radio": self.radio,
 			#"tts": self.tts,
+			"playgame": self.playgame,
 			"logout": self.logout
 		}
 		
@@ -180,7 +182,7 @@ class LemmyBot:
 			if msg.content.startswith(self.symbolMap[msg.server.id]) and msg.author != self.client.user:
 				dmsg = Lutils.ParseMessage(msg.content[len(self.symbolMap[msg.server.id]):])
 
-				if dmsg.command in self.funcMap:
+				if dmsg.command is not None and dmsg.command in self.funcMap:
 					await self.funcMap[dmsg.command](self, msg, dmsg)
 
 			# Message is an emote
@@ -208,7 +210,7 @@ class LemmyBot:
 				imageMatch += ")"
 
 				# Message is a hybrid emote
-				if re.match(imageMatch + "( " + imageMatch + ")+", msg.content):
+				if re.match(imageMatch + "( +" + imageMatch + ")+", msg.content):
 					imageTerms = msg.content.split()
 					images = []
 					for imageTerm in imageTerms:
@@ -231,6 +233,16 @@ class LemmyBot:
 					for image in imageTerms:
 						Lutils.LogEmoteUse(self.res, msg.author, image)
 						
+		@self.client.event
+		async def on_message_edit(before, after):
+			# await Lutils.LogMessageEdit(before, after)
+			pass
+
+
+		@self.client.event
+		async def on_message_delete(msg):
+			# await Lutils.LogMessageDelete(msg)
+			pass
 
 		@self.client.event
 		async def on_voice_state_update(before, after):
