@@ -316,7 +316,7 @@ async def choose(self, msg, dmsg):
 		await self.client.send_message(msg.channel, msg.author.mention + "   `" + random.choice(options) + "`")
 
 async def playgame(self, msg, dmsg):
-	await self.client.change_status(game=(discord.Game(name=" ".join(dmsg.params)) if len(dmsg.params) > 0 else None))
+	await self.client.change_status(game=(discord.Game(name=dmsg.params[0]) if len(dmsg.params) > 0 else None))
 
 
 # async def radio(self, msg, dmsg):
