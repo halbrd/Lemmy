@@ -1,1 +1,21 @@
-{"lol": "League of Legends", "payday": "Payday 2", "showdown": "Pokemon Showdown", "starbound": "Starbound", "spaceeng": "Space Engineers", "civ": "Civilization V", "rocketleague": "Rocket League", "insurgency": "Insurgency", "test": "Test", "e:d": "Elite: Dangerous", "sc2": "Starcraft 2", "contagion": "Contagion", "borderlands": "Borderlands 2", "csgo": "CS:GO", "ttt": "Trouble in Terrorist Town", "rotr": "Rise of the Reds. Kappa."}
+{
+    "sc2": "Starcraft 2",
+    "dow": "Dawn Of War Soulstorm",
+    "spaceeng": "Space Engineers",
+    "contagion": "Contagion",
+    "borderlands": "Borderlands 2",
+    "insurgency": "Insurgency",
+    "rocketleague": "Rocket League",
+    "payday": "Payday 2",
+    "starbound": "Starbound",
+    "tabletop": "Tabletop Simulator",
+    "e:d": "Elite: Dangerous",
+    "csgo": "CS:GO",
+    "halo": "Halo Online",
+    "showdown": "Pokemon Showdown",
+    "civ": "Civilization V",
+    "rotr": "Rise of the Reds. Kappa.",
+    "test": "Test",
+    "lol": "League of Legends",
+    "ttt": "Trouble in Terrorist Town"
+}

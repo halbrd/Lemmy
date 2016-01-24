@@ -10,6 +10,7 @@
 [Command] !twitch (with api calls)
 [Function] LemmyCoin Bounty Board
 [Bug] Fix private messages
+[Bug] Add explicit primary key to emote usage table to fix duplicates on hybrid emotes
 [ToDo] Clean up hybrid-emote-related code
 [ToDo] Make /db strictly for instantial data (unique to each instance of a bot (move the lennies somewhere else))
 [Emote] Full Life Consequences

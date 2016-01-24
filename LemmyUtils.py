@@ -5,6 +5,7 @@ from PIL import Image
 import random
 import datetime
 import re
+from math import sin, cos, ceil
 
 class DecomposedMessage:
 	def __init__(self, command, params, flags):
@@ -90,7 +91,7 @@ def CombineImages(images):
 		horizontalPointer += images[i].size[0]
 		i += 1
 
-	result.save("pics/result.png")
+	result.save("pics/temp/combination.png")
 
 def LogEmoteUse(res, sender, emote):
 	cursor = res.sqlConnection.cursor()
@@ -114,6 +115,31 @@ async def LogMessageDelete(msg):
 	metadata = "[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] " + msg.author.name + " x> " + ("(private channel)" if msg.channel.is_private else msg.channel.name) + ": "
 	tab = "".join([" " for _ in range(len(metadata))])
 	print(metadata + ("(Non-text message or file)" if not msg.content else RemoveUnicode(msg.content).replace("\n", "\n" + tab)))
+
+def NewDimensions(width, height, angle):
+	a = abs(width * sin(angle)) + abs(height * cos(angle))
+	b = abs(width * cos(angle)) + abs(height * sin(angle))
+	return (int(ceil(a)), int(ceil(b)))
+
+def RotateImage(sourceLocation, angle):
+	source = Image.open(sourceLocation)
+	od = (int(ceil(source.size[0])), int(ceil(source.size[1])))
+	nd = NewDimensions(od[0], od[1], angle)
+	result = Image.new("RGBA", nd)
+	result.paste(source, (ceil((nd[0] - od[0])/2), ceil((nd[1] - od[1])/2)))
+	result = result.rotate(angle)
+	result.save("pics/temp/rotated.png")
+
+def GetPingText(self, msg, tag):
+	response = msg.author.mention  + " pinging "
+	for userId in self.res.jamesDb[tag]:
+		user = FindUserById(msg.channel.server.members, userId)
+		if user is not None:
+			if user != msg.author:
+				response += (user.mention if user.status != discord.Status.offline else user.name) + " "
+	response += "for " + self.res.jamesConverter[tag]
+	return response
+
 
 ##################
 # Archived Utils #

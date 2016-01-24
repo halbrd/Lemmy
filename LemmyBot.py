@@ -5,6 +5,7 @@ sys.path.append('modules')
 import LemmyUtils as Lutils
 import LemmyCommands as Lcmds
 import LemmyResources as Lres
+import LemmyConstants as Lconst
 from LemmyRadio import LemmyRadio
 from FloodProtector import FloodProtector
 from CallLogger import CallLogger
@@ -46,6 +47,8 @@ class LemmyBot:
 		#self.radio = Lcmds.radio
 		#self.tts = Lcmds.tts
 		self.playgame = Lcmds.playgame
+		#self.mygame = Lcmds.mygame
+		self.tilt = Lcmds.tilt
 		self.logout = Lcmds.logout
 
 		# Map of function names to their equivalent function pointers
@@ -72,6 +75,8 @@ class LemmyBot:
 			#"radio": self.radio,
 			#"tts": self.tts,
 			"playgame": self.playgame,
+			#"mygame": self.mygame,
+			"tilt": self.tilt,
 			"logout": self.logout
 		}
 		
@@ -86,6 +91,8 @@ class LemmyBot:
 		}
 
 		self.callLogger = None
+
+		self.constants = Lconst.LemmyConstants()
 
 		self.client = discord.Client()
 
@@ -206,6 +213,7 @@ class LemmyBot:
 			else:
 				imageMatch = "("
 				imageMatch += "|".join(self.res.emotes)
+				imageMatch += "|"
 				imageMatch += "|".join(self.res.stickers)
 				imageMatch += ")"
 
@@ -224,19 +232,28 @@ class LemmyBot:
 					Lutils.CombineImages(images)
 
 					await self.client.send_message(msg.channel, "__**" + msg.author.name + "**__")
-					await self.client.send_file(msg.channel, "pics/result.png")
+					await self.client.send_file(msg.channel, "pics/temp/combination.png")
 
-					os.remove("pics/result.png")
+					os.remove("pics/temp/combination.png")
 
 					await self.client.delete_message(msg)
 
 					for image in imageTerms:
 						Lutils.LogEmoteUse(self.res, msg.author, image)
+
+			tagMatch = "("
+			tagMatch += "|".join([x for x in self.res.jamesDb])
+			tagMatch += ")"
+			sentTags = []
+
+			for match in re.findall("\$" + tagMatch, msg.content):
+				await self.client.send_message(msg.channel, Lutils.GetPingText(self, msg, match))
+
 						
 		@self.client.event
 		async def on_message_edit(before, after):
-			# await Lutils.LogMessageEdit(before, after)
-			pass
+			if before.content != after.content:
+				await Lutils.LogMessageEdit(before, after)
 
 
 		@self.client.event
