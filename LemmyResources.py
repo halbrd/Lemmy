@@ -15,14 +15,10 @@ class LemmyResources:
 		self.lennies = None
 		self.emotes = None
 		self.stickers = None
-		self.jamesDb = None
-		self.jamesConverter = None
 		self.voiceToTextChannelMap = None
 		self.textToVoiceChannelMap = None
 		self.sqlConnection = None
 
-
-	def Load(self):
 		print(Lutils.TitleBox("Loading Resources"))
 		
 		self.lenny = "( ͡° ͜ʖ ͡°)"
@@ -54,22 +50,6 @@ class LemmyResources:
 			print("ERROR loading stickers! (" + str(e) + ")")
 		else:
 			print("Loaded " + str(len(self.stickers)) + " stickers.")
-
-		try:
-			with open("db/jamesDb.json", "r") as f:
-				self.jamesDb = json.load(f)
-		except Exception as e:
-			print("ERROR loading JamesDb! (" + str(e) + ")")
-		else:
-			print("JamesDb loaded with " + str(len(self.jamesDb)) + " games.")
-
-		try:
-			with open("db/jamesConverter.json", "r") as f:
-				self.jamesConverter = json.load(f)
-		except Exception as e:
-			print("ERROR loading JamesConverter! (" + str(e) + ")")
-		else:
-			print("JamesConverter loaded with " + str(len(self.jamesConverter)) + " games.")
 
 		try:
 			self.sqlConnection = sqlite3.connect("db/sqlite/lemmy.db")

@@ -110,9 +110,9 @@ async def james(self, msg, dmsg):
 	if len(dmsg.params) > 0:
 		sentTags = []
 		for tag in dmsg.params:
-			if tag in self.res.jamesDb and tag not in sentTags:
+			if tag in self.tags.db and tag not in sentTags:
 				sentTags.append(tag)
-				if msg.author.id not in self.res.jamesDb[tag]:
+				if msg.author.id not in self.tags.db[tag]:
 					await self.client.send_message(msg.channel, self.constants.error + " User must be subscribed to the tag to issue pings.")
 				else:
 					await self.client.send_message(msg.channel, Lutils.GetPingText(self, msg, tag))
@@ -124,9 +124,9 @@ async def james(self, msg, dmsg):
 
 		if flag == "-tags":
 			response = "```"
-			for key in self.res.jamesDb:
-				response += "\n" + key + " (" + self.res.jamesConverter[key] + ")"
-				for userId in self.res.jamesDb[key]:
+			for key in self.tags.db:
+				response += "\n" + key + " (" + self.tags.converter[key] + ")"
+				for userId in self.tags.db[key]:
 					user = Lutils.FindUserById(msg.channel.server.members, userId)
 					response += "\n> " + user.name
 				response += "\n"
@@ -138,14 +138,14 @@ async def james(self, msg, dmsg):
 				await self.client.send_message(msg.channel, self.constants.error + " " + msg.author.mention + " was not added to any tag: No tag was specified.")
 			else:
 				gameTag = flagParams[0]
-				if not gameTag in self.res.jamesDb:
+				if not gameTag in self.tags.db:
 					await self.client.send_message(msg.channel, self.constants.error + " " + msg.author.mention + " was not added to '" + gameTag + "': No such tag exists.")
 				else:
-					if msg.author.id in self.res.jamesDb[gameTag]:
+					if msg.author.id in self.tags.db[gameTag]:
 						await self.client.send_message(msg.channel, self.constants.error + " " + msg.author.mention + " was not added to '" + gameTag + "': User is already in '" + gameTag + "'.")
 					else:
 						update = True
-						self.res.jamesDb[gameTag].append(msg.author.id)
+						self.tags.db[gameTag].append(msg.author.id)
 						await self.client.send_message(msg.channel, msg.author.mention + " was successfully added to '" + gameTag + "'.")
 					
 		elif flag == "-leave":
@@ -153,14 +153,14 @@ async def james(self, msg, dmsg):
 				await self.client.send_message(msg.channel, self.constants.error + " " + msg.author.mention + " was not removed from any tag: No tag was specified.")
 			else:
 				gameTag = flagParams[0]
-				if not gameTag in self.res.jamesDb:
+				if not gameTag in self.tags.db:
 					await self.client.send_message(msg.channel, self.constants.error + " " + msg.author.mention + " was not removed from '" + gameTag + "': No such tag exists.")
 				else:
-					if not msg.author.id in self.res.jamesDb[gameTag]:
+					if not msg.author.id in self.tags.db[gameTag]:
 						await self.client.send_message(msg.channel, self.constants.error + " " + msg.author.mention + " was not removed from '" + gameTag + "': User is not in '" + gameTag + "'.")
 					else:
 						update = True
-						self.res.jamesDb[gameTag] = [x for x in self.res.jamesDb[gameTag] if x != msg.author.id]
+						self.tags.db[gameTag] = [x for x in self.tags.db[gameTag] if x != msg.author.id]
 						await self.client.send_message(msg.channel, msg.author.mention + " was successfully removed from '" + gameTag + "'.")
 
 		elif flag == "-create":
@@ -176,12 +176,12 @@ async def james(self, msg, dmsg):
 						gameTag = flagParams[0]
 						displayName = " ".join(flagParams[1:])
 
-						if gameTag in self.res.jamesDb:
+						if gameTag in self.tags.db:
 							await self.client.send_message(msg.channel, self.constants.error + " New tag '" + gameTag + "' not created: Tag already exists.")
 						else:
 							update = True
-							self.res.jamesDb[gameTag] = []
-							self.res.jamesConverter[gameTag] = displayName
+							self.tags.db[gameTag] = []
+							self.tags.converter[gameTag] = displayName
 							await self.client.send_message(msg.channel, "New tag '" + gameTag + "' successfully created with display name '" + displayName + "'.")
 
 		elif flag == "-delete":
@@ -192,30 +192,30 @@ async def james(self, msg, dmsg):
 					await self.client.send_message(msg.channel, self.constants.error + " No tag deleted: No tag name was specified.")
 				else:
 					gameTag = flagParams[0]
-					if not gameTag in self.res.jamesDb:
+					if not gameTag in self.tags.db:
 						await self.client.send_message(msg.channel, self.constants.error + " Tag '" + gameTag + "' not deleted: Tag does not exist.")
 					else:
 						update = True
-						self.res.jamesDb.pop(gameTag, None)
-						self.res.jamesConverter.pop(gameTag, None)
+						self.tags.db.pop(gameTag, None)
+						self.tags.converter.pop(gameTag, None)
 						await self.client.send_message(msg.channel, "Tag '" + gameTag + "' successfully deleted.")						
 
 		if update:
 			try:
-				with open("db/jamesDb.json", "w") as f:
-					json.dump(self.res.jamesDb, f, indent=4)
+				with open("db/james.db.json", "w") as f:
+					json.dump(self.tags.db, f, indent=4)
 			except Exception as e:
-				print("ERROR updating JamesDb! (" + str(e) + ")")
+				print("ERROR updating james.db! (" + str(e) + ")")
 			else:
-				print("JamesDb updated with " + str(len(self.res.jamesDb)) + " games.")
+				print("james.db updated with " + str(len(self.tags.db)) + " games.")
 
 			try:
-				with open("db/jamesConverter.json", "w") as f:
-					json.dump(self.res.jamesConverter, f, indent=4)
+				with open("db/james.converter.json", "w") as f:
+					json.dump(self.tags.converter, f, indent=4)
 			except Exception as e:
-				print("ERROR updating JamesConverter! (" + str(e) + ")")
+				print("ERROR updating james.converter! (" + str(e) + ")")
 			else:
-				print("JamesConverter updated with " + str(len(self.res.jamesConverter)) + " games.")
+				print("james.converter updated with " + str(len(self.tags.converter)) + " games.")
 
 async def happening(self, msg, dmsg):
 	await self.client.send_message(msg.channel, "https://i.imgur.com/bYGOUHP.png")
@@ -342,28 +342,6 @@ async def tilt(self, msg, dmsg):
 				os.remove("pics/temp/rotated.png")
 
 
-
-# async def mygame(self, msg, dmsg):
-# 	if not msg.channel.is_private:
-# 		channel = msg.channel
-# 		await self.client.delete_message(msg)
-# 		await self.client.send_message(channel, "Message deleted. Be VERY careful to not use !mygame in a public channel.")
-# 	else:
-# 		if len(dmsg.params) < 3:
-# 			await self.client.send_message(msg.channel, "Insufficient parameters supplied. Usage: `!mygame email password text`.")
-# 			await self.client.delete_message(msg)
-# 		else:
-# 			email = dmsg.params[0]
-# 			password = dmsg.params[1]
-# 			text = dmsg.params[2]
-# 			if not re.fullmatch(".+@.+\..+", email):
-# 				await self.client.send_message(msg.channel, "Incorrectly formatted email address.")
-# 				await self.client.delete_message(msg)
-# 			elif not len(password) > 0:
-# 				await self.client.send_message(msg.channel, "Incorrectly formatted password.")
-# 				await self.client.delete_message(msg)
-# 			else:
-# 				os.system("python modules\\ChangeGame.py " + email + " " + password + " `" + text + "`")
 
 # async def radio(self, msg, dmsg):
 # 	# radioChannel = discord.utils.find(lambda m: m.id == "133010408377286656", msg.server.channels)

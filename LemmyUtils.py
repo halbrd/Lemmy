@@ -132,12 +132,12 @@ def RotateImage(sourceLocation, angle):
 
 def GetPingText(self, msg, tag):
 	response = msg.author.mention  + " pinging "
-	for userId in self.res.jamesDb[tag]:
+	for userId in self.tags.db[tag]:
 		user = FindUserById(msg.channel.server.members, userId)
 		if user is not None:
 			if user != msg.author:
 				response += (user.mention if user.status != discord.Status.offline else user.name) + " "
-	response += "for " + self.res.jamesConverter[tag]
+	response += "for " + self.tags.converter[tag]
 	return response
 
 

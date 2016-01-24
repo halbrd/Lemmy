@@ -6,6 +6,7 @@ import LemmyUtils as Lutils
 import LemmyCommands as Lcmds
 import LemmyResources as Lres
 import LemmyConstants as Lconst
+import LemmyTags as Ltags
 from LemmyRadio import LemmyRadio
 from FloodProtector import FloodProtector
 from CallLogger import CallLogger
@@ -25,9 +26,13 @@ class LemmyBot:
 		if not discord.opus.is_loaded():
 			discord.opus.load_opus('libopus-0.dll')
 
+		### Load major member variables ###
 		self.res = Lres.LemmyResources()
-		self.res.Load()
+		self.tags = Ltags.LemmyTags()
+		self.constants = Lconst.LemmyConstants()
+		self.callLogger = None
 
+		### Map member functions to LemmyCommands functions ###
 		self.help = Lcmds.help
 		self.emotes = Lcmds.emotes
 		self.stickers = Lcmds.stickers
@@ -47,7 +52,6 @@ class LemmyBot:
 		#self.radio = Lcmds.radio
 		#self.tts = Lcmds.tts
 		self.playgame = Lcmds.playgame
-		#self.mygame = Lcmds.mygame
 		self.tilt = Lcmds.tilt
 		self.logout = Lcmds.logout
 
@@ -75,7 +79,6 @@ class LemmyBot:
 			#"radio": self.radio,
 			#"tts": self.tts,
 			"playgame": self.playgame,
-			#"mygame": self.mygame,
 			"tilt": self.tilt,
 			"logout": self.logout
 		}
@@ -89,10 +92,6 @@ class LemmyBot:
 			"emote": FloodProtector(5),
 			"sticker": FloodProtector(5)
 		}
-
-		self.callLogger = None
-
-		self.constants = Lconst.LemmyConstants()
 
 		self.client = discord.Client()
 
@@ -242,11 +241,11 @@ class LemmyBot:
 						Lutils.LogEmoteUse(self.res, msg.author, image)
 
 			tagMatch = "("
-			tagMatch += "|".join([x for x in self.res.jamesDb])
+			tagMatch += "|".join([x for x in self.tags.db])
 			tagMatch += ")"
 			sentTags = []
 
-			for match in re.findall("\$" + tagMatch, msg.content):
+			for match in re.findall("&" + tagMatch, msg.content):
 				await self.client.send_message(msg.channel, Lutils.GetPingText(self, msg, match))
 
 						
