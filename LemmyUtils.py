@@ -63,6 +63,9 @@ def FindUserByName(members, username):
 def FindUserById(members, userId):
 	return discord.utils.find(lambda m: m.id == userId, members)
 
+def FindChannelById(channels, channelId):
+	return discord.utils.find(lambda m: m.id == channelId, channels)
+
 def GetLemmyCoinBalance(res, user):
 	cursor = res.sqlConnection.cursor()
 	cursor.execute("SELECT LemmyCoinBalance FROM tblUser WHERE UserId = ?", (user.id,))

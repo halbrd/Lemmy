@@ -7,6 +7,7 @@ import LemmyCommands as Lcmds
 import LemmyResources as Lres
 import LemmyConstants as Lconst
 import LemmyTags as Ltags
+import LemmyRadio as Lradio
 from LemmyRadio import LemmyRadio
 from FloodProtector import FloodProtector
 from CallLogger import CallLogger
@@ -31,56 +32,57 @@ class LemmyBot:
 		self.tags = Ltags.LemmyTags()
 		self.constants = Lconst.LemmyConstants()
 		self.callLogger = None
+		self.radio = Lradio.LemmyRadio(None, None)
 
 		### Map member functions to LemmyCommands functions ###
-		self.help = Lcmds.help
-		self.emotes = Lcmds.emotes
-		self.stickers = Lcmds.stickers
-		self.lenny = Lcmds.lenny
-		self.refresh = Lcmds.refresh
-		self.correct = Lcmds.correct
-		self.eightball = Lcmds.eightball
-		self.userinfo = Lcmds.userinfo
-		self.channelinfo = Lcmds.channelinfo
-		self.james = Lcmds.james
-		self.happening = Lcmds.happening
-		self.ruseman = Lcmds.ruseman
-		self.lemmycoin = Lcmds.lemmycoin
-		self.channelids = Lcmds.channelids
-		self.serverinfo = Lcmds.serverinfo
-		self.choose = Lcmds.choose
-		#self.radio = Lcmds.radio
-		#self.tts = Lcmds.tts
-		self.playgame = Lcmds.playgame
-		self.tilt = Lcmds.tilt
-		self.logout = Lcmds.logout
+		# self.help = Lcmds.help
+		# self.emotes = Lcmds.emotes
+		# self.stickers = Lcmds.stickers
+		# self.lenny = Lcmds.lenny
+		# self.refresh = Lcmds.refresh
+		# self.correct = Lcmds.correct
+		# self.eightball = Lcmds.eightball
+		# self.userinfo = Lcmds.userinfo
+		# self.channelinfo = Lcmds.channelinfo
+		# self.james = Lcmds.james
+		# self.happening = Lcmds.happening
+		# self.ruseman = Lcmds.ruseman
+		# self.lemmycoin = Lcmds.lemmycoin
+		# self.channelids = Lcmds.channelids
+		# self.serverinfo = Lcmds.serverinfo
+		# self.choose = Lcmds.choose
+		# self.radio = Lcmds.radio
+		# #self.tts = Lcmds.tts
+		# self.playgame = Lcmds.playgame
+		# self.tilt = Lcmds.tilt
+		# self.logout = Lcmds.logout
 
 		# Map of function names to their equivalent function pointers
 		self.funcMap = {
-			"help": self.help,
-			"emotes": self.emotes,
-			"stickers": self.stickers,
-			"lenny": self.lenny,
-			"refresh": self.refresh,
-			"f5": self.refresh,
-			"correct": self.correct,
-			"8ball": self.eightball,
-			"userinfo": self.userinfo,
-			"channelinfo": self.channelinfo,
-			"james": self.james,
-			"happening": self.happening,
-			"ruseman": self.ruseman,
-			"lemmycoin": self.lemmycoin,
-			"lc": self.lemmycoin,
-			"l$": self.lemmycoin,
-			"channelids": self.channelids,
-			"serverinfo": self.serverinfo,
-			"choose": self.choose,
-			#"radio": self.radio,
-			#"tts": self.tts,
-			"playgame": self.playgame,
-			"tilt": self.tilt,
-			"logout": self.logout
+			"help": Lcmds.help,
+			"emotes": Lcmds.emotes,
+			"stickers": Lcmds.stickers,
+			"lenny": Lcmds.lenny,
+			"refresh": Lcmds.refresh,
+			"f5": Lcmds.refresh,
+			"correct": Lcmds.correct,
+			"8ball": Lcmds.eightball,
+			"userinfo": Lcmds.userinfo,
+			"channelinfo": Lcmds.channelinfo,
+			"james": Lcmds.james,
+			"happening": Lcmds.happening,
+			"ruseman": Lcmds.ruseman,
+			"lemmycoin": Lcmds.lemmycoin,
+			"lc": Lcmds.lemmycoin,
+			"l$": Lcmds.lemmycoin,
+			"channelids": Lcmds.channelids,
+			"serverinfo": Lcmds.serverinfo,
+			"choose": Lcmds.choose,
+			"radio": Lcmds.radio,
+			#"tts": Lcmds.tts,
+			"playgame": Lcmds.playgame,
+			"tilt": Lcmds.tilt,
+			"logout": Lcmds.logout
 		}
 		
 		self.symbolMap = {
@@ -176,6 +178,18 @@ class LemmyBot:
 			print("Call Logger initialized with the following channels:")
 			for channel in channelList:
 				print("[" + Lutils.StripUnicode(channel.server.name) + "] " + Lutils.StripUnicode(channel.name.strip()))
+
+			print(Lutils.TitleBox("Mapping Radio Channels"))
+			channelList = []
+			for server in self.client.servers:
+				for channel in server.channels:
+					channelList.append(channel)
+			radioChannel = Lutils.FindChannelById(channelList, "133010408377286656")
+			infoChannel = Lutils.FindChannelById(channelList, "134272864999178241")
+			self.radio.radioChannel = radioChannel
+			self.radio.infoChannel = infoChannel
+			print("radioChannel mapped to " + Lutils.StripUnicode(radioChannel.name) if radioChannel is not None else "WARNING: radioChannel is null!")
+			print("infoChannel mapped to " + Lutils.StripUnicode(infoChannel.name) if infoChannel is not None else "WARNING: infoChannel is null!")
 
 			print(Lutils.TitleBox("Listening For Messages"))
 

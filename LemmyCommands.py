@@ -341,6 +341,47 @@ async def tilt(self, msg, dmsg):
 				await self.client.send_file(msg.channel, "pics/temp/rotated.png")
 				os.remove("pics/temp/rotated.png")
 
+async def radio(self, msg, dmsg):
+	#await self.client.send_message(msg.channel, self.constants.error + " This command has been disabled due to the overwhelming probability that everything will explode upon invocation.")
+
+	for fullFlag in dmsg.flags:
+		flag = fullFlag[0]
+
+		if flag == "-init":
+			self.radio.voiceConnection = await self.client.join_voice_channel(self.radio.radioChannel)
+
+		elif flag == "-shuffletag":
+			if len(fullFlag) < 2:
+				await self.client.send_message(msg.channel, self.constants.error + " No tag was given.")
+			else:
+				tag = fullFlag[1]
+				tagConverter = {
+					"cafe del mar": "Cafe Del Mar",
+					"payday": "PAYDAY 2 Official Soundtrack"
+				}
+
+				if tag.lower() not in tagConverter:
+					await self.client.send_message(msg.channel, self.constants.error + " Tag not recognized (available tags: " + ", ".join([x for x in tagConverter]) + ")")
+				else:
+					convertedTag = tagConverter[tag]
+					await self.radio.ShuffleTag(self.client, convertedTag)
+
+		elif flag == "-playyt":
+			if len(fullFlag) < 2:
+				await self.client.send_message(msg.channel, self.constants.error + " No URL was given")
+			else:
+				url = fullFlag[1]
+				try:
+					await self.radio.PlayYoutubeVideo(self.client, url)
+				except Exception as e:
+					await self.client.send_message(msg.channel, self.constants.error + " " + str(e))
+
+
+
+		elif flag == "-exit":
+			await self.radio.voiceConnection.disconnect()
+
+
 
 
 # async def radio(self, msg, dmsg):

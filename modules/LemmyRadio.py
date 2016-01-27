@@ -1,3 +1,91 @@
+import discord
+import asyncio
+import os
+from pprint import pprint
+import random
+import stagger
+
+def GetSongInfo(filename):
+		try:
+			tag = stagger.read_tag(filename)
+		except:
+			return None
+		else:
+			ret = "" + tag.title + "\n"
+			ret += "*" + tag.artist + "*\n"
+			ret += "*" + tag.album + "*"
+			return ret
+
+class Song:
+	def __init__(self, player, info):
+		self.player = player
+		self.info = info
+
+class LemmyRadio:
+	def __init__(self, radioChannel, infoChannel):
+		self.radioChannel = radioChannel
+		self.infoChannel = infoChannel
+		self.voiceConnection = None
+		self.player = None
+
+	async def ClosePlayer(self):
+		if self.player is not None:
+			self.player.stop()
+			self.player = None
+
+	async def ShuffleTag(self, client, tag):
+		directory = "N:\\" + tag + "\\"
+
+		#print("Shuffling " + directory)
+
+		songs = []
+		for path, subdirs, files in os.walk(directory):
+			for name in files:
+				if name.endswith(".mp3") or name.endswith(".m4a"):
+					songs.append(os.path.join(path, name))
+		random.shuffle(songs)
+
+		#print(str(len(songs)) + " songs in queue.")
+		await client.send_message(self.infoChannel, str(len(songs)) + " songs in queue.")
+
+		await self.ClosePlayer()
+
+		while len(songs) > 0 and (self.player is None or self.player.is_done()):
+			self.ClosePlayer()
+
+			index = random.randint(0, len(songs) - 1)
+			song = songs[index]
+			del songs[index]
+
+			self.player = self.voiceConnection.create_ffmpeg_player(song)
+			player.start()
+			info = GetSongInfo(song)
+			await client.send_message(self.infoChannel, "**=== Now Playing ===**\n" + info)
+
+	async def PlayYoutubeVideo(self, client, url):
+		await self.ClosePlayer()
+
+		self.player = self.voiceConnection.create_ytdl_player(url)
+		self.player.start()
+
+
+			
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""
 import sys
 sys.path.append('..')
 
@@ -131,3 +219,4 @@ class LemmyRadio:
 			return "--------------\n:musical_note: Now Playing\n" + self.GetSongInfo(self.currentSong)
 		else:
 			return "No song playing."
+"""
