@@ -8,6 +8,7 @@ import LemmyResources as Lres
 import LemmyConstants as Lconst
 import LemmyTags as Ltags
 import LemmyRadio as Lradio
+import LemmyConfig as Lconf
 from LemmyRadio import LemmyRadio
 from FloodProtector import FloodProtector
 from CallLogger import CallLogger
@@ -33,66 +34,10 @@ class LemmyBot:
 		self.constants = Lconst.LemmyConstants()
 		self.callLogger = None
 		self.radio = Lradio.LemmyRadio(None, None)
-
-		### Map member functions to LemmyCommands functions ###
-		# self.help = Lcmds.help
-		# self.emotes = Lcmds.emotes
-		# self.stickers = Lcmds.stickers
-		# self.lenny = Lcmds.lenny
-		# self.refresh = Lcmds.refresh
-		# self.correct = Lcmds.correct
-		# self.eightball = Lcmds.eightball
-		# self.userinfo = Lcmds.userinfo
-		# self.channelinfo = Lcmds.channelinfo
-		# self.james = Lcmds.james
-		# self.happening = Lcmds.happening
-		# self.ruseman = Lcmds.ruseman
-		# self.lemmycoin = Lcmds.lemmycoin
-		# self.channelids = Lcmds.channelids
-		# self.serverinfo = Lcmds.serverinfo
-		# self.choose = Lcmds.choose
-		# self.radio = Lcmds.radio
-		# #self.tts = Lcmds.tts
-		# self.playgame = Lcmds.playgame
-		# self.tilt = Lcmds.tilt
-		# self.logout = Lcmds.logout
-
-		# Map of function names to their equivalent function pointers
-		self.funcMap = {
-			"help": Lcmds.help,
-			"emotes": Lcmds.emotes,
-			"stickers": Lcmds.stickers,
-			"lenny": Lcmds.lenny,
-			"refresh": Lcmds.refresh,
-			"f5": Lcmds.refresh,
-			"correct": Lcmds.correct,
-			"8ball": Lcmds.eightball,
-			"userinfo": Lcmds.userinfo,
-			"channelinfo": Lcmds.channelinfo,
-			"james": Lcmds.james,
-			"happening": Lcmds.happening,
-			"ruseman": Lcmds.ruseman,
-			"lemmycoin": Lcmds.lemmycoin,
-			"lc": Lcmds.lemmycoin,
-			"l$": Lcmds.lemmycoin,
-			"channelids": Lcmds.channelids,
-			"serverinfo": Lcmds.serverinfo,
-			"choose": Lcmds.choose,
-			"radio": Lcmds.radio,
-			#"tts": Lcmds.tts,
-			"playgame": Lcmds.playgame,
-			"tilt": Lcmds.tilt,
-			"logout": Lcmds.logout
-		}
-		
-		self.symbolMap = {
-			"77041788564545536": "!",   # Better Than Skype
-			"77041897784225792": "!"   # blue87
-		}
-
+		self.config = Lconf.LemmyConfig()
 		self.floodProtectors = {
-			"emote": FloodProtector(5),
-			"sticker": FloodProtector(5)
+			"emote": FloodProtector(self.config.cooldown["emote"]),
+			"sticker": FloodProtector(self.config.cooldown["sticker"])
 		}
 
 		self.client = discord.Client()
@@ -100,110 +45,19 @@ class LemmyBot:
 		print(Lutils.TitleBox("Registering Events"))
 
 		@self.client.event
-		async def on_ready():
-			print("Successfully logged in.")
-			print("USERNAME: " + username)
-			print("PASSWORD: " + "".join(["*" for x in password]))
-
-			print(Lutils.TitleBox("Checking Command Symbols"))
-			for server in self.client.servers:
-				if server.id in self.symbolMap:
-					print("Server '" + server.name + "' has been assigned the command symbol '" + self.symbolMap[server.id] + "'.")
-				else:
-					print("Warning! Server '" + server.name + "' has no command symbol assigned to it.")
-
-			print(Lutils.TitleBox("Checking Channel Mapping"))
-			warnings = False
-			for server in self.client.servers:
-
-				# Server hasn't been mapped at all
-				if server.id not in self.res.voiceToTextChannelMaps and server.id not in self.res.textToVoiceChannelMaps:
-					print("Warning! Server '" + server.name + "' does not have its voice or text channels mapped.")
-					warnings = True
-
-				# Server has had text channels mapped, but not voice channels
-				elif server.id not in self.res.voiceToTextChannelMaps:
-					print("Warning! Server '" + server.name + "' does not have its voice channels mapped.")
-					warnings = True
-					for channel in server.channels:
-						if channel.type == discord.ChannelType.text and channel.id not in self.res.textToVoiceChannelMaps[server.id]:
-							print("  Warning! Server '" + server.name + "'s text channel " + channel.name + " has not been mapped to a voice channel (or None).")
-
-				# Server has had voice channels mapped, but not text channels
-				elif server.id not in self.res.textToVoiceChannelMaps:
-					print("Warning! Server '" + server.name + "' does not have its text channels mapped.")
-					warnings = True
-					for channel in server.channels:
-						if channel.type == discord.ChannelType.voice and channel.id not in self.res.voiceToTextChannelMaps[server.id]:
-							print("  Warning! Server '" + server.name + "'s voice channel " + Lutils.StripUnicode(channel.name).strip() + " has not been mapped to a text channel (or None).")
-
-				# Server has had voice and text channels mapped
-				else:
-					print("Server '" + server.name + "' has its voice and text channels mapped.")
-					for channel in server.channels:
-						if channel.type == discord.ChannelType.text and channel.id not in self.res.textToVoiceChannelMaps[server.id]:
-							print("Warning! Server '" + server.name + "'s text channel " + channel.name + " has not been mapped to a voice channel (or None).")
-							warnings = True
-					for channel in server.channels:
-						if channel.type == discord.ChannelType.voice and channel.id not in self.res.voiceToTextChannelMaps[server.id]:
-							print("Warning! Server '" + server.name + "'s voice channel " + Lutils.StripUnicode(channel.name).strip() + " has not been mapped to a text channel (or None).")
-							warnings = True
-
-			if not warnings:
-				print("All channels of all servers have been mapped.")
-
-
-			print(Lutils.TitleBox("Registering Users"))
-			members = []
-			for server in self.client.servers:
-				for member in server.members:
-					members.append(member)
-
-			cursor = self.res.sqlConnection.cursor()
-
-			for member in members:
-				cursor.execute("SELECT * FROM tblUser WHERE UserId = ?", (member.id,))
-				if len(cursor.fetchall()) == 0:
-					print("Registering new user '" + member.name + "'.")
-					cursor.execute("INSERT INTO tblUser VALUES (?, 10)", (member.id,))
-				self.res.sqlConnection.commit()
-
-			print(Lutils.TitleBox("Initializing Call Logger"))
-			channelList = []
-			for server in self.client.servers:
-				for channel in server.channels:
-					if channel.type == discord.ChannelType.voice:
-						channelList.append(channel)
-			self.callLogger = CallLogger(channelList)
-			print("Call Logger initialized with the following channels:")
-			for channel in channelList:
-				print("[" + Lutils.StripUnicode(channel.server.name) + "] " + Lutils.StripUnicode(channel.name.strip()))
-
-			print(Lutils.TitleBox("Mapping Radio Channels"))
-			channelList = []
-			for server in self.client.servers:
-				for channel in server.channels:
-					channelList.append(channel)
-			radioChannel = Lutils.FindChannelById(channelList, "133010408377286656")
-			infoChannel = Lutils.FindChannelById(channelList, "134272864999178241")
-			self.radio.radioChannel = radioChannel
-			self.radio.infoChannel = infoChannel
-			print("radioChannel mapped to " + Lutils.StripUnicode(radioChannel.name) if radioChannel is not None else "WARNING: radioChannel is null!")
-			print("infoChannel mapped to " + Lutils.StripUnicode(infoChannel.name) if infoChannel is not None else "WARNING: infoChannel is null!")
-
-			print(Lutils.TitleBox("Listening For Messages"))
-
-
-		@self.client.event
 		async def on_message(msg):
 			await Lutils.LogMessage(msg)
 
 			# Message is a command
-			if msg.content.startswith(self.symbolMap[msg.server.id]) and msg.author != self.client.user:
-				dmsg = Lutils.ParseMessage(msg.content[len(self.symbolMap[msg.server.id]):])
+			if msg.content.startswith(self.config.symbol[(msg.server.id if msg.server is not None else None)]) and msg.author != self.client.user:
+				dmsg = Lutils.ParseMessage(msg.content[len(self.config.symbol[(msg.server.id if msg.server is not None else None)]):])
 
-				if dmsg.command is not None and dmsg.command in self.funcMap:
-					await self.funcMap[dmsg.command](self, msg, dmsg)
+				if dmsg.command is not None and dmsg.command in self.config.command:
+					if self.config.command[dmsg.command]["enabled"]:
+						if self.config.command[dmsg.command]["moderator"] and not Lutils.IsModOrAbove(msg.author):
+							await self.client.send_message(msg.channel, self.constants.error + " " + self.constants.errNotMod)
+						else:
+							await self.config.command[dmsg.command]["function"](self, msg, dmsg)
 
 			# Message is an emote
 			elif msg.content in self.res.emotes and msg.author != self.client.user:
@@ -262,6 +116,93 @@ class LemmyBot:
 			for match in re.findall("&" + tagMatch, msg.content):
 				await self.client.send_message(msg.channel, Lutils.GetPingText(self, msg, match))
 
+
+		@self.client.event
+		async def on_ready():
+			print("Successfully logged in.")
+			print("USERNAME: " + username)
+			print("PASSWORD: " + "".join(["*" for x in password]))
+
+			print(Lutils.TitleBox("Checking Command Symbols"))
+			for server in self.client.servers:
+				if server.id in self.config.symbol:
+					print("Server '" + server.name + "' has been assigned the command symbol '" + self.config.symbol[server.id] + "'.")
+				else:
+					print("Warning! Server '" + server.name + "' has no command symbol assigned to it.")
+
+			print(Lutils.TitleBox("Checking Channel Mapping"))
+			warnings = False
+			
+			print("Voice to text channel map loaded with " + str(len(self.config.voiceToText)) + " servers mapped.")
+			print("Text to voice channel map loaded with " + str(len(self.config.textToVoice)) + " servers mapped.")
+
+			for server in self.client.servers:
+
+				# Server hasn't been mapped at all
+				if server.id not in self.config.voiceToText and server.id not in self.config.textToVoice:
+					print("Warning! Server '" + server.name + "' does not have its voice or text channels mapped.")
+					warnings = True
+
+				# Server has had text channels mapped, but not voice channels
+				elif server.id not in self.config.voiceToText:
+					print("Warning! Server '" + server.name + "' does not have its voice channels mapped.")
+					warnings = True
+					for channel in server.channels:
+						if channel.type == discord.ChannelType.text and channel.id not in self.config.textToVoice[server.id]:
+							print("  Warning! Server '" + server.name + "'s text channel " + channel.name + " has not been mapped to a voice channel (or None).")
+
+				# Server has had voice channels mapped, but not text channels
+				elif server.id not in self.config.textToVoice:
+					print("Warning! Server '" + server.name + "' does not have its text channels mapped.")
+					warnings = True
+					for channel in server.channels:
+						if channel.type == discord.ChannelType.voice and channel.id not in self.config.voiceToText[server.id]:
+							print("  Warning! Server '" + server.name + "'s voice channel " + Lutils.StripUnicode(channel.name).strip() + " has not been mapped to a text channel (or None).")
+
+				# Server has had voice and text channels mapped
+				else:
+					print("Server '" + server.name + "' has its voice and text channels mapped.")
+					for channel in server.channels:
+						if channel.type == discord.ChannelType.text and channel.id not in self.config.textToVoice[server.id]:
+							print("Warning! Server '" + server.name + "'s text channel " + channel.name + " has not been mapped to a voice channel (or None).")
+							warnings = True
+					for channel in server.channels:
+						if channel.type == discord.ChannelType.voice and channel.id not in self.config.voiceToText[server.id]:
+							print("Warning! Server '" + server.name + "'s voice channel " + Lutils.StripUnicode(channel.name).strip() + " has not been mapped to a text channel (or None).")
+							warnings = True
+
+			if not warnings:
+				print("All channels of all servers have been mapped.")
+
+
+			print(Lutils.TitleBox("Registering New Users"))
+			members = []
+			for server in self.client.servers:
+				for member in server.members:
+					members.append(member)
+
+			cursor = self.res.sqlConnection.cursor()
+
+			for member in members:
+				cursor.execute("SELECT * FROM tblUser WHERE UserId = ?", (member.id,))
+				if len(cursor.fetchall()) == 0:
+					print("Registering new user '" + member.name + "'.")
+					cursor.execute("INSERT INTO tblUser VALUES (?, 10)", (member.id,))
+				self.res.sqlConnection.commit()
+
+			print(Lutils.TitleBox("Initializing Call Logger"))
+			channelList = []
+			for server in self.client.servers:
+				for channel in server.channels:
+					if channel.type == discord.ChannelType.voice:
+						channelList.append(channel)
+			self.callLogger = CallLogger(channelList)
+			print("Call Logger initialized with the following channels:")
+			for channel in channelList:
+				print("[" + Lutils.StripUnicode(channel.server.name) + "] " + Lutils.StripUnicode(channel.name.strip()))
+
+			print(Lutils.TitleBox("Listening For Messages"))
+
 						
 		@self.client.event
 		async def on_message_edit(before, after):
@@ -271,8 +212,7 @@ class LemmyBot:
 
 		@self.client.event
 		async def on_message_delete(msg):
-			# await Lutils.LogMessageDelete(msg)
-			pass
+			await Lutils.LogMessageDelete(msg)
 
 		@self.client.event
 		async def on_voice_state_update(before, after):
@@ -287,8 +227,8 @@ class LemmyBot:
 				channel = response[0]
 				timeString = response[1]
 
-				if channel.server.id in self.res.voiceToTextChannelMaps:
-					textChannelId = self.res.voiceToTextChannelMaps[channel.server.id][channel.id]
+				if channel.server.id in self.config.voiceToText:
+					textChannelId = self.config.voiceToText[channel.server.id][channel.id]
 					if textChannelId is not None:
 						textChannel = discord.utils.find(lambda m: m.id == textChannelId, channel.server.channels)
 						await self.client.send_message(textChannel if textChannel is not None else channel.server.get_default_channel(), "Call ended in " + Lutils.StripUnicode(channel.name).strip() + ", duration " + timeString)

@@ -165,7 +165,7 @@ async def james(self, msg, dmsg):
 
 		elif flag == "-create":
 			if not Lutils.IsModOrAbove(msg.author):
-				await self.client.send_message(msg.channel, self.constants.error + " No new tag created: User is not moderator or above.")
+				await self.client.send_message(msg.channel, self.constants.error + " No new tag created: " + self.constants.errNotMod)
 			else:
 				if len(flagParams) == 0:
 					await self.client.send_message(msg.channel, self.constants.error + " No new tag created: No tag name was specified.")
@@ -186,7 +186,7 @@ async def james(self, msg, dmsg):
 
 		elif flag == "-delete":
 			if not Lutils.IsModOrAbove(msg.author):
-				await self.client.send_message(msg.channel, self.constants.error + " No tag deleted: User is not moderator or above.")
+				await self.client.send_message(msg.channel, self.constants.error + " No tag deleted: " + self.constants.errNotMod)
 			else:
 				if len(flagParams) == 0:
 					await self.client.send_message(msg.channel, self.constants.error + " No tag deleted: No tag name was specified.")
@@ -316,6 +316,10 @@ async def choose(self, msg, dmsg):
 		# await self.client.send_message(msg.channel, msg.author.mention + "\n```\n" + random.choice(options) + "\n```")
 		await self.client.send_message(msg.channel, msg.author.mention + "   `" + random.choice(options) + "`")
 
+async def tts(self, msg, dmsg):
+	await self.client.send_message(msg.channel, msg.content[5:], tts=True)
+	await self.client.delete_message(msg)
+
 async def playgame(self, msg, dmsg):
 	await self.client.change_status(game=(discord.Game(name=dmsg.params[0]) if len(dmsg.params) > 0 else None))
 
@@ -348,7 +352,14 @@ async def radio(self, msg, dmsg):
 		flag = fullFlag[0]
 
 		if flag == "-init":
+			self.radio.radioChannel = Lutils.FindChannelById(msg.server.channels, self.config.radioVoiceChannel[msg.server.id])
+			self.radio.infoChannel = Lutils.FindChannelById(msg.server.channels, self.config.radioInfoChannel[msg.server.id])
 			self.radio.voiceConnection = await self.client.join_voice_channel(self.radio.radioChannel)
+
+		elif flag == "-exit":
+			await self.radio.voiceConnection.disconnect()
+			self.radio.radioChannel = None
+			self.radio.infoChannel = None
 
 		elif flag == "-shuffletag":
 			if len(fullFlag) < 2:
@@ -375,11 +386,6 @@ async def radio(self, msg, dmsg):
 					await self.radio.PlayYoutubeVideo(self.client, url)
 				except Exception as e:
 					await self.client.send_message(msg.channel, self.constants.error + " " + str(e))
-
-
-
-		elif flag == "-exit":
-			await self.radio.voiceConnection.disconnect()
 
 
 
@@ -488,7 +494,3 @@ async def radio(self, msg, dmsg):
 # 	Lutils.CombineImages(images)
 
 # 	await client.send_file(msg.channel, "pics/result.png")
-
-# async def tts(self, msg, dmsg):
-# 	await self.client.send_message(msg.channel, msg.content[5:], tts=True)
-# 	await self.client.delete_message(msg)

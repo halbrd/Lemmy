@@ -1,9 +1,15 @@
+# Lemmy's stuff
+import LemmyUtils as Lutils
+
+# Other stuff
 import json
 
 class LemmyTags:
 	def __init__(self):
 		self.db = None
 		self.converter = None
+
+		print(Lutils.TitleBox("Loading Tags"))
 
 		try:
 			with open("db/tagDb.json", "r") as f:

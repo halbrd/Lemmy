@@ -58,7 +58,7 @@ class LemmyRadio:
 			del songs[index]
 
 			self.player = self.voiceConnection.create_ffmpeg_player(song)
-			player.start()
+			self.player.start()
 			info = GetSongInfo(song)
 			await client.send_message(self.infoChannel, "**=== Now Playing ===**\n" + info)
 
