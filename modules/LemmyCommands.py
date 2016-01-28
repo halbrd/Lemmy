@@ -327,9 +327,9 @@ async def tilt(self, msg, dmsg):
 	if len(dmsg.params) > 0:
 		#urllib.request.urlretrieve(msg.author.avatar_url, "pics/temp/avatar.jpg")
 		#Lutils.RotateImage("pics/temp/avatar.jpg")
-		emoteName = dmsg.params[0]
-		if not emoteName in self.res.emotes:
-			await self.client.send_message(msg.channel, self.constants.error + " Emote '" + emoteName + "' not found.")
+		imgName = dmsg.params[0]
+		if not imgName in self.res.emotes and not imgName in self.res.stickers:
+			await self.client.send_message(msg.channel, self.constants.error + " Emote or sticker '" + imgName + "' not found.")
 		else:
 			send = True
 			angle = -45
@@ -341,7 +341,10 @@ async def tilt(self, msg, dmsg):
 					send = false
 
 			if send:
-				Lutils.RotateImage("pics/emotes/" + dmsg.params[0] + ".png", angle)
+				if imgName in self.res.emotes:
+					Lutils.RotateImage("pics/emotes/" + dmsg.params[0] + ".png", angle)
+				elif imgName in self.res.stickers:
+					Lutils.RotateImage("pics/stickers/" + dmsg.params[0] + ".png", angle)
 				await self.client.send_file(msg.channel, "pics/temp/rotated.png")
 				os.remove("pics/temp/rotated.png")
 

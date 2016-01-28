@@ -163,5 +163,10 @@ class LemmyConfig:
 				"function": Lcmds.logout,
 				"enabled": True,
 				"moderator": True
+			},
+			"shutdown": {
+				"function": Lcmds.logout,
+				"enabled": True,
+				"moderator": True
 			}
 		}

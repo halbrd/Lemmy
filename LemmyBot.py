@@ -78,22 +78,19 @@ class LemmyBot:
 					await self.client.delete_message(msg)
 
 			else:
-				imageMatch = "("
-				imageMatch += "|".join(self.res.emotes)
-				imageMatch += "|"
-				imageMatch += "|".join(self.res.stickers)
-				imageMatch += ")"
+				imageMatch = "(" + "|".join(self.res.emotes) + "|" + "|".join(self.res.stickers) + ")"
 
 				# Message is a hybrid emote
 				if re.match(imageMatch + "( +" + imageMatch + ")+", msg.content):
 					imageTerms = msg.content.split()
 					images = []
 					for imageTerm in imageTerms:
-						# I'm *really* sorry about these next 4 lines.
-						try:
+						if imageTerm in self.res.emotes:
 							images.append(Image.open("pics/emotes/" + imageTerm + ".png"))
-						except IOError:
+						elif imageTerm in self.res.stickers:
 							images.append(Image.open("pics/stickers/" + imageTerm + ".png"))
+						else:
+							images.append(Image.new("RGBA", (64,64)))							
 
 					# This saves the combined image as pics/result.png
 					Lutils.CombineImages(images)
@@ -108,11 +105,10 @@ class LemmyBot:
 					for image in imageTerms:
 						Lutils.LogEmoteUse(self.res, msg.author, image)
 
-			tagMatch = "("
-			tagMatch += "|".join([x for x in self.tags.db])
-			tagMatch += ")"
+			tagMatch = "(" + "|".join([x for x in self.tags.db]) + ")"
 			sentTags = []
 
+			# Ampersand-prefixed tags
 			for match in re.findall("&" + tagMatch, msg.content):
 				await self.client.send_message(msg.channel, Lutils.GetPingText(self, msg, match))
 
