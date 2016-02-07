@@ -17,8 +17,9 @@ def GetSongInfo(filename):
 			return ret
 
 class Song:
-	def __init__(self, player, info):
-		self.player = player
+	def __init__(self, type, source, info):
+		self.type = type
+		self.source = source
 		self.info = info
 
 class LemmyRadio:
@@ -26,7 +27,57 @@ class LemmyRadio:
 		self.radioChannel = radioChannel
 		self.infoChannel = infoChannel
 		self.voiceConnection = None
+		self.queue = []
+		self.queueIndex = -1
 		self.player = None
+
+	def CurrentSong(self):
+		assert self.queueIndex < len(self.queue), "Queue index exceeded queue length"
+		return self.queue[self.queueIndex]
+
+	async def QueueSong(self, song):
+		self.queue.append(song)
+		if self.player is None and self.queueIndex == -1:
+			self.NextSong()
+
+	async def Pause(self):
+		if self.voiceConnection is not None:
+			if len(self.queue) > 0 and not self.player.is_done():
+				self.player.pause()
+
+	async def Resume(self):
+		if self.voiceConnection is not None:
+			if len(self.queue) > 0 and not self.player.is_done():
+				self.player.resume()
+
+	def NextSong(self):
+		if len(self.queue) > self.queueIndex + 1:
+			if self.player is not None:
+				self.player.stop()
+			self.player = None
+			
+			print("Queue index = " + str(self.queueIndex))
+			self.queueIndex += 1
+			
+			print("Creating player from source " + self.CurrentSong().source)
+			if self.CurrentSong().type == "youtube":
+				self.player = self.voiceConnection.create_ytdl_player(self.CurrentSong().source, after=self.NextSong)
+			print("Created player.")
+			
+			self.player.start()
+
+	def PrevSong(self):
+		if self.queueIndex > 0:
+			if self.player is not None:
+				self.player.stop()
+			self.player = None
+			
+			self.queueIndex -= 1
+			
+			if self.CurrentSong().type == "youtube":
+				self.player = self.voiceConnection.create_ytdl_player(self.CurrentSong().source, after=self.NextSong)
+			
+			self.player.start()
 
 	async def ClosePlayer(self):
 		if self.player is not None:
@@ -61,6 +112,10 @@ class LemmyRadio:
 			self.player.start()
 			info = GetSongInfo(song)
 			await client.send_message(self.infoChannel, "**=== Now Playing ===**\n" + info)
+
+	async def LoopSong(self, songPath):
+		self.player = self.voiceConnection.create_ffmpeg_player(songPath, after=self.LoopSong(songPath))
+		self.player.start()
 
 	async def PlayYoutubeVideo(self, client, url):
 		await self.ClosePlayer()

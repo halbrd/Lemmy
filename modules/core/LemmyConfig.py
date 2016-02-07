@@ -3,6 +3,7 @@ import LemmyCommands as Lcmds
 
 class LemmyConfig:
 	def __init__(self):
+
 		self.symbol = {
 			"77041788564545536": "!",   # Better Than Skype
 			None: "!"

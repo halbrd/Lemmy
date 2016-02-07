@@ -6,6 +6,7 @@ import random
 import datetime
 import re
 from math import sin, cos, ceil
+import os
 
 class DecomposedMessage:
 	def __init__(self, command, params, flags):
@@ -35,14 +36,20 @@ def ParseMessage(messageText):
 	return DecomposedMessage(command, params, flags)
 
 async def SendEmote(client, msg):
-	await client.send_message(msg.channel, "__**" + msg.author.name + "**__")
+	await client.send_message(msg.channel, "**" + msg.author.name + "**")
 	await client.send_file(msg.channel, "pics/emotes/" + msg.content + ".png")
 	await client.delete_message(msg)
 
 async def SendSticker(client, msg):
-	await client.send_message(msg.channel, "__**" + msg.author.name + "**__")
+	await client.send_message(msg.channel, "**" + msg.author.name + "**")
 	await client.send_file(msg.channel, "pics/stickers/" + msg.content + ".png")
 	await client.delete_message(msg)
+
+async def SendTemp(client, msg):
+	await client.send_message(msg.channel, "**" + msg.author.name + "**")
+	await client.send_file(msg.channel, "pics/temp/temp.png")
+	await client.delete_message(msg)
+	os.remove("pics/temp/temp.png")
 
 def StripUnicode(string):
 	stripped = [c for c in string if 0 < ord(c) < 127]
@@ -94,7 +101,7 @@ def CombineImages(images):
 		horizontalPointer += images[i].size[0]
 		i += 1
 
-	result.save("pics/temp/combination.png")
+	result.save("pics/temp/temp.png")
 
 def LogEmoteUse(res, sender, emote):
 	cursor = res.sqlConnection.cursor()
@@ -115,7 +122,7 @@ async def LogMessageEdit(before, after):
 	print("(Non-text message or file)" if not after.content else RemoveUnicode(after.content).replace("\n", "\n" + tab))
 
 async def LogMessageDelete(msg):
-	metadata = "[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] " + msg.author.name + " x> " + ("(private channel)" if msg.channel.is_private else msg.channel.name) + ": "
+	metadata = "[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] " + msg.author.name + "? x> " + ("(private channel)" if msg.channel.is_private else msg.channel.name) + ": "
 	tab = "".join([" " for _ in range(len(metadata))])
 	print(metadata + ("(Non-text message or file)" if not msg.content else RemoveUnicode(msg.content).replace("\n", "\n" + tab)))
 
@@ -131,7 +138,7 @@ def RotateImage(sourceLocation, angle):
 	result = Image.new("RGBA", nd)
 	result.paste(source, (ceil((nd[0] - od[0])/2), ceil((nd[1] - od[1])/2)))
 	result = result.rotate(angle)
-	result.save("pics/temp/rotated.png")
+	result.save("pics/temp/temp.png")
 
 def GetPingText(self, msg, tag):
 	response = msg.author.mention  + " pinging "

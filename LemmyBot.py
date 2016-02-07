@@ -1,5 +1,6 @@
 import sys
 sys.path.append('modules')
+sys.path.append('modules/core')
 
 # Lemmy's stuff
 import LemmyUtils as Lutils
@@ -22,6 +23,7 @@ import shlex
 import os
 import re
 from PIL import Image
+import random
 
 class LemmyBot:
 	def __init__(self, username, password):
@@ -90,17 +92,12 @@ class LemmyBot:
 						elif imageTerm in self.res.stickers:
 							images.append(Image.open("pics/stickers/" + imageTerm + ".png"))
 						else:
-							images.append(Image.new("RGBA", (64,64)))							
+							images.append(Image.new("RGBA", (64,64)))
 
-					# This saves the combined image as pics/result.png
+					# This saves the combined image as pics/temp.png
 					Lutils.CombineImages(images)
 
-					await self.client.send_message(msg.channel, "__**" + msg.author.name + "**__")
-					await self.client.send_file(msg.channel, "pics/temp/combination.png")
-
-					os.remove("pics/temp/combination.png")
-
-					await self.client.delete_message(msg)
+					await Lutils.SendTemp(self.client, msg)
 
 					for image in imageTerms:
 						Lutils.LogEmoteUse(self.res, msg.author, image)
@@ -109,7 +106,7 @@ class LemmyBot:
 			sentTags = []
 
 			# Ampersand-prefixed tags
-			for match in re.findall("&" + tagMatch, msg.content):
+			for match in re.findall("(&|$)" + tagMatch, msg.content):
 				await self.client.send_message(msg.channel, Lutils.GetPingText(self, msg, match))
 
 
@@ -197,6 +194,28 @@ class LemmyBot:
 			for channel in channelList:
 				print("[" + Lutils.StripUnicode(channel.server.name) + "] " + Lutils.StripUnicode(channel.name.strip()))
 
+			# print(Lutils.TitleBox("Sending Online Message"))
+
+			# channelList = []
+			# for server in self.client.servers:
+			# 	for channel in server.channels:
+			# 		channelList.append(channel)
+
+			# for server in self.client.servers:
+			# 	words = []
+			# 	for channel in server.channels:
+			# 		logs = self.client.logs_from(channel, limit=10)
+			# 		async for message in logs:
+			# 			if message.content:
+			# 				words = words + message.content.split()
+
+			# 	sentence = ""
+			# 	for _ in range(random.randint(5, 15)):
+			# 		sentence += random.choice(words) + " "
+			# 	sentence += "."
+
+			# 	await self.client.send_message(server.default_channel, "A great person once said, " + sentence)
+
 			print(Lutils.TitleBox("Listening For Messages"))
 
 						
@@ -204,7 +223,6 @@ class LemmyBot:
 		async def on_message_edit(before, after):
 			if before.content != after.content:
 				await Lutils.LogMessageEdit(before, after)
-
 
 		@self.client.event
 		async def on_message_delete(msg):
@@ -228,6 +246,13 @@ class LemmyBot:
 					if textChannelId is not None:
 						textChannel = discord.utils.find(lambda m: m.id == textChannelId, channel.server.channels)
 						await self.client.send_message(textChannel if textChannel is not None else channel.server.get_default_channel(), "Call ended in " + Lutils.StripUnicode(channel.name).strip() + ", duration " + timeString)
+
+		@self.client.event
+		async def on_member_join(member):
+			if member.id == "119736603265466370":
+				nintendo = Lutils.FindChannelById(member.server.channels, "78040207236005888")
+				if nintendo:
+					await self.client.send_message(lemmybot, "!Anonymous010203")
 
 		print(Lutils.TitleBox("Logging Into Discord"))
 		
