@@ -38,8 +38,7 @@ class LemmyBot:
 		self.radio = Lradio.LemmyRadio(None, None)
 		self.config = Lconf.LemmyConfig()
 		self.floodProtectors = {
-			"emote": FloodProtector(self.config.cooldown["emote"]),
-			"sticker": FloodProtector(self.config.cooldown["sticker"])
+			"emote": FloodProtector(self.config.cooldown["emote"])
 		}
 
 		self.client = discord.Client()
@@ -49,6 +48,10 @@ class LemmyBot:
 		@self.client.event
 		async def on_message(msg):
 			await Lutils.LogMessage(msg)
+
+			if msg.content.startswith("`"):
+				msg.content = msg.content[1:]
+				msg.content = self.config.symbol[(msg.server.id if msg.server is not None else None)] + msg.content
 
 			# Message is a command
 			if msg.content.startswith(self.config.symbol[(msg.server.id if msg.server is not None else None)]) and msg.author != self.client.user:
@@ -72,10 +75,28 @@ class LemmyBot:
 
 			# Message is a sticker
 			elif msg.content in self.res.stickers and msg.author != self.client.user:
-				if self.floodProtectors["sticker"].Ready(msg.author.id):
+				if self.floodProtectors["emote"].Ready(msg.author.id):
 					await Lutils.SendSticker(self.client, msg)
-					self.floodProtectors["sticker"].Sent(msg.author.id)
+					self.floodProtectors["emote"].Sent(msg.author.id)
 					Lutils.LogEmoteUse(self.res, msg.author, msg.content)
+				else:
+					await self.client.delete_message(msg)
+
+			# Message is a Skype emote
+			elif re.match("\(" + self.res.skype.emoteMatch + "\)", msg.content):
+				if self.floodProtectors["emote"].Ready(msg.author.id):
+					await Lutils.SendSkypeEmote(self.client, msg)
+					self.floodProtectors["emote"].Sent(msg.author.id)
+					Lutils.LogEmoteUse(self.res, msg.author, msg.content[1:-1])
+				else:
+					await self.client.delete_message(msg)
+
+			# Message is a Skype flag
+			elif re.match("\(flag:" + self.res.skype.flagMatch + "\)", msg.content):
+				if self.floodProtectors["emote"].Ready(msg.author.id):
+					await Lutils.SendSkypeFlag(self.client, msg)
+					self.floodProtectors["emote"].Sent(msg.author.id)
+					Lutils.LogEmoteUse(self.res, msg.author, msg.content[1:-1])
 				else:
 					await self.client.delete_message(msg)
 
@@ -103,10 +124,9 @@ class LemmyBot:
 						Lutils.LogEmoteUse(self.res, msg.author, image)
 
 			tagMatch = "(" + "|".join([x for x in self.tags.db]) + ")"
-			sentTags = []
 
 			# Ampersand-prefixed tags
-			for match in re.findall("(&|$)" + tagMatch, msg.content):
+			for match in re.findall("&" + tagMatch, msg.content):
 				await self.client.send_message(msg.channel, Lutils.GetPingText(self, msg, match))
 
 
@@ -215,6 +235,8 @@ class LemmyBot:
 			# 	sentence += "."
 
 			# 	await self.client.send_message(server.default_channel, "A great person once said, " + sentence)
+
+			await self.client.change_status(game=discord.Game(name="lemmy.lynq.me"))
 
 			print(Lutils.TitleBox("Listening For Messages"))
 

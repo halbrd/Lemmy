@@ -126,10 +126,13 @@ async def james(self, msg, dmsg):
 		if flag == "-tags":
 			response = "```"
 			for key in self.tags.db:
-				response += "\n" + key + " (" + self.tags.converter[key] + ")"
+				response += "\n" + key + " (" + self.tags.converter[key] + ")\n"
+				userNames = []
 				for userId in self.tags.db[key]:
 					user = Lutils.FindUserById(msg.channel.server.members, userId)
-					response += "\n> " + user.name
+					if user:
+						userNames.append(user.name)
+				response += "> " + ", ".join(userNames)
 				response += "\n"
 			response += "```"
 			await self.client.send_message(msg.channel, response)
@@ -415,6 +418,13 @@ async def radio(self, msg, dmsg):
 
 		elif flag == "-interlude":
 			await self.radio.LoopSong("N:\\Misc\\Interlude.m4a")
+
+async def skypeemotes(self, msg, dmsg):
+	await self.client.send_message(msg.channel, "   ".join(self.res.skype.emotes))
+	
+async def shrug(self, msg, dmsg):
+	await self.client.send_message(msg.channel, "¯\\_(ツ)_/¯")
+
 
 
 

@@ -8,6 +8,7 @@ from os import listdir
 from os.path import isfile, join
 import json
 import sqlite3
+from ddict import ddict
 
 class LemmyResources:
 	def __init__(self):
@@ -15,6 +16,7 @@ class LemmyResources:
 		self.lennies = None
 		self.emotes = None
 		self.stickers = None
+		self.skype = ddict()
 		self.voiceToTextChannelMap = None
 		self.textToVoiceChannelMap = None
 		self.sqlConnection = None
@@ -50,6 +52,24 @@ class LemmyResources:
 			print("ERROR loading stickers! (" + str(e) + ")")
 		else:
 			print("Loaded " + str(len(self.stickers)) + " stickers.")
+
+		try:
+			self.skype.emotes = [ os.path.splitext(f)[0] for f in listdir("pics/skype/emotes") if isfile(join("pics/skype/emotes",f)) ]
+		except Exception as e:
+			print("ERROR loading Skype emotes! (" + str(e) + ")")
+		else:
+			print("Loaded " + str(len(self.skype.emotes)) + " Skype emotes.")
+
+		self.skype.emoteMatch = ("(" + "|".join(self.skype.emotes) + ")") if self.skype.emotes else None
+
+		try:
+			self.skype.flags = [ os.path.splitext(f)[0] for f in listdir("pics/skype/flags") if isfile(join("pics/skype/flags",f)) ]
+		except Exception as e:
+			print("ERROR loading Skype flags! (" + str(e) + ")")
+		else:
+			print("Loaded " + str(len(self.skype.flags)) + " Skype flags.")
+
+		self.skype.flagMatch = ("(" + "|".join(self.skype.flags) + ")") if self.skype.flags else None
 
 		try:
 			self.sqlConnection = sqlite3.connect("db/sqlite/lemmy.db")

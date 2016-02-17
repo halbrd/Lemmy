@@ -160,6 +160,16 @@ class LemmyConfig:
 				"enabled": True,
 				"moderator": False
 			},
+			"skypeemotes": {
+				"function": Lcmds.skypeemotes,
+				"enabled": True,
+				"moderator": False
+			},
+			"shrug": {
+				"function": Lcmds.shrug,
+				"enabled": True,
+				"moderator": False
+			},
 			"logout": {
 				"function": Lcmds.logout,
 				"enabled": True,

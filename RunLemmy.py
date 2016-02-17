@@ -2,6 +2,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 import LemmyBot
+import datetime
 
 with open("credentials.txt") as f:
 	username = f.readline().strip()
