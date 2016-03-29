@@ -156,7 +156,7 @@ def GetPingText(self, msg, tag):
 		user = FindUserById(msg.channel.server.members, userId)
 		if user is not None:
 			if user != msg.author:
-				response += (user.mention if user.status != discord.Status.offline else user.name) + " "
+				response += "[" + (user.mention if user.status != discord.Status.offline else user.name) + "] "
 	response += "for " + self.tags.converter[tag]
 	return response
 

@@ -1,6 +1,7 @@
 [Major] Emote NASDAQ
 [Major] Lemmy Radio
 [Major] Implement command parsing with finite state machines
+[Major] Command line client
 [Core] Personalized flood protection/timeouts
 [Core] User purge
 [Core] Add constants (BTS ID, Lemmy ID, etc)
@@ -14,6 +15,16 @@
 [ToDo] Clean up hybrid-emote-related code
 [ToDo] Make /db strictly for instantial data (unique to each instance of a bot (move the lennies somewhere else))
 [ToDo] Incorporate tags into config
-[ToDo] Add __pycache__ to .gitignore
-[ToDo] Sort !james -tags by most recently used
 [Emote] Full Life Consequences
+[Red] Command help metadata
+[Red] Mention to refer to user
+[Red] Slots
+[Red] Infinite currency feed (eg payday)
+[Red] Polls
+[Red] Dice roller
+[Red] Flip
+[Red] Random (imgur) images
+[Red] Twitch (lookup/listener)
+[Red] Change config with commands
+[Red] Join/leave server
+[Red] Reload files

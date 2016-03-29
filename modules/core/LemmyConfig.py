@@ -48,136 +48,169 @@ class LemmyConfig:
 			"help": {
 				"function": Lcmds.help,
 				"enabled": True,
-				"moderator": False
+				"moderator": False,
+				"description": "...Wait, this seems self-referential..."
 			},
 			"emotes": {
 				"function": Lcmds.emotes,
 				"enabled": True,
-				"moderator": False
+				"moderator": False,
+				"description": "Get a list of emotes"
 			},
 			"stickers": {
 				"function": Lcmds.stickers,
 				"enabled": True,
-				"moderator": False
+				"moderator": False,
+				"description": "Get a list of stickers"
 			},
 			"lenny": {
 				"function": Lcmds.lenny,
 				"enabled": True,
-				"moderator": False
+				"moderator": False,
+				"description": "Get a Lenny"
 			},
 			"refresh": {
 				"function": Lcmds.refresh,
 				"enabled": True,
-				"moderator": False
+				"moderator": False,
+				"description": "Check for new stickers and emotes"
 			},
 			"f5": {
 				"function": Lcmds.refresh,
 				"enabled": True,
-				"moderator": False
+				"moderator": False,
+				"description": "Check for new stickers and emotes"
 			},
 			"correct": {
 				"function": Lcmds.correct,
 				"enabled": True,
-				"moderator": False
+				"moderator": False,
+				"description": "Get the correct horse video"
 			},		
 			"8ball": {
 				"function": Lcmds.eightball,
 				"enabled": True,
-				"moderator": False
+				"moderator": False,
+				"description": "Get a certified correct answer to your question"
 			},
 			"userinfo": {
 				"function": Lcmds.userinfo,
 				"enabled": True,
-				"moderator": False
+				"moderator": False,
+				"description": "Get info about a user"
 			},
 			"channelinfo": {
 				"function": Lcmds.channelinfo,
 				"enabled": True,
-				"moderator": False
+				"moderator": False,
+				"description": "Get info about a channel"
 			},
 			"james": {
 				"function": Lcmds.james,
 				"enabled": True,
-				"moderator": False
+				"moderator": False,
+				"description": "Perform tag-related operations"
 			},
 			"happening": {
 				"function": Lcmds.happening,
 				"enabled": True,
-				"moderator": False
+				"moderator": False,
+				"description": "Get a high quality Ron Paul gif"
 			},
 			"ruseman": {
 				"function": Lcmds.ruseman,
 				"enabled": True,
-				"moderator": False
+				"moderator": False,
+				"description": "Get a random expression of rusedness"
 			},
 			"lemmycoin": {
 				"function": Lcmds.lemmycoin,
 				"enabled": True,
-				"moderator": False
+				"moderator": False,
+				"description": "Perform LemmyCoin-related operations"
 			},
 			"lc": {
 				"function": Lcmds.lemmycoin,
 				"enabled": True,
-				"moderator": False
+				"moderator": False,
+				"description": "Perform LemmyCoin-related operations"
 			},
 			"l$": {
 				"function": Lcmds.lemmycoin,
 				"enabled": True,
-				"moderator": False
+				"moderator": False,
+				"description": "Perform LemmyCoin-related operations"
 			},
 			"channelids": {
 				"function": Lcmds.channelids,
 				"enabled": True,
-				"moderator": False
+				"moderator": False,
+				"description": "Get a list of channel ids on the current server"
 			},
 			"serverinfo": {
 				"function": Lcmds.serverinfo,
 				"enabled": True,
-				"moderator": False
+				"moderator": False,
+				"description": "Get info about the current server"
 			},
 			"choose": {
 				"function": Lcmds.choose,
 				"enabled": True,
-				"moderator": False
+				"moderator": False,
+				"description": "Choose between the given options"
 			},
 			"radio": {
 				"function": Lcmds.radio,
 				"enabled": True,
-				"moderator": False
+				"moderator": False,
+				"description": "Perform radio-related operations"
 			},
 			"tts": {
 				"function": Lcmds.tts,
 				"enabled": False,
-				"moderator": False
+				"moderator": False,
+				"description": "Make Lemmy say the given message"
 			},
 			"playgame": {
 				"function": Lcmds.playgame,
 				"enabled": True,
-				"moderator": False
+				"moderator": False,
+				"description": "Set Lemmy's \"Playing\" message"
 			},
 			"tilt": {
 				"function": Lcmds.tilt,
 				"enabled": True,
-				"moderator": False
+				"moderator": False,
+				"description": "Get a rotated emote"
 			},
 			"skypeemotes": {
 				"function": Lcmds.skypeemotes,
 				"enabled": True,
-				"moderator": False
+				"moderator": False,
+				"description": "Get a list of Skype emotes"
 			},
 			"shrug": {
 				"function": Lcmds.shrug,
 				"enabled": True,
-				"moderator": False
+				"moderator": False,
+				"description": "Get a Unicode shrug"
+			},
+			"thisisfine": {
+				"function": Lcmds.thisisfine,
+				"enabled": True,
+				"moderator": False,
+				"description": "Confirm that everything is okay"
 			},
 			"logout": {
 				"function": Lcmds.logout,
 				"enabled": True,
-				"moderator": True
+				"moderator": True,
+				"description": "Turn Lemmy off"
 			},
 			"shutdown": {
 				"function": Lcmds.logout,
 				"enabled": True,
-				"moderator": True
+				"moderator": True,
+				"description": "Turn Lemmy off"
 			}
 		}

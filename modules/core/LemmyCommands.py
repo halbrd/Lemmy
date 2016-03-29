@@ -18,7 +18,25 @@ import re
 import urllib.request
 
 async def help(self, msg, dmsg):
-	await self.client.send_message(msg.channel, "http://lynq.me/lemmy")
+	reply = "Lemmy reference page: http://lynq.me/lemmy"
+	reply += "\n"
+	reply += "\nCommand terminology: `!command parameter -flag flagParameter`"
+	reply += "\n\n```"
+
+	commands = []
+	for commandText, commandInfo in self.config.command.items():
+		notes = []
+		if not commandInfo["enabled"]: notes.append("disabled")
+		if commandInfo["moderator"]: notes.append("moderator+")
+
+		command = self.config.symbol[msg.server.id] + commandText + "    " + ("[" if len(notes) > 0 else "") + ", ".join(notes) + ("]" if len(notes) > 0 else "")
+		command += "\n    " + commandInfo["description"]
+
+		commands.append(command)
+	reply += "\n".join(commands)
+	reply += "\n```"
+
+	await self.client.send_message(msg.channel, reply)
 
 async def emotes(self, msg, dmsg):
 	await self.client.send_message(msg.channel, "http://lynq.me/lemmy/#emotes")
@@ -29,10 +47,13 @@ async def stickers(self, msg, dmsg):
 async def lenny(self, msg, dmsg):
 	if len(dmsg.flags) == 0:
 		await self.client.send_message(msg.channel, self.res.lennies[random.randint(0, len(self.res.lennies)-1)])
-	elif dmsg.flags[0][0] == "-og":
-		await self.client.send_message(msg.channel, self.res.lenny)
-	elif dmsg.flags[0][0] == "-r":
-		await self.client.send_message(msg.channel, RandomLenny.randomLenny())
+	else:
+		for fullFlag in dmsg.flags:
+			flag = fullFlag[0]
+			if flag == "-og":
+				await self.client.send_message(msg.channel, self.res.lenny)
+			elif flag == "-r":
+				await self.client.send_message(msg.channel, RandomLenny.randomLenny())
 
 async def logout(self, msg, dmsg):
 	print("User with id " + str(msg.author.id) + " attempting to initiate logout.")
@@ -251,7 +272,7 @@ async def lemmycoin(self, msg, dmsg):
 				if balance is None:
 					await self.client.send_message(msg.channel, self.constants.error.symbol + " " + user.mention + " does not have a LemmyCoin balance because they have not been registered in the database.")
 				else:
-					await self.client.send_message(msg.channel, self.constants.error.symbol + " " + user.mention + " has a LemmyCoin balance of L$" + str(balance) + ".")
+					await self.client.send_message(msg.channel, user.mention + " has a LemmyCoin balance of L$" + str(balance) + ".")
 
 		elif flag == "-pay" or flag == "-p":
 			if param1 is not None:
@@ -425,7 +446,9 @@ async def skypeemotes(self, msg, dmsg):
 async def shrug(self, msg, dmsg):
 	await self.client.send_message(msg.channel, "¯\\_(ツ)_/¯")
 
-
+async def thisisfine(self, msg, dmsg):
+	#await self.client.send_file(msg.channel, "pics/originals/ThisIsFine.png")
+	await self.client.send_message(msg.channel, "http://i.imgur.com/YfAZJky.png")
 
 
 # async def radio(self, msg, dmsg):

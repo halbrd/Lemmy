@@ -236,7 +236,7 @@ class LemmyBot:
 
 			# 	await self.client.send_message(server.default_channel, "A great person once said, " + sentence)
 
-			await self.client.change_status(game=discord.Game(name="lemmy.lynq.me"))
+			await self.client.change_status(game=discord.Game(name="!help for info"))
 
 			print(Lutils.TitleBox("Listening For Messages"))
 
@@ -267,7 +267,8 @@ class LemmyBot:
 					textChannelId = self.config.voiceToText[channel.server.id][channel.id]
 					if textChannelId is not None:
 						textChannel = discord.utils.find(lambda m: m.id == textChannelId, channel.server.channels)
-						await self.client.send_message(textChannel if textChannel is not None else channel.server.get_default_channel(), "Call ended in " + Lutils.StripUnicode(channel.name).strip() + ", duration " + timeString)
+						if not timeString.startswith("00:00:"):
+							await self.client.send_message(textChannel if textChannel is not None else channel.server.get_default_channel(), "Call ended in " + Lutils.StripUnicode(channel.name).strip() + ", duration " + timeString)
 
 		@self.client.event
 		async def on_member_join(member):
