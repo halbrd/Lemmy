@@ -6,6 +6,7 @@ class LemmyConfig:
 
 		self.symbol = {
 			"77041788564545536": "!",   # Better Than Skype
+			"157748397502234624": "!",   # No Chris Meme Server
 			None: "!"
 		}
 		self.radioVoiceChannel = {

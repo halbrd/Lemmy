@@ -10,4 +10,4 @@ while True:
 		password = f.readline().strip()
 
 	lemmy = LemmyBot.LemmyBot(username, password)
-	input("Lemmy run aborted. Time: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ".")
+	print("Lemmy run aborted. Time: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ".")

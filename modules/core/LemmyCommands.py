@@ -270,9 +270,9 @@ async def lemmycoin(self, msg, dmsg):
 				balance = Lutils.GetLemmyCoinBalance(self.res, user)
 
 				if balance is None:
-					await self.client.send_message(msg.channel, self.constants.error.symbol + " " + user.mention + " does not have a LemmyCoin balance because they have not been registered in the database.")
+					await self.client.send_message(msg.channel, self.constants.error.symbol + " " + user.name + " does not have a LemmyCoin balance because they have not been registered in the database.")
 				else:
-					await self.client.send_message(msg.channel, user.mention + " has a LemmyCoin balance of L$" + str(balance) + ".")
+					await self.client.send_message(msg.channel, user.name + " has a LemmyCoin balance of L$" + str(balance) + ".")
 
 		elif flag == "-pay" or flag == "-p":
 			if param1 is not None:
@@ -326,7 +326,7 @@ async def serverinfo(self, msg, dmsg):
 	for role in server.roles:
 		response += "\n  " + ("everyone" if role.name == "@everyone" else role.name)
 	response += "\n**Default channel:** " + server.default_channel.name
-	response += "\n**AFK channel:** " + server.afk_channel.name
+	response += "\n**AFK channel:** " + (server.afk_channel.name if server.afk_channel is not None else "None")
 	response += "\n**AFK timeout length:** " + str(server.afk_timeout) + " minutes"
 	response += "\n**Icon URL:** " + server.icon_url
 

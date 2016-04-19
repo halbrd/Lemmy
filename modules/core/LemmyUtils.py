@@ -36,29 +36,29 @@ def ParseMessage(messageText):
 	return DecomposedMessage(command, params, flags)
 
 async def SendEmote(client, msg):
-	await client.send_message(msg.channel, "**" + msg.author.name + "**")
-	await client.send_file(msg.channel, "pics/emotes/" + msg.content + ".png")
+	#await client.send_message(msg.channel, "**" + msg.author.name + "**")
+	await client.send_file(msg.channel, "pics/emotes/" + msg.content + ".png", content=msg.author.name)
 	await client.delete_message(msg)
 
 async def SendSticker(client, msg):
-	await client.send_message(msg.channel, "**" + msg.author.name + "**")
-	await client.send_file(msg.channel, "pics/stickers/" + msg.content + ".png")
+	#await client.send_message(msg.channel, "**" + msg.author.name + "**")
+	await client.send_file(msg.channel, "pics/stickers/" + msg.content + ".png", content=msg.author.name)
 	await client.delete_message(msg)
 
 async def SendTemp(client, msg):
-	await client.send_message(msg.channel, "**" + msg.author.name + "**")
-	await client.send_file(msg.channel, "pics/temp/temp.png")
+	#await client.send_message(msg.channel, "**" + msg.author.name + "**")
+	await client.send_file(msg.channel, "pics/temp/temp.png", content=msg.author.name)
 	await client.delete_message(msg)
 	os.remove("pics/temp/temp.png")
 
 async def SendSkypeEmote(client, msg):
-	await client.send_message(msg.channel, "**" + msg.author.name + "**")
-	await client.send_file(msg.channel, "pics/skype/emotes/" + msg.content[1:-1] + ".gif")
+	#await client.send_message(msg.channel, "**" + msg.author.name + "**")
+	await client.send_file(msg.channel, "pics/skype/emotes/" + msg.content[1:-1] + ".gif", content=msg.author.name)
 	await client.delete_message(msg)
 
 async def SendSkypeFlag(client, msg):
-	await client.send_message(msg.channel, "**" + msg.author.name + "**")
-	await client.send_file(msg.channel, "pics/skype/flags/" + msg.content[6:-1] + ".png")
+	#await client.send_message(msg.channel, "**" + msg.author.name + "**")
+	await client.send_file(msg.channel, "pics/skype/flags/" + msg.content[6:-1] + ".png", content=msg.author.name)
 	await client.delete_message(msg)
 
 def StripUnicode(string):
