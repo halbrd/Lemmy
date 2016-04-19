@@ -1,0 +1,114 @@
+Lemmy
+-> Commands
+-> Config
+   -> Some bot-level config
+   -> Some server-level config
+   -> Store version number
+-> Constants (make much more widespread)
+-> Radio?
+-> Resources (merge with constants?)
+-> Tags (maybe don't use class?)
+-> Utils (maybe rethink this)
+-> Data (maybe same directory as bot-level config)
+-> IO (SaveSettings(dir), LoadSettings(dir))
+
+General thoughts
+-> Scale back sqlite usage - JSON for most things
+
+Checks
+-> Outside function code
+   -> User is allowed
+      -> Blacklisted
+      -> etc
+   -> User has permission
+      -> Mod
+      -> Admin
+
+Directory structure
+archive
+data
+  config
+    bot
+    server(s)
+  pics
+    emotes
+    stickers
+    skype
+system
+  constants
+
+Synced accessible info
+-> Command documentation
+-> To do
+-> Emotes/Stickers
+-> Misc help text
+-> Company?
+
+Reference page
+-> Configurable for any Lemmy bot
+-> Mostly (if not entirely) drawn from /data
+
+File structure
+-> "System" files (version)
+   -> Modules
+   -> Categories/functions
+-> Data
+   -> Categories/functions
+-> Static resources
+-> Archive
+
+Additional features
+-> Help texts sent to user
+-> Bot info modifiable and refreshable without restart
+
+Command restructure
+!emotes, !stickers, !skypeemotes
+    Incorporate into some other help text
+    Access originals (if they exist)
+    Use same framework for all emotes so tilt/chaining/whatever uses same code (maybe use a class)
+!tts    [disabled]
+    Probably remove, otherwise leave disabled
+!ruseman    
+    Maybe incorporate into !meme, otherwise leave as is
+!correct    
+    Maybe incorporate into !meme
+!happening    
+    Maybe incorporate into !meme
+!shrug    
+    Maybe incorporate into !meme
+!lenny    
+    Maybe incorporate into !meme
+!playgame    
+    Give better name (maybe incorporate into !lemmy)
+!f5    
+    Mention deletions as well
+!help    
+    Send reply to user - commands, format, flags, reference page
+    If a valid command is given as a parameter (maybe flag notated) give detailed info about that command
+!channelinfo    
+    Incorporate into !info
+!userinfo    
+    Incorporate into !info
+!channelids    
+    Incorporate into !info
+!serverinfo    
+    Incorporate into !info
+!radio    
+!choose    
+!shutdown    [moderator+]
+    Ask for confirmation
+!8ball    
+    Maybe update formatting
+!tilt    
+    Use image descriptions
+!lemmycoin    
+!james    
+
+Command attributes
+-> Function
+-> Enabled
+-> Moderator
+-> Format
+-> Flag(s)
+-> Description
+-> Long description
