@@ -1,15 +1,10 @@
-"""
-Required docstrings (FIT1008 lelelelelelelelele):
-@input (params)
-@function (description of what it does)
-@output (resultant actions and/or return value)
-"""
+from LemmyGlobals import JsonPath
+import json
+import os
 
 def TitleBox(string):
-	"""
-	@input: Text to be title-ified
-	@function: Turn input string into highlighted title box
-	@output: Title-box'd version of the strings (with linebreaks above and below, for convenience)
-	"""
 	return "\n" + "".join(["=" for _ in range(len(string) + 4)]) + "\n= " + string + " =\n" + "".join(["=" for _ in range(len(string) + 4)]) + "\n"
 
+def JsonGet(path):
+	with open(os.path.join(*path)) as f:
+		return json.loads(f.read())
