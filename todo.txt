@@ -6,16 +6,12 @@
 [Core] User purge
 [Core] Add constants (BTS ID, Lemmy ID, etc)
 [Command] !togethertube
-[Command] !vote
 [Command] !reminder
 [Command] !twitch (with api calls)
 [Function] LemmyCoin Bounty Board
-[Function] Slot machine/jackpot
 [Function] Last seen
-[Bug] Add explicit primary key to emote usage table to fix duplicates on hybrid emotes
 [ToDo] Clean up hybrid-emote-related code
 [ToDo] Make /db strictly for instantial data (unique to each instance of a bot (move the lennies somewhere else))
-[ToDo] Incorporate tags into config
 [Emote] Full Life Consequences
 [Red] Command help metadata
 [Red] Mention to refer to user
@@ -29,4 +25,5 @@
 [Red] Change config with commands
 [Red] Join/leave server
 [Red] Reload files
-
+???
+Profit!

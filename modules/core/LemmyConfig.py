@@ -202,6 +202,18 @@ class LemmyConfig:
 				"moderator": False,
 				"description": "Confirm that everything is okay"
 			},
+			"role": {
+				"function": Lcmds.role,
+				"enabled": True,
+				"moderator": False,
+				"description": "Manage role membership"
+			},
+			"lol": {
+				"function": Lcmds.lol,
+				"enabled": True,
+				"moderator": False,
+				"description": "You can look up items or some shit like that"
+			},
 			"logout": {
 				"function": Lcmds.logout,
 				"enabled": True,

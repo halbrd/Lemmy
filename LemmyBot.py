@@ -26,7 +26,7 @@ from PIL import Image
 import random
 
 class LemmyBot:
-	def __init__(self, username, password):
+	def __init__(self, token):
 		if not discord.opus.is_loaded():
 			discord.opus.load_opus('libopus-0.dll')
 
@@ -133,8 +133,7 @@ class LemmyBot:
 		@self.client.event
 		async def on_ready():
 			print("Successfully logged in.")
-			print("USERNAME: " + username)
-			print("PASSWORD: " + "".join(["*" for x in password]))
+			print("NAME: " + self.client.user.name)
 
 			print(Lutils.TitleBox("Checking Command Symbols"))
 			for server in self.client.servers:
@@ -281,7 +280,7 @@ class LemmyBot:
 		
 		print("Attempting to log in.")
 		try:
-			self.client.run(username, password)
+			self.client.run(token)
 		except Exception as e:
 			print("ERROR logging into Discord! (" + str(e) + ")")
 			input("Press enter to exit.\n")

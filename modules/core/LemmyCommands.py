@@ -15,7 +15,8 @@ import sqlite3
 import datetime
 from PIL import Image
 import re
-import urllib.request
+import urllib.request as req
+from fuzzywuzzy import fuzz
 
 async def help(self, msg, dmsg):
 	reply = "Lemmy reference page: http://lynq.me/lemmy"
@@ -223,7 +224,7 @@ async def james(self, msg, dmsg):
 						update = True
 						self.tags.db.pop(gameTag, None)
 						self.tags.converter.pop(gameTag, None)
-						await self.client.send_message(msg.channel, "Tag '" + gameTag + "' successfully deleted.")						
+						await self.client.send_message(msg.channel, "Tag '" + gameTag + "' successfully deleted.")
 
 		if update:
 			try:
@@ -241,6 +242,109 @@ async def james(self, msg, dmsg):
 				print("ERROR updating tagConverter! (" + str(e) + ")")
 			else:
 				print("tagConverter updated with " + str(len(self.tags.converter)) + " games.")
+
+			await self.client.send_message(msg.channel, "Note: !james is deprecated, and has been replaced with native Discord roles and the !role command. Use @tag to ping a tag.")
+
+async def role(self, msg, dmsg):
+	# List roles
+	# Add role
+	# Delete role
+	# Make james perform these actions
+
+	# Load role metadata
+	with open("db/roles.json", "r") as f:
+		roleData = json.load(f)
+
+	for fullFlag in dmsg.flags:
+		flag = fullFlag[0]
+		param1 = fullFlag[1] if len(fullFlag) > 1 else None
+		param2 = fullFlag[2] if len(fullFlag) > 2 else None
+		
+		if flag == "-allow" or flag == "-deny":
+			allow = flag == "-allow"
+			if not Lutils.IsModOrAbove(msg.author):
+				await self.client.send_message(msg.channel, self.constants.error.symbol + " No role changed: " + self.constants.error.notMod)
+			else:
+				if param1 is None:
+					await self.client.send_message(msg.channel, self.constants.error.symbol + " No role changed: No role name was specified.")
+				else:
+					role = discord.utils.get(msg.server.roles, mention=param1)
+					if role is None:
+						role = discord.utils.get(msg.server.roles, name=param1)
+
+					if role is None:
+						await self.client.send_message(msg.channel, self.constants.error.symbol + " No role changed: Role '" + param1 + "' does not exist.")
+					else:
+						roleData[role.id] = allow
+						await self.client.send_message(msg.channel, "Role '" + role.name + "' set to " + ("allow" if allow else "deny") + " joining.")
+
+		elif flag == "-join" or flag == "-leave":
+			join = flag == "-join"
+			if param1 is None:
+				await self.client.send_message(msg.channel, self.constants.error.symbol + " Role not " + ("joined" if join else "left") + ": No role name provided.")
+			else:
+				role = discord.utils.get(msg.server.roles, mention=param1)
+				if role is None:
+					role = discord.utils.get(msg.server.roles, name=param1)
+
+				if role is None:
+					await self.client.send_message(msg.channel, self.constants.error.symbol + " Role not " + ("joined" if join else "left") + ": Role '" + param1 + "' does not exist.")
+				else:
+					if not (role.id in roleData and roleData[role.id]):
+						await self.client.send_message(msg.channel, self.constants.error.symbol + " Role not " + ("joined" if join else "left") + ": Role '" + role.name + "' is not set to accept automated " + ("joining" if join else "leaving") + ".")
+					else:
+						if join:
+							await self.client.add_roles(msg.author, role)
+						else:
+							await self.client.remove_roles(msg.author, role)
+						await self.client.send_message(msg.channel, "User " + msg.author.mention + " " + ("added to" if join else "removed from") + " " + role.name + ".")
+
+		elif flag == "-adduser" or flag == "-remuser":
+			add = flag == "-adduser"
+			if not Lutils.IsModOrAbove(msg.author):
+				await self.client.send_message(msg.channel, self.constants.error.symbol + " No role changed: " + self.constants.error.notMod)
+			else:
+				if param1 is None:
+					await self.client.send_message(msg.channel, self.constants.error.symbol + " User not " + ("added to" if add else "removed from") + " role: No user name provided.")
+				else:
+					if param2 is None:
+						await self.client.send_message(msg.channel, self.constants.error.symbol + " User not " + ("added to" if add else "removed from") + " role: No role provided.")
+					else:
+						user = discord.utils.get(msg.server.members, mention=param1)
+						if user is None:
+							user = discord.utils.get(msg.server.members, name=param1)
+
+						role = discord.utils.get(msg.server.roles, mention=param2)
+						if role is None:
+							role = discord.utils.get(msg.server.roles, name=param2)
+
+						if user is None:
+							await self.client.send_message(msg.channel, self.constants.error.symbol + " User not " + ("added to" if add else "removed from") + " role: User '" + param1 + "' does not exist.")
+						elif role is None:
+							await self.client.send_message(msg.channel, self.constants.error.symbol + " User not " + ("added to" if add else "removed from") + " role: Role '" + param2 + "' does not exist.")
+						else:
+							if not (role.id in roleData and roleData[role.id]):
+								await self.client.send_message(msg.channel, self.constants.error.symbol + " User " + user.name + " not " + ("added to" if add else "removed from") + " role " + role.name + ": Role '" + role.name + "' is not set to accept automated " + ("joining" if add else "leaving") + ".")
+							else:
+								if add:
+									await self.client.add_roles(user, role)
+								else:
+									await self.client.remove_roles(user, role)
+								await self.client.send_message(msg.channel, "User " + user.mention + " " + ("added to" if add else "removed from") + " " + role.name + ".")
+
+		for key in roleData:
+			role = discord.utils.get(msg.channel.server.roles, id=key)
+			if role is None:
+				del roleData[key]
+
+		try:
+			with open("db/roles.json", "w") as f:
+				json.dump(roleData, f, indent=4)
+		except Exception as e:
+			print("ERROR updating roleData! (" + str(e) + ")")
+		else:
+			print("roleData updated.")
+
 
 async def happening(self, msg, dmsg):
 	await self.client.send_message(msg.channel, "https://i.imgur.com/bYGOUHP.gif")
@@ -449,6 +553,44 @@ async def shrug(self, msg, dmsg):
 async def thisisfine(self, msg, dmsg):
 	#await self.client.send_file(msg.channel, "pics/originals/ThisIsFine.png")
 	await self.client.send_message(msg.channel, "http://i.imgur.com/YfAZJky.png")
+
+async def lol(self, msg, dmsg):
+	for fullFlag in dmsg.flags:
+		flag = fullFlag[0]
+
+		if flag == "-item":
+			searchTerm = " ".join(fullFlag[1:])
+			if searchTerm == "":
+				await self.client.send_message(msg.channel, self.constants.error.symbol + " No search term given.")
+			else:
+				itemResp = req.urlopen("https://global.api.pvp.net/api/lol/static-data/oce/v1.2/item?api_key=fc9a7992-b45f-46a9-ad2f-9f35608aee36")
+
+				if not itemResp.getcode() != "200":
+					await self.client.send_message(msg.channel, "HTTP code " + itemResp.getcode())
+				else:
+					itemData = json.loads(itemResp.read().decode("utf-8"))["data"]
+
+					nameMap = {}
+					searchMap = []
+					for itemId in itemData:
+						nameMap[itemData[itemId]["name"]] = itemId
+						searchMap.append([fuzz.ratio(searchTerm, itemData[itemId]["name"]), itemData[itemId]["name"]])
+					searchMap.sort(reverse=True)
+					#await self.client.send_message(msg.channel, "datalen=" + str(len(itemData)) + "\nsearchmaplen=" + str(len(searchMap)))
+
+					#d = str(searchMap)
+					#d = [d[i:i+2000] for i in range(0, len(d), 2000)]
+					#for chunk in d:
+					#	await self.client.send_message(msg.channel, chunk)
+					
+					matchName = searchMap[0][1]
+					matchId = nameMap[matchName]
+					matchDesc = itemData[matchId]["description"]
+					matchDesc = re.sub("<br>", "\n", matchDesc)
+					matchDesc = re.sub("<\/?[a-zA-Z]*>", "", matchDesc)
+					await self.client.send_message(msg.channel, "**" + matchName + "**\n" + matchDesc)
+
+
 
 
 # async def radio(self, msg, dmsg):
