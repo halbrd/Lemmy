@@ -17,6 +17,7 @@ from PIL import Image
 import re
 import urllib.request as req
 from fuzzywuzzy import fuzz
+import copy
 
 async def help(self, msg, dmsg):
 	reply = "Lemmy reference page: http://lynq.me/lemmy"
@@ -119,6 +120,7 @@ async def userinfo(self, msg, dmsg):
 			# 	message += "\nCurrent playing " + str(user.game_id) + "."
 
 			await self.client.send_message(msg.channel, message)
+			await self.client.send_message("Note: This command is deprecated; use Discord's Developer Mode to get IDs.")
 
 async def channelinfo(self, msg, dmsg):
 	if len(dmsg.params) > 0:
@@ -127,7 +129,8 @@ async def channelinfo(self, msg, dmsg):
 		if not channel:
 			await self.client.send_message(msg.channel, self.constants.error.symbol + " Channel not found.")
 		else:
-			await self.client.send_message(msg.channel, "**Channel name: **" + channel.mention + "\n**ID: **" + channel.id)			
+			await self.client.send_message(msg.channel, "**Channel name: **" + channel.mention + "\n**ID: **" + channel.id)
+		await self.client.send_message("Note: This command is deprecated; use Discord's Developer Mode to get IDs.")
 
 async def james(self, msg, dmsg):
 	if len(dmsg.params) > 0:
@@ -299,8 +302,8 @@ async def role(self, msg, dmsg):
 							await self.client.remove_roles(msg.author, role)
 						await self.client.send_message(msg.channel, "User " + msg.author.mention + " " + ("added to" if join else "removed from") + " " + role.name + ".")
 
-		elif flag == "-adduser" or flag == "-remuser":
-			add = flag == "-adduser"
+		elif flag == "-add" or flag == "-remove":
+			add = flag == "-add"
 			if not Lutils.IsModOrAbove(msg.author):
 				await self.client.send_message(msg.channel, self.constants.error.symbol + " No role changed: " + self.constants.error.notMod)
 			else:
@@ -332,18 +335,20 @@ async def role(self, msg, dmsg):
 									await self.client.remove_roles(user, role)
 								await self.client.send_message(msg.channel, "User " + user.mention + " " + ("added to" if add else "removed from") + " " + role.name + ".")
 
+		tempDict = copy.deepcopy(roleData)
 		for key in roleData:
 			role = discord.utils.get(msg.channel.server.roles, id=key)
 			if role is None:
-				del roleData[key]
+				del tempDict[key]
+		roleData = tempDict
 
-		try:
-			with open("db/roles.json", "w") as f:
-				json.dump(roleData, f, indent=4)
-		except Exception as e:
-			print("ERROR updating roleData! (" + str(e) + ")")
-		else:
-			print("roleData updated.")
+	try:
+		with open("db/roles.json", "w") as f:
+			json.dump(roleData, f, indent=4)
+	except Exception as e:
+		print("ERROR updating roleData! (" + str(e) + ")")
+	else:
+		print("roleData updated.")
 
 
 async def happening(self, msg, dmsg):
@@ -418,6 +423,7 @@ async def channelids(self, msg, dmsg):
 	for channel in msg.channel.server.channels:
 		ret += channel.name + " : " + channel.id + "\n"
 	await self.client.send_message(msg.channel, ret)
+	await self.client.send_message("Note: This command is deprecated; use Discord's Developer Mode to get IDs.")
 
 async def serverinfo(self, msg, dmsg):
 	#await self.client.send_message(msg.channel, msg.channel.server.name + ": " + msg.channel.server.id)

@@ -192,13 +192,13 @@ class LemmyConfig:
 			},
 			"shrug": {
 				"function": Lcmds.shrug,
-				"enabled": True,
+				"enabled": False,
 				"moderator": False,
 				"description": "Get a Unicode shrug"
 			},
 			"thisisfine": {
 				"function": Lcmds.thisisfine,
-				"enabled": True,
+				"enabled": False,
 				"moderator": False,
 				"description": "Confirm that everything is okay"
 			},

@@ -128,6 +128,7 @@ class LemmyBot:
 			# Ampersand-prefixed tags
 			for match in re.findall("&" + tagMatch, msg.content):
 				await self.client.send_message(msg.channel, Lutils.GetPingText(self, msg, match))
+				await self.client.send_message(msg.channel, "Note: !james is deprecated, and has been replaced with native Discord roles and the !role command. Use @tag to ping a tag.")
 
 
 		@self.client.event

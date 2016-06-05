@@ -18,3 +18,10 @@ lemmycoin (or !lc, !l$)
 &nbsp;&nbsp;&nbsp;&nbsp;-balance (or -b) [username]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Check the LemmyCoin balance of a user (defaults to command caller)
 &nbsp;&nbsp;&nbsp;&nbsp;-pay (or -p) [username] [amount]&nbsp;&nbsp;&nbsp;Pay a user a given amount
 choose [option 1 or option 2 or ...] - Randomly chooses from the given options
+role - Join or leave @roles
+&nbsp;&nbsp;&nbsp;&nbsp;-join [@role] - Add yourself to a role
+&nbsp;&nbsp;&nbsp;&nbsp;-leave [@role] - Remove yourself from a role
+&nbsp;&nbsp;&nbsp;&nbsp;-allow [@role] - Allow users to add/remove themselves from a role (Mod+)
+&nbsp;&nbsp;&nbsp;&nbsp;-deny [@role] - Prevent users from adding/removing themselves from a role (Mod+)
+&nbsp;&nbsp;&nbsp;&nbsp;-add [@user] [@role] - Add user to role (Mod+)
+&nbsp;&nbsp;&nbsp;&nbsp;-remove [@user] [@role] - Remove user from role (Mod+)
