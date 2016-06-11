@@ -49,10 +49,6 @@ class LemmyBot:
 		async def on_message(msg):
 			await Lutils.LogMessage(msg)
 
-			if msg.content.startswith("`"):
-				msg.content = msg.content[1:]
-				msg.content = self.config.symbol[(msg.server.id if msg.server is not None else None)] + msg.content
-
 			# Message is a command
 			if msg.content.startswith(self.config.symbol[(msg.server.id if msg.server is not None else None)]) and msg.author != self.client.user:
 				dmsg = Lutils.ParseMessage(msg.content[len(self.config.symbol[(msg.server.id if msg.server is not None else None)]):])
@@ -269,13 +265,6 @@ class LemmyBot:
 						textChannel = discord.utils.find(lambda m: m.id == textChannelId, channel.server.channels)
 						if not timeString.startswith("00:00:"):
 							await self.client.send_message(textChannel if textChannel is not None else channel.server.get_default_channel(), "Call ended in " + Lutils.StripUnicode(channel.name).strip() + ", duration " + timeString)
-
-		@self.client.event
-		async def on_member_join(member):
-			if member.id == "119736603265466370":
-				nintendo = Lutils.FindChannelById(member.server.channels, "78040207236005888")
-				if nintendo:
-					await self.client.send_message(lemmybot, "!Anonymous010203")
 
 		print(Lutils.TitleBox("Logging Into Discord"))
 		

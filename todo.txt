@@ -26,11 +26,5 @@
 [Red] Change config with commands
 [Red] Join/leave server
 [Red] Reload files
-[Server Agnosticism] config.cooldown
-[Server Agnosticism] Full config editing interface
-[Server Agnosticism] Channel map check
-[Server Agnosticism]
-[Server Agnosticism]
-[Server Agnosticism]
 ???
 Profit!
