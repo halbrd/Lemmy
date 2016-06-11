@@ -1,7 +1,7 @@
 import discord
 import asyncio
 import shlex
-#from PIL import Image
+from PIL import Image
 import random
 import datetime
 import re

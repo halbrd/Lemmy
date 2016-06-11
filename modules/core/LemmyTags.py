@@ -12,7 +12,7 @@ class LemmyTags:
 		print(Lutils.TitleBox("Loading Tags"))
 
 		try:
-			with open("db/tagDb.json", "r") as f:
+			with open("db/config/tagDb.json", "r") as f:
 				self.db = json.load(f)
 		except Exception as e:
 			print("ERROR loading tagDb! (" + str(e) + ")")
@@ -20,7 +20,7 @@ class LemmyTags:
 			print("tagDb loaded with " + str(len(self.db)) + " tags.")
 
 		try:
-			with open("db/tagConverter.json", "r") as f:
+			with open("db/config/tagConverter.json", "r") as f:
 				self.converter = json.load(f)
 		except Exception as e:
 			print("ERROR loading tagConverter! (" + str(e) + ")")

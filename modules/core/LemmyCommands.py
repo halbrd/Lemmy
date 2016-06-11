@@ -255,7 +255,7 @@ async def role(self, msg, dmsg):
 	# Make james perform these actions
 
 	# Load role metadata
-	with open("db/roles.json", "r") as f:
+	with open("db/config/roles.json", "r") as f:
 		roleData = json.load(f)
 
 	for fullFlag in dmsg.flags:
@@ -343,7 +343,7 @@ async def role(self, msg, dmsg):
 		roleData = tempDict
 
 	try:
-		with open("db/roles.json", "w") as f:
+		with open("db/config/roles.json", "w") as f:
 			json.dump(roleData, f, indent=4)
 	except Exception as e:
 		print("ERROR updating roleData! (" + str(e) + ")")

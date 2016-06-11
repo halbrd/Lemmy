@@ -8,6 +8,7 @@
 [Command] !togethertube
 [Command] !reminder
 [Command] !twitch (with api calls)
+[Command] !weather (see BooBot)
 [Function] LemmyCoin Bounty Board
 [Function] Last seen
 [ToDo] Clean up hybrid-emote-related code
@@ -25,5 +26,11 @@
 [Red] Change config with commands
 [Red] Join/leave server
 [Red] Reload files
+[Server Agnosticism] config.cooldown
+[Server Agnosticism] Full config editing interface
+[Server Agnosticism] Channel map check
+[Server Agnosticism]
+[Server Agnosticism]
+[Server Agnosticism]
 ???
 Profit!

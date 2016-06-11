@@ -1,50 +1,29 @@
 # Lemmy's stuff
 import LemmyCommands as Lcmds
 
+import json
+
 class LemmyConfig:
 	def __init__(self):
 
-		self.symbol = {
-			"77041788564545536": "!",   # Better Than Skype
-			"157748397502234624": "!",   # No Chris Meme Server
-			None: "!"
-		}
-		self.radioVoiceChannel = {
-			"77041788564545536": "133010408377286656"   # Better Than Skype (Radio)
-		}
-		self.radioInfoChannel = {
-			"77041788564545536": "134272864999178241"   # Better Than Skype (radio)
-		}
-		self.voiceToText = {
-			"77041788564545536": { # Better Than Skype
-				"110179496002338816": "77041788564545536", # Everything
-				"77050951277486080": "77046593114615808", # CS:GO
-				"77306055939325952": "77303335920611328", # League of Legends
-				"77683791056863232": "77683668360892416", # tdeacmc
-				"113133087004622848": "77937243011944448", # Blizzard
-				"139981745586962432": "138973821171400704", # Halo
-				"133010408377286656": None, # Radio
-				"109171427252404224": None # AFK
-			}
-		}
-		self.textToVoice = {
-			"77041788564545536": { # Better Than Skype
-			 	"77041788564545536": "110179496002338816", # everything
-				"77046593114615808": "77050951277486080", # csgo
-				"77303335920611328": "77306055939325952", # leagueoflegends
-				"77683668360892416": "77683791056863232", # tdeacmc
-				"110624691177177088": None, # lemmybot
-				"77937243011944448": "113133087004622848", # blizzard
-				"78040207236005888": None, # nintendo
-				"78040100348366848": None, # masseffect
-				"77557134866264064": None, # announcements
-				"134272864999178241": None # radio
-			}
-		}
-		self.cooldown = {
-			"emote": 5,
-			"sticker": 5
-		}
+		with open("db/config/symbol.json",  "r") as f:
+			self.symbol = json.load(f)
+
+		with open("db/config/radioVoiceChannel.json",  "r") as f:
+			self.radioVoiceChannel = json.load(f)
+
+		with open("db/config/radioInfoChannel.json",  "r") as f:
+			self.radioInfoChannel = json.load(f)
+
+		with open("db/config/voiceToText.json",  "r") as f:
+			self.voiceToText = json.load(f)
+
+		with open("db/config/textToVoice.json",  "r") as f:
+			self.textToVoice = json.load(f)
+
+		with open("db/config/cooldown.json",  "r") as f:
+			self.cooldown = json.load(f)
+
 		self.command = {
 			"help": {
 				"function": Lcmds.help,
