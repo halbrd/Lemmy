@@ -596,7 +596,36 @@ async def lol(self, msg, dmsg):
 					matchDesc = re.sub("<\/?[a-zA-Z]*>", "", matchDesc)
 					await self.client.send_message(msg.channel, "**" + matchName + "**\n" + matchDesc)
 
+async def joinlink(self, msg, dmsg):
+	await self.client.send_message(msg.channel, discord.utils.oauth_url(self.clientId))
 
+async def leave(self, msg, dmsg):
+	if not Lutils.IsAdmin(msg.author):
+		await self.client.send_message(msg.channel, self.constants.error.symbol + " " + self.constants.error.notAdmin)
+	else:
+		await self.client.send_message(msg.channel, "Really remove Lemmy from the server? Type the name of the server to confirm.")
+		reply = await self.client.wait_for_message(timeout=10, author=msg.author, channel=msg.channel)
+		if reply is None or reply.content != msg.channel.server.name:
+			await self.client.send_message(msg.channel, "Removal cancelled.")
+		else:
+			await self.client.send_message(msg.channel, "Removal confirmed. To re-add Lemmy to the server, use this link: " + discord.utils.oauth_url(self.clientId))
+			await self.client.leave_server(msg.channel.server)
+
+async def ccomm(self, msg, dmsg):
+	for fullFlag in dmsg.flags:
+		flag = fullFlag[0]
+
+		if flag == "-list":
+			await self.client.send_message(msg.channel, ", ".join([command for command in self.customCommands]))
+		elif flag == "-add":
+			if len(fullFlag) < 3:
+				await self.client.send_message(msg.channel, self.constants.error.symbol + " Insufficient parameters supplied. Usage: `!ccomm <name> <string>`.")
+			else:
+				name = fullFlag[1] if len(fullFlag) > 1 else None
+				string = fullFlag[2] if len(fullFlag) > 2 else None
+
+				self.customCommands[name] = string
+				Lutils.SaveConfigAttribute("customcommands", "name", "string")
 
 
 # async def radio(self, msg, dmsg):

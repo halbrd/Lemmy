@@ -7,6 +7,7 @@ import datetime
 import re
 from math import sin, cos, ceil
 import os
+import json
 
 class DecomposedMessage:
 	def __init__(self, command, params, flags):
@@ -159,6 +160,28 @@ def GetPingText(self, msg, tag):
 				response += "[" + (user.mention if user.status != discord.Status.offline else user.name) + "] "
 	response += "for " + self.tags.converter[tag]
 	return response
+
+def GetConfig(file):
+	with open("db/config/" + file + ".json", "r") as f:
+		return json.load(f)
+
+def GetConfigAttribute(file, attribute):
+	with open("db/config/" + file + ".json", "r") as f:
+		return json.load(f)[attribute]
+
+def SaveConfig(file, dict):
+	with open("db/config/" + file + ".json", "w") as f:
+		json.dump(dict, f)
+
+def SaveConfigAttribute(file, attribute, value):
+	with open("db/config/" + file + ".json", "r") as f:
+		data = json.load(f)
+
+	data["attribute"] = value
+
+	with open("db/config/" + file + ".json", "w") as f:
+		json.dump(data, f)
+
 
 
 ##################

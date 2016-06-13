@@ -22,7 +22,7 @@ class CallLogger:
 					# If there wasn't 2 people before and there is now
 					elif self.db[channel.id] is None and len(channel.voice_members) >= 2:
 						self.db[channel.id] = datetime.datetime.now()
-						print("Call started in " + channel.name[2:])
+						#print("Call started in " + channel.name[2:])
 					# If there was 2 people before and still is
 					elif self.db[channel.id] is not None and len(channel.voice_members) >= 2:
 						continue

@@ -193,6 +193,24 @@ class LemmyConfig:
 				"moderator": False,
 				"description": "You can look up items or some shit like that"
 			},
+			"joinlink": {
+				"function": Lcmds.joinlink,
+				"enabled": True,
+				"moderator": False,
+				"description": "Get link to invite Lemmy to other servers"
+			},
+			"leave": {
+				"function": Lcmds.leave,
+				"enabled": True,
+				"moderator": False,
+				"description": "Remove Lemmy from server"
+			},
+			"ccomm": {
+				"function": Lcmds.ccomm,
+				"enabled": False,
+				"moderator": False,
+				"description": "Manage custom commands"
+			},
 			"logout": {
 				"function": Lcmds.logout,
 				"enabled": True,
