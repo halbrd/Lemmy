@@ -616,13 +616,31 @@ async def ccomm(self, msg, dmsg):
 		flag = fullFlag[0]
 
 		if flag == "-list":
-			await self.client.send_message(msg.channel, ", ".join([command for command in self.customCommands]))
-		elif flag == "-add":
+			await self.client.send_message(msg.channel, "```\n" + "\n".join([(key + " : " + self.customCommands[key]) for key in self.customCommands]) + "\n```")
+		elif flag == "-set":
 			if len(fullFlag) < 3:
-				await self.client.send_message(msg.channel, self.constants.error.symbol + " Insufficient parameters supplied. Usage: `!ccomm <name> <string>`.")
+				await self.client.send_message(msg.channel, self.constants.error.symbol + " Insufficient parameters supplied. Usage: `!ccomm -set <name> <string>`.")
 			else:
-				name = fullFlag[1] if len(fullFlag) > 1 else None
-				string = fullFlag[2] if len(fullFlag) > 2 else None
+				name = fullFlag[1]
+				string = fullFlag[2]
+
+				replaced = name in self.customCommands
 
 				self.customCommands[name] = string
-				Lutils.SaveConfigAttribute("customcommands", "name", "string")
+				Lutils.SaveConfigAttribute("customcommands", name, string)
+
+				await self.client.send_message(msg.channel, "Custom command '" + name + "' successfully " + ("updated" if replaced else "created") + ".")
+
+		elif flag == "-del":
+			if len(fullFlag) < 2:
+				await self.client.send_message(msg.channel, self.constants.error.symbol + " Insufficient parameters supplied. Usage: `!ccomm -del <name>`.")
+			else:
+				name = fullFlag[1]
+
+				if name not in self.customCommands:
+					await self.client.send_message(msg.channel, "Custom command '" + name + "' does not exist.")
+				else:
+					del self.customCommands[name]
+					Lutils.DeleteConfigAttribute("customcommands", name)
+
+					await self.client.send_message(msg.channel, "Custom command '" + name + "' successfully deleted.")

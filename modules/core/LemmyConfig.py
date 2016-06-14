@@ -207,8 +207,8 @@ class LemmyConfig:
 			},
 			"ccomm": {
 				"function": Lcmds.ccomm,
-				"enabled": False,
-				"moderator": False,
+				"enabled": True,
+				"moderator": True,
 				"description": "Manage custom commands"
 			},
 			"logout": {
