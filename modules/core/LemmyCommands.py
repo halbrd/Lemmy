@@ -617,7 +617,7 @@ async def ccomm(self, msg, dmsg):
 
 		if flag == "-list":
 			await self.client.send_message(msg.channel, "```\n" + "\n".join([(key + " : " + self.customCommands[key]) for key in self.customCommands]) + "\n```")
-		elif flag == "-set":
+		elif flag in ["-set", "-add"]:
 			if len(fullFlag) < 3:
 				await self.client.send_message(msg.channel, self.constants.error.symbol + " Insufficient parameters supplied. Usage: `!ccomm -set <name> <string>`.")
 			else:

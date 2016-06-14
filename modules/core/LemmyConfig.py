@@ -63,7 +63,7 @@ class LemmyConfig:
 			},
 			"correct": {
 				"function": Lcmds.correct,
-				"enabled": True,
+				"enabled": False,
 				"moderator": False,
 				"description": "Get the correct horse video"
 			},		
@@ -93,7 +93,7 @@ class LemmyConfig:
 			},
 			"happening": {
 				"function": Lcmds.happening,
-				"enabled": True,
+				"enabled": False,
 				"moderator": False,
 				"description": "Get a high quality Ron Paul gif"
 			},

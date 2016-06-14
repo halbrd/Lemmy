@@ -56,12 +56,11 @@ class LemmyBot:
 				dmsg = Lutils.ParseMessage(msg.content[len(self.config.symbol[(msg.server.id if msg.server is not None else None)]):])
 
 				if dmsg.command is not None:
-					if dmsg.command in self.config.command:
-						if self.config.command[dmsg.command]["enabled"]:
-							if self.config.command[dmsg.command]["moderator"] and not Lutils.IsModOrAbove(msg.author):
-								await self.client.send_message(msg.channel, self.constants.error + " " + self.constants.errNotMod)
-							else:
-								await self.config.command[dmsg.command]["function"](self, msg, dmsg)
+					if dmsg.command in self.config.command and self.config.command[dmsg.command]["enabled"]:
+						if self.config.command[dmsg.command]["moderator"] and not Lutils.IsModOrAbove(msg.author):
+							await self.client.send_message(msg.channel, self.constants.error + " " + self.constants.errNotMod)
+						else:
+							await self.config.command[dmsg.command]["function"](self, msg, dmsg)
 					elif dmsg.command in self.customCommands:
 						await self.client.send_message(msg.channel, self.customCommands[dmsg.command])
 

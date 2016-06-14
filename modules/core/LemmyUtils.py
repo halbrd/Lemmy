@@ -180,7 +180,7 @@ def SaveConfigAttribute(file, attribute, value):
 	data[attribute] = value
 
 	with open("db/config/" + file + ".json", "w") as f:
-		json.dump(data, f)
+		json.dump(data, f, indent=4)
 
 def DeleteConfigAttribute(file, attribute):
 	with open("db/config/" + file + ".json", "r") as f:
@@ -189,4 +189,4 @@ def DeleteConfigAttribute(file, attribute):
 	del data[attribute]
 
 	with open("db/config/" + file + ".json", "w") as f:
-		json.dump(data, f)
+		json.dump(data, f, indent=4)
