@@ -24,6 +24,7 @@ import os
 import re
 from PIL import Image
 import random
+import logging
 
 class LemmyBot:
 	def __init__(self, token):
@@ -237,6 +238,8 @@ class LemmyBot:
 			# 	await self.client.send_message(server.default_channel, "A great person once said, " + sentence)
 
 			await self.client.change_status(game=discord.Game(name="!help for info"))
+
+			logging.getLogger("discord.gateway").setLevel(logging.CRITICAL)
 
 			print(Lutils.TitleBox("Listening For Messages"))
 
