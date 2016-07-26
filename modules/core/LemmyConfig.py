@@ -211,6 +211,12 @@ class LemmyConfig:
 				"moderator": True,
 				"description": "Manage custom commands"
 			},
+			"n7hq": {
+				"function": Lcmds.n7hq,
+				"enabled": True,
+				"moderator": False,
+				"description": "Look up Mass Effect 3 player on N7HQ"
+			},
 			"logout": {
 				"function": Lcmds.logout,
 				"enabled": True,

@@ -647,7 +647,7 @@ async def ccomm(self, msg, dmsg):
 
 async def n7hq(self, msg, dmsg):
 	if len(dmsg.params) == 0:
-		msg = "http://n7hq.masseffect.com/home/characters/?name=phazmore&platform=pc"
+		r = "http://n7hq.masseffect.com/home/characters/?name=phazmore&platform=pc"
 	else:
-		msg = "http://n7hq.masseffect.com/home/characters/?name={}&platform=pc".format(dmsg.params[0])
-	await self.client.send_message(msg)
+		r = "http://n7hq.masseffect.com/home/characters/?name={}&platform=pc".format(dmsg.params[0])
+	await self.client.send_message(msg.channel, r)

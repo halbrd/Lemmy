@@ -1,7 +1,7 @@
 import discord
 import asyncio
 import shlex
-#from PIL import Image
+from PIL import Image
 import random
 import datetime
 import re
@@ -121,19 +121,19 @@ def LogEmoteUse(res, sender, emote):
 	res.sqlConnection.commit()
 
 async def LogMessage(msg):
-	metadata = "[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] " + msg.author.name + " => " + ("(private channel)" if msg.channel.is_private else msg.channel.name) + ": "
+	metadata = Colorize("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]", "black") + " " + Colorize(msg.author.name, "cyan") + " => " + Colorize(("(private channel)" if msg.channel.is_private else msg.channel.name), "green") + ": "
 	tab = "".join([" " for _ in range(len(metadata))])
 	print(metadata + ("(Non-text message or file)" if not msg.content else RemoveUnicode(msg.content).replace("\n", "\n" + tab)))
 
 async def LogMessageEdit(before, after):
-	metadata = "[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] " + before.author.name + " /> " + ("(private channel)" if before.channel.is_private else before.channel.name) + ": "
+	metadata = Colorize("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]", "black") + " " + Colorize(before.author.name, "cyan") + " /> " + Colorize(("(private channel)" if before.channel.is_private else before.channel.name), "green") + ": "
 	tab = "".join([" " for _ in range(len(metadata))])
 	print(metadata + ("(Non-text message or file)" if not before.content else RemoveUnicode(before.content).replace("\n", "\n" + tab)))
 	print(tab[:-3] + "└> ", end="")
 	print("(Non-text message or file)" if not after.content else RemoveUnicode(after.content).replace("\n", "\n" + tab))
 
 async def LogMessageDelete(msg):
-	metadata = "[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] " + msg.author.name + "? x> " + ("(private channel)" if msg.channel.is_private else msg.channel.name) + ": "
+	metadata = Colorize("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]", "black") + " " + Colorize(msg.author.name, "cyan") + "? x> " + Colorize(("(private channel)" if msg.channel.is_private else msg.channel.name), "green") + ": "
 	tab = "".join([" " for _ in range(len(metadata))])
 	print(metadata + ("(Non-text message or file)" if not msg.content else RemoveUnicode(msg.content).replace("\n", "\n" + tab)))
 
@@ -190,3 +190,11 @@ def DeleteConfigAttribute(file, attribute):
 
 	with open("db/config/" + file + ".json", "w") as f:
 		json.dump(data, f, indent=4)
+
+def Colorize(text, color):
+	colors = { "black": 30, "red": 31, "green": 32, "yellow": 33, "blue": 34, "purple": 35, "cyan": 36, "white": 37 }
+
+	if color in colors:
+		color = colors[color]
+
+	return "\033[" + str(color) + "m" + text + "\033[0m"
