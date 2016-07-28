@@ -62,8 +62,26 @@ class LemmyBot:
 							await self.client.send_message(msg.channel, self.constants.error + " " + self.constants.errNotMod)
 						else:
 							await self.config.command[dmsg.command]["function"](self, msg, dmsg)
+					# Message is a custom command
 					elif dmsg.command in self.customCommands:
 						await self.client.send_message(msg.channel, self.customCommands[dmsg.command])
+						"""def replaceDefaults(string):
+							for match in re.findall("{.+}", string):
+								del string[match.end]
+								del string[match.start]
+
+						responseTemplate = self.customCommands[dmsg.command]
+						requiredParamCount = response.count("{}")
+						totalParamCount = len(re.findall("{.*}", responseTemplate))
+						suppliedParamCount = len(dmsg.params)
+						if suppliedParamCount == totalParamCount:
+							await self.client.send_message(msg.channel, responseTemplate.format(*dmsg.params))
+						elif suppliedParamCount == requiredParamCount:
+
+
+							await self.client.send_message(msg.channel, self.constants.error + " Incorrect number of arguments ({} total, {} mandatory, got {})".format(totalParamCount, requiredParamCount, suppliedParamCount))
+						else:
+							await self.client.send_message(msg.channel, self.customCommands[dmsg.command])"""
 
 			# Message is an emote
 			elif msg.content in self.res.emotes and msg.author != self.client.user:
@@ -146,7 +164,7 @@ class LemmyBot:
 
 			print(Lutils.TitleBox("Checking Channel Mapping"))
 			warnings = False
-			
+
 			print("Voice to text channel map loaded with " + str(len(self.config.voiceToText)) + " servers mapped.")
 			print("Text to voice channel map loaded with " + str(len(self.config.textToVoice)) + " servers mapped.")
 
@@ -243,7 +261,7 @@ class LemmyBot:
 
 			print(Lutils.TitleBox("Listening For Messages"))
 
-						
+
 		@self.client.event
 		async def on_message_edit(before, after):
 			if before.content != after.content:
@@ -274,7 +292,7 @@ class LemmyBot:
 							await self.client.send_message(textChannel if textChannel is not None else channel.server.get_default_channel(), "Call ended in " + Lutils.StripUnicode(channel.name).strip() + ", duration " + timeString)
 
 		print(Lutils.TitleBox("Logging Into Discord"))
-		
+
 		print("Attempting to log in.")
 		try:
 			self.client.run(token)
