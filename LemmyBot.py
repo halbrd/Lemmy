@@ -28,8 +28,8 @@ import logging
 
 class LemmyBot:
 	def __init__(self, token):
-		if not discord.opus.is_loaded():
-			discord.opus.load_opus('libopus-0.dll')
+		#if not discord.opus.is_loaded():
+		#	discord.opus.load_opus('libopus-0.dll')
 
 		### Load major member variables ###
 		self.res = Lres.LemmyResources()
@@ -59,29 +59,28 @@ class LemmyBot:
 				if dmsg.command is not None:
 					if dmsg.command in self.config.command and self.config.command[dmsg.command]["enabled"]:
 						if self.config.command[dmsg.command]["moderator"] and not Lutils.IsModOrAbove(msg.author):
-							await self.client.send_message(msg.channel, self.constants.error + " " + self.constants.errNotMod)
+							await self.client.send_message(msg.channel, self.constants.error.symbol + " " + self.constants.errNotMod)
 						else:
 							await self.config.command[dmsg.command]["function"](self, msg, dmsg)
 					# Message is a custom command
 					elif dmsg.command in self.customCommands:
-						await self.client.send_message(msg.channel, self.customCommands[dmsg.command])
-						"""def replaceDefaults(string):
-							for match in re.findall("{.+}", string):
-								del string[match.end]
-								del string[match.start]
+						#await self.client.send_message(msg.channel, self.customCommands[dmsg.command])
+
+						def replaceDefaults(string):
+							return re.sub(r"{([^{}]+)}", r"\1", string)
 
 						responseTemplate = self.customCommands[dmsg.command]
-						requiredParamCount = response.count("{}")
-						totalParamCount = len(re.findall("{.*}", responseTemplate))
+						requiredParamCount = responseTemplate.count("{}")
+						totalParamCount = len(re.findall("{[^{}]*}", responseTemplate))
 						suppliedParamCount = len(dmsg.params)
 						if suppliedParamCount == totalParamCount:
+							responseTemplate = re.sub("{[^{}]+}", "{}", responseTemplate)
 							await self.client.send_message(msg.channel, responseTemplate.format(*dmsg.params))
 						elif suppliedParamCount == requiredParamCount:
-
-
-							await self.client.send_message(msg.channel, self.constants.error + " Incorrect number of arguments ({} total, {} mandatory, got {})".format(totalParamCount, requiredParamCount, suppliedParamCount))
+							await self.client.send_message(msg.channel, replaceDefaults(responseTemplate).format(*dmsg.params))
 						else:
-							await self.client.send_message(msg.channel, self.customCommands[dmsg.command])"""
+							await self.client.send_message(msg.channel, self.constants.error.symbol + " Incorrect number of arguments ({} total, {} mandatory, got {})".format(str(totalParamCount), str(requiredParamCount), str(suppliedParamCount)))
+
 
 			# Message is an emote
 			elif msg.content in self.res.emotes and msg.author != self.client.user:

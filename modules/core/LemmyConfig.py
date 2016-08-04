@@ -66,7 +66,7 @@ class LemmyConfig:
 				"enabled": False,
 				"moderator": False,
 				"description": "Get the correct horse video"
-			},		
+			},
 			"8ball": {
 				"function": Lcmds.eightball,
 				"enabled": True,
@@ -211,19 +211,7 @@ class LemmyConfig:
 				"moderator": True,
 				"description": "Manage custom commands"
 			},
-			"n7hq": {
-				"function": Lcmds.n7hq,
-				"enabled": True,
-				"moderator": False,
-				"description": "Look up Mass Effect 3 player on N7HQ"
-			},
-			"logout": {
-				"function": Lcmds.logout,
-				"enabled": True,
-				"moderator": True,
-				"description": "Turn Lemmy off"
-			},
-			"shutdown": {
+			"restart": {
 				"function": Lcmds.logout,
 				"enabled": True,
 				"moderator": True,

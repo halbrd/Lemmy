@@ -176,7 +176,7 @@ async def james(self, msg, dmsg):
 						update = True
 						self.tags.db[gameTag].append(msg.author.id)
 						await self.client.send_message(msg.channel, msg.author.mention + " was successfully added to '" + gameTag + "'.")
-					
+
 		elif flag == "-leave":
 			if len(flagParams) == 0:
 				await self.client.send_message(msg.channel, self.constants.error.symbol + " " + msg.author.mention + " was not removed from any tag: No tag was specified.")
@@ -262,7 +262,7 @@ async def role(self, msg, dmsg):
 		flag = fullFlag[0]
 		param1 = fullFlag[1] if len(fullFlag) > 1 else None
 		param2 = fullFlag[2] if len(fullFlag) > 2 else None
-		
+
 		if flag == "-allow" or flag == "-deny":
 			allow = flag == "-allow"
 			if not Lutils.IsModOrAbove(msg.author):
@@ -552,7 +552,7 @@ async def radio(self, msg, dmsg):
 
 async def skypeemotes(self, msg, dmsg):
 	await self.client.send_message(msg.channel, "   ".join(self.res.skype.emotes))
-	
+
 async def shrug(self, msg, dmsg):
 	await self.client.send_message(msg.channel, "¯\\_(ツ)_/¯")
 
@@ -588,7 +588,7 @@ async def lol(self, msg, dmsg):
 					#d = [d[i:i+2000] for i in range(0, len(d), 2000)]
 					#for chunk in d:
 					#	await self.client.send_message(msg.channel, chunk)
-					
+
 					matchName = searchMap[0][1]
 					matchId = nameMap[matchName]
 					matchDesc = itemData[matchId]["description"]
@@ -644,10 +644,3 @@ async def ccomm(self, msg, dmsg):
 					Lutils.DeleteConfigAttribute("customcommands", name)
 
 					await self.client.send_message(msg.channel, "Custom command '" + name + "' successfully deleted.")
-
-async def n7hq(self, msg, dmsg):
-	if len(dmsg.params) == 0:
-		r = "http://n7hq.masseffect.com/home/characters/?name=phazmore&platform=pc"
-	else:
-		r = "http://n7hq.masseffect.com/home/characters/?name={}&platform=pc".format(dmsg.params[0])
-	await self.client.send_message(msg.channel, r)
