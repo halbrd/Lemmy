@@ -631,7 +631,7 @@ async def ccomm(self, msg, dmsg):
 
 				await self.client.send_message(msg.channel, "Custom command '" + name + "' successfully " + ("updated" if replaced else "created") + ".")
 
-		elif flag == "-del":
+		elif flag == ["-del", "-delete", "-rem", "-remove"]:
 			if len(fullFlag) < 2:
 				await self.client.send_message(msg.channel, self.constants.error.symbol + " Insufficient parameters supplied. Usage: `!ccomm -del <name>`.")
 			else:
@@ -644,3 +644,6 @@ async def ccomm(self, msg, dmsg):
 					Lutils.DeleteConfigAttribute("customcommands", name)
 
 					await self.client.send_message(msg.channel, "Custom command '" + name + "' successfully deleted.")
+
+async def coinflip(self, msg, dmsg):
+	await self.client.send_message(msg.channel, random.choice(["Heads!", "Tails!"]))

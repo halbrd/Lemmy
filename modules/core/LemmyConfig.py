@@ -31,6 +31,12 @@ class LemmyConfig:
 				"moderator": False,
 				"description": "...Wait, this seems self-referential..."
 			},
+			"restart": {
+				"function": Lcmds.logout,
+				"enabled": True,
+				"moderator": True,
+				"description": "Turn Lemmy off"
+			},
 			"emotes": {
 				"function": Lcmds.emotes,
 				"enabled": True,
@@ -211,10 +217,11 @@ class LemmyConfig:
 				"moderator": True,
 				"description": "Manage custom commands"
 			},
-			"restart": {
-				"function": Lcmds.logout,
+			"coinflip": {
+				"function": Lcmds.coinflip,
 				"enabled": True,
-				"moderator": True,
-				"description": "Turn Lemmy off"
+				"moderator": False,
+				"description": "Flip a coin"
 			}
+
 		}
