@@ -647,3 +647,27 @@ async def ccomm(self, msg, dmsg):
 
 async def coinflip(self, msg, dmsg):
 	await self.client.send_message(msg.channel, random.choice(["Heads!", "Tails!"]))
+
+async def emoji(self, msg, dmsg):
+	for fullFlag in dmsg.flags:
+		flag = fullFlag[0]
+
+		if flag == "-list":
+			response = ""
+
+			for emoji in msg.server.emojis:
+				response += "Name: " + emoji.name + "\n"
+				response += "Twitch managed: " + ("Yes" if emoji.managed else "No") + "\n"
+				response += "URL: " + emoji.url + "\n"
+				response += "\n"
+
+			await self.client.send_message(msg.channel, response)
+
+		elif flag == "-add":
+			# This is pretty much completely broken
+
+			emoji = discord.Emoji(name = fullFlag[1], require_colons = True, managed = False, server = msg.channel.server, roles = [], url = "https://discordapp.com/api/users/77041679726551040/avatars/8af5538665bb31bd73d002dd2a599652.jpg")
+
+			msg.server.emojis.append(emoji)
+
+			await self.client.send_message(msg.channel, "Somehow this command executed without crashing")

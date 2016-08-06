@@ -222,6 +222,11 @@ class LemmyConfig:
 				"enabled": True,
 				"moderator": False,
 				"description": "Flip a coin"
+			},
+			"emoji": {
+				"function": Lcmds.emoji,
+				"enabled": True,
+				"moderator": True,
+				"description": "Manage server emojis"
 			}
-
 		}
