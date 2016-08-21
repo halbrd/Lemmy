@@ -228,5 +228,11 @@ class LemmyConfig:
 				"enabled": True,
 				"moderator": True,
 				"description": "Manage server emojis"
+			},
+			"resetprofile": {
+				"function": Lcmds.resetprofile,
+				"enabled": True,
+				"moderator": True,
+				"description": "laters"
 			}
 		}

@@ -663,7 +663,7 @@ async def emoji(self, msg, dmsg):
 
 			await self.client.send_message(msg.channel, response)
 
-		elif flag == "-add":
+		elif flag == "-add" and False:
 			# This is pretty much completely broken
 
 			emoji = discord.Emoji(name = fullFlag[1], require_colons = True, managed = False, server = msg.channel.server, roles = [], url = "https://discordapp.com/api/users/77041679726551040/avatars/8af5538665bb31bd73d002dd2a599652.jpg")
@@ -671,3 +671,7 @@ async def emoji(self, msg, dmsg):
 			msg.server.emojis.append(emoji)
 
 			await self.client.send_message(msg.channel, "Somehow this command executed without crashing")
+
+async def resetprofile(self, msg, dmsg):
+	with open("pics/displaypics/white-lemmy.png", "rb") as dp:
+		await self.client.edit_profile(username="Lemmy", avatar=dp.read())
