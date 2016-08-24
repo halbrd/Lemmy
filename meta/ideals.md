@@ -23,3 +23,8 @@
 ## Project management
 * Feature branches and pull requests (a la Gitflow) should be used (though *responsibly* skipping this for things that you have very carefully checked is okay)
 * [Trello board](https://trello.com/b/Nt0I1pZK/lemmy)
+
+## Misc
+These are just random, unrelated things that I want to documentation
+* Lemmy will have core emotes that are built in and hosted externally (to keep repo size down), though an option to download them all locally for improved performance is a good idea. An instance of Lemmy will also be able to have its own emotes that are stored locally.
+* Modules should probably have metadata for attribution and other info.

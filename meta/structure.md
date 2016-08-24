@@ -4,3 +4,19 @@
 * `/res` is for data that isn't instantial but doesn't belong in code (eg. lenny faces)
 * `/meta` is for internal documentation on the project
 * `/old` is for code that I wrote that isn't going to be used but might be useful for reference
+
+# Config
+* Lemmy will use a carefully structured, centralised config system of JSON files
+* The hierarchy will be roughly:
+
+```bash
+/global   #server-agnostic config
+	some-global-config-topic.json
+	some-global-config-topic.json
+/<server id> #server-specific config
+	some-server-specific-topic.json
+	some-server-specific-topic.json
+	some-server-specific-topic.json
+```
+
+* Specifics to be determined (eg. do plugins get their own section?)
