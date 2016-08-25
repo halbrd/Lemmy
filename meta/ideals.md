@@ -24,7 +24,12 @@
 * Feature branches and pull requests (a la Gitflow) should be used (though *responsibly* skipping this for things that you have very carefully checked is okay)
 * [Trello board](https://trello.com/b/Nt0I1pZK/lemmy)
 
+## User experience style
+* Commands should be loosely based on Unix-style command structure (something like the `!command -flag parameter` thing we have going now but not quite)
+	* For example: at the moment we have `!ccomm -del thing1 -del thing2 -del thing3`, but we should have `!ccomm -del thing1 thing2 thing3` (though the first would still work).
+
 ## Misc
 These are just random, unrelated things that I want to documentation
 * Lemmy will have core emotes that are built in and hosted externally (to keep repo size down), though an option to download them all locally for improved performance is a good idea. An instance of Lemmy will also be able to have its own emotes that are stored locally.
 * Modules should probably have metadata for attribution and other info.
+* I'd really like to have a "terminal mode" where all of your messages are interpreted as commands, without needing to prepend a symbol (i.e. `!`)
