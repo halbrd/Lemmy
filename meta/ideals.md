@@ -15,6 +15,7 @@
 * Variable names use camelCase
 * Comments are good, but don't narrate the code; focus on the overall function of a block of code
 * Comments on inputs/outputs of ambiguous functions are good
+* Commit messages should be short but descriptive, and use present tense verbs (eg. `Implement !command`, `Fix !command not printing error message`, `Remove !command due to Skynet-related issues`)
 
 ## Tech stack
 * JSON > everything else until we have large amounts of data and/or frequent read/write (we'll cross that bridge when we come to it)
