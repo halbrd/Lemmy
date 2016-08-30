@@ -7,12 +7,12 @@
 * Breaking things up into directories and files is better than large files
 * Wherever possible, store things in JSON, not just lines in a text file
 * Think big picture - reusable microframeworks over in-situ algorithms
-* For config read/write, a nonexistent file should be created and initialized
+* Until performance becomes an issue, Lemmy should read from file as required, rather than reading a file into memory, in order to achieve live updating 
 
 ## Code style
 * Tabs
-* Class and function names use CapsCase
-* Variable names use camelCase
+* Class names use CapsCase
+* Variable and function names use camelCase
 * Comments are good, but don't narrate the code; focus on the overall function of a block of code
 * Comments on inputs/outputs of ambiguous functions are good
 * Commit messages should be short but descriptive, and use present tense verbs (eg. `Implement !command`, `Fix !command not printing error message`, `Remove !command due to Skynet-related issues`)
@@ -30,7 +30,7 @@
 	* For example: at the moment we have `!ccomm -del thing1 -del thing2 -del thing3`, but we should have `!ccomm -del thing1 thing2 thing3` (though the first would still work).
 
 ## Misc
-These are just random, unrelated things that I want to documentation
+These are just random, unrelated things that I want to document
 * Lemmy will have core emotes that are built in and hosted externally (to keep repo size down), though an option to download them all locally for improved performance is a good idea. An instance of Lemmy will also be able to have its own emotes that are stored locally.
 * Modules should probably have metadata for attribution and other info.
 * I'd really like to have a "terminal mode" where all of your messages are interpreted as commands, without needing to prepend a symbol (i.e. `!`)
