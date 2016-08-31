@@ -631,7 +631,7 @@ async def ccomm(self, msg, dmsg):
 
 				await self.client.send_message(msg.channel, "Custom command '" + name + "' successfully " + ("updated" if replaced else "created") + ".")
 
-		elif flag == ["-del", "-delete", "-rem", "-remove"]:
+		elif flag in ["-del", "-delete", "-rem", "-remove"]:
 			if len(fullFlag) < 2:
 				await self.client.send_message(msg.channel, self.constants.error.symbol + " Insufficient parameters supplied. Usage: `!ccomm -del <name>`.")
 			else:

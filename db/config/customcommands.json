@@ -1,10 +1,11 @@
 {
-    "test": "optional parameter: {something} required parameter: {}",
-    "thisisfine": "http://i.imgur.com/YfAZJky.png",
-    "n7hq": "http://n7hq.masseffect.com/home/characters/?name={phazmore}&platform=pc",
-    "happening": "https://i.imgur.com/bYGOUHP.gif",
     "tttfiles": "http://steamcommunity.com/sharedfiles/filedetails/?id=367501531",
-    "wunteps": "https://gfycat.com/MetallicAcidicCollardlizard",
+    "n7hq": "http://n7hq.masseffect.com/home/characters/?name={phazmore}&platform=pc",
+    "correct": "https://youtu.be/OoZN3CAVczs",
     "mviii": "http://i.imgur.com/m6AO0ML.png",
-    "correct": "https://youtu.be/OoZN3CAVczs"
+    "wunteps": "https://gfycat.com/MetallicAcidicCollardlizard",
+    "cs": "https://csgosquad.com/search/{}",
+    "happening": "https://i.imgur.com/bYGOUHP.gif",
+    "foaas": "http://foaas.com/off/{Will}/{}",
+    "thisisfine": "http://i.imgur.com/YfAZJky.png"
 }

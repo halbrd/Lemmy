@@ -1,4 +1,4 @@
 while true
 do
-	sudo python RunLemmy.py
+	sudo python3.5 RunLemmy.py
 done
