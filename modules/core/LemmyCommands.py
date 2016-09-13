@@ -675,3 +675,17 @@ async def emoji(self, msg, dmsg):
 async def resetprofile(self, msg, dmsg):
 	with open("pics/displaypics/white-lemmy.png", "rb") as dp:
 		await self.client.edit_profile(username="Lemmy", avatar=dp.read())
+
+async def dump(self, msg, dmsg):
+	logs = {}
+	for channel in msg.channel.server.channels:
+		logs[channel.name] = self.client.logs_from(channel, limit=999999999)
+	for channelName in logs:
+		payload = ""
+		async for message in logs[channelName]:
+			try:
+				payload += "[" + message.timestamp.strftime("%Y-%m-%d %H:%M:%S") + "] " + message.author.name + ": " + message.content + "\n"
+			except Exception as e:
+				payload += "[Error appending message: " + str(e) + "]"
+		with open(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "_" + msg.channel.server.name + '_' + channelName + '_dump.txt', 'w') as f:
+			f.write(payload)
