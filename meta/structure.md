@@ -20,10 +20,10 @@
 ```
 
 * Specifics to be determined (eg. do plugins get their own section?)
-* All files will be written with pretty formatting (tabs and linebreaks) so that the user can edit them with a text editor
+* All config files will be written with pretty formatting (tabs and linebreaks) so that the user can edit them with a text editor
 * There will also be a command for config mutation
 * For config read/write, a nonexistent file should be created and initialized
 * All commands will have mandatory metadata
-	* Quick summary
-	* Detailed explanation
+	* Quick summary (using native docstrings and function.__doc__ call)
+	* Detailed explanation (probably an explicit metadata field)
 	* Usage (documenting all parameters and flags)
