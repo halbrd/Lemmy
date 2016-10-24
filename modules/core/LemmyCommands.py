@@ -122,7 +122,7 @@ async def userinfo(self, msg, dmsg):
 			# 	message += "\nCurrent playing " + str(user.game_id) + "."
 
 			await self.client.send_message(msg.channel, message)
-			await self.client.send_message("Note: This command is deprecated; use Discord's Developer Mode to get IDs.")
+			await self.client.send_message(msg.channel, "Note: This command is deprecated; use Discord's Developer Mode to get IDs.")
 
 async def channelinfo(self, msg, dmsg):
 	if len(dmsg.params) > 0:
