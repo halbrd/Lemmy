@@ -555,9 +555,6 @@ async def radio(self, msg, dmsg):
 async def skypeemotes(self, msg, dmsg):
 	await self.client.send_message(msg.channel, "   ".join(self.res.skype.emotes))
 
-async def shrug(self, msg, dmsg):
-	await self.client.send_message(msg.channel, "¯\\_(ツ)_/¯")
-
 async def thisisfine(self, msg, dmsg):
 	#await self.client.send_file(msg.channel, "pics/originals/ThisIsFine.png")
 	await self.client.send_message(msg.channel, "http://i.imgur.com/YfAZJky.png")

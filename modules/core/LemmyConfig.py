@@ -175,12 +175,6 @@ class LemmyConfig:
 				"moderator": False,
 				"description": "Get a list of Skype emotes"
 			},
-			"shrug": {
-				"function": Lcmds.shrug,
-				"enabled": False,
-				"moderator": False,
-				"description": "Get a Unicode shrug"
-			},
 			"thisisfine": {
 				"function": Lcmds.thisisfine,
 				"enabled": False,
