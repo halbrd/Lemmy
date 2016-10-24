@@ -20,23 +20,25 @@ from fuzzywuzzy import fuzz
 import copy
 
 async def help(self, msg, dmsg):
-	reply = "Lemmy reference page: http://lynq.me/lemmy"
-	reply += "\n"
-	reply += "\nCommand terminology: `!command parameter -flag flagParameter`"
-	reply += "\n\n```"
+	reply = "Lemmy reference page: http://lynq.me/lemmy\n"
+	reply += "Commands available: " + ", ".join([commandText for commandText, commandInfo in self.config.command.items()])
 
-	commands = []
-	for commandText, commandInfo in self.config.command.items():
-		notes = []
-		if not commandInfo["enabled"]: notes.append("disabled")
-		if commandInfo["moderator"]: notes.append("moderator+")
-
-		command = self.config.symbol[msg.server.id] + commandText + "    " + ("[" if len(notes) > 0 else "") + ", ".join(notes) + ("]" if len(notes) > 0 else "")
-		command += "\n    " + commandInfo["description"]
-
-		commands.append(command)
-	reply += "\n".join(commands)
-	reply += "\n```"
+	# reply += "\n"
+	# reply += "\nCommand terminology: `!command parameter -flag flagParameter`"
+	# reply += "\n\n```"
+	#
+	# commands = []
+	# for commandText, commandInfo in self.config.command.items():
+	# 	notes = []
+	# 	if not commandInfo["enabled"]: notes.append("disabled")
+	# 	if commandInfo["moderator"]: notes.append("moderator+")
+	#
+	# 	command = self.config.symbol[msg.server.id] + commandText + "    " + ("[" if len(notes) > 0 else "") + ", ".join(notes) + ("]" if len(notes) > 0 else "")
+	# 	command += "\n    " + commandInfo["description"]
+	#
+	# 	commands.append(command)
+	# reply += "\n".join(commands)
+	# reply += "\n```"
 
 	await self.client.send_message(msg.channel, reply)
 
@@ -626,8 +628,8 @@ async def ccomm(self, msg, dmsg):
 
 				replaced = name in self.customCommands
 
-				self.customCommands[name] = string
-				Lutils.SaveConfigAttribute("customcommands", name, string)
+				self.customCommands[name.lower()] = string
+				Lutils.SaveConfigAttribute("customcommands", name.lower(), string)
 
 				await self.client.send_message(msg.channel, "Custom command '" + name + "' successfully " + ("updated" if replaced else "created") + ".")
 
@@ -675,6 +677,7 @@ async def emoji(self, msg, dmsg):
 async def resetprofile(self, msg, dmsg):
 	with open("pics/displaypics/white-lemmy.png", "rb") as dp:
 		await self.client.edit_profile(username="Lemmy", avatar=dp.read())
+		await self.client.send_message(msg.channel, "Profile reset.")
 
 async def dump(self, msg, dmsg):
 	logs = {}
@@ -689,3 +692,36 @@ async def dump(self, msg, dmsg):
 				payload += "[Error appending message: " + str(e) + "]"
 		with open(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "_" + msg.channel.server.name + '_' + channelName + '_dump.txt', 'w') as f:
 			f.write(payload)
+
+async def hero(self, msg, dmsg):
+	heroes = ["Genji", "McCree", "Pharah", "Reaper", "Soldier: 76", "Tracer", "Bastion", "Hanzo", "Junkrat", "Mei", "Torbjorn", "Widowmaker", "D.Va", "Reinhardt", "Roadhog", "Winston", "Zarya", "Ana", "Lucio", "Mercy", "Symmetra", "Zenyatta"]
+	await self.client.send_message(msg.channel, msg.author.mention + " `" + random.choice(heroes) + "`")
+
+async def rainbow(self, msg, dmsg):
+	try:
+		roleName = dmsg.params[0]
+	except IndexError:
+		await self.client.send_message(msg.channel, self.constants.error.symbol + " No role given.")
+	finally:
+		role = discord.utils.find(lambda role: role.name == roleName, msg.channel.server.roles)
+
+		if role is None:
+			await self.client.send_message(msg.channel, self.constants.error.symbol + " No role with name '" + roleName + "' on this server.'")
+		else:
+			colours = [
+			discord.Colour.red(),
+			discord.Colour.orange(),
+			discord.Colour.gold(),
+			discord.Colour.green(),
+			discord.Colour.blue(),
+			discord.Colour.purple()
+			]
+			i = 0
+
+			while True:
+				await self.client.edit_role(msg.channel.server, role, colour=colours[i])
+				print("editing role")
+				i = (i + 1) % len(colours)
+
+async def genjimain(self, msg, dmsg):
+	await self.client.send_message(msg.channel, random.choice(["http://i.imgur.com/ezKaQot.gifv", "http://i.imgur.com/pzoNbDk.png", "https://i.imgur.com/GakPwPr.jpg", "http://i.imgur.com/E5AxL8b.jpg"]))

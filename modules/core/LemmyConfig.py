@@ -234,5 +234,23 @@ class LemmyConfig:
 				"enabled": True,
 				"moderator": True,
 				"description": "laters"
+			},
+			"hero": {
+				"function": Lcmds.hero,
+				"enabled": True,
+				"moderator": False,
+				"description": "Choose a random Overwatch hero"
+			},
+			"rainbow": {
+				"function": Lcmds.rainbow,
+				"enabled": True,
+				"moderator": False,
+				"description": "Make a role rainbow"
+			},
+			"genjimain": {
+				"function": Lcmds.genjimain,
+				"enabled": True,
+				"moderator": False,
+				"description": "Get an insight into the lives of Genji players"
 			}
 		}
