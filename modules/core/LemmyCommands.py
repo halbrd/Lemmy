@@ -737,3 +737,18 @@ async def gifr(self, msg, dmsg):
 				await self.client.send_message(msg.channel, url)
 			else:
 				await self.client.send_message(msg.channel, "Your search terms gave no results.")
+
+async def roll(self, msg, dmsg):
+	def parseRoll(roll):
+		return None if not re.fullmatch("(\d)*d(\d)+(k[hl])?", roll)
+		# Finish this
+
+
+	queryString = "".join(dmsg.params).replace(" ", "").replace("+", " + ").replace("-", " - ")
+	queryPhrases = queryString.split()
+	for i in range(1, len(queryPhrases), 2):
+		if not queryPhrases[i] in ["+", "-"]:
+			await self.client.send_message(msg.channel, self.constants.error.symbol + " Malformed statement: expected `+` or `-`, got " + queryPhrases[i])
+			return
+
+	# await self.client.send_message(msg.channel, self.constants.error.symbol + " Malformed dice roll: " + roll)
