@@ -246,5 +246,11 @@ class LemmyConfig:
 				"enabled": True,
 				"moderator": False,
 				"description": "Get an insight into the lives of Genji players"
+			},
+			"gifr": {
+				"function": Lcmds.gifr,
+				"enabled": True,
+				"moderator": False,
+				"description": "Get a random gif with search terms"
 			}
 		}

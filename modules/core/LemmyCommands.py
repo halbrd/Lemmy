@@ -18,6 +18,7 @@ import re
 import urllib.request as req
 from fuzzywuzzy import fuzz
 import copy
+import aiohttp
 
 async def help(self, msg, dmsg):
 	reply = "Lemmy reference page: http://lynq.me/lemmy\n"
@@ -722,3 +723,32 @@ async def rainbow(self, msg, dmsg):
 
 async def genjimain(self, msg, dmsg):
 	await self.client.send_message(msg.channel, random.choice(["http://i.imgur.com/ezKaQot.gifv", "http://i.imgur.com/pzoNbDk.png", "https://i.imgur.com/GakPwPr.jpg", "http://i.imgur.com/E5AxL8b.jpg"]))
+
+async def gifr(self, msg, dmsg):
+	if len(dmsg.params) < 1:
+		await self.client.send_message(msg.channel, self.constants.error.symbol + " No search term given.")
+	else:
+		searchParams = "+".join(dmsg.params)
+		searchTerm = "http://api.giphy.com/v1/gifs/random?&api_key=dc6zaTOxFJmzC&tag=" + searchParams
+		async with aiohttp.get(searchTerm) as request:
+			result = await request.json()
+			if result["data"] != []:
+				url = result["data"]["url"]
+				await self.client.send_message(msg.channel, url)
+			else:
+				await self.client.send_message(msg.channel, "Your search terms gave no results.")
+
+async def roll(self, msg, dmsg):
+	def parseRoll(roll):
+		return None if not re.fullmatch("(\d)*d(\d)+(k[hl])?", roll)
+		# Finish this
+
+
+	queryString = "".join(dmsg.params).replace(" ", "").replace("+", " + ").replace("-", " - ")
+	queryPhrases = queryString.split()
+	for i in range(1, len(queryPhrases), 2):
+		if not queryPhrases[i] in ["+", "-"]:
+			await self.client.send_message(msg.channel, self.constants.error.symbol + " Malformed statement: expected `+` or `-`, got " + queryPhrases[i])
+			return
+
+	# await self.client.send_message(msg.channel, self.constants.error.symbol + " Malformed dice roll: " + roll)
