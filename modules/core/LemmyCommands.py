@@ -740,7 +740,8 @@ async def gifr(self, msg, dmsg):
 
 async def roll(self, msg, dmsg):
 	def parseRoll(roll):
-		return None if not re.fullmatch("(\d)*d(\d)+(k[hl])?", roll)
+		if not re.fullmatch("(\d)*d(\d)+(k[hl])?", roll):
+			return None
 		# Finish this
 
 
