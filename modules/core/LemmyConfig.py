@@ -237,7 +237,7 @@ class LemmyConfig:
 			},
 			"rainbow": {
 				"function": Lcmds.rainbow,
-				"enabled": True,
+				"enabled": False,
 				"moderator": False,
 				"description": "Make a role rainbow"
 			},
