@@ -27,3 +27,10 @@
 	* Quick summary (using native docstrings and function.__doc__ call)
 	* Detailed explanation (probably an explicit metadata field)
 	* Usage (documenting all parameters and flags)
+* Certain terminology should be global for standardization - e.g.:
+```python
+config.remove = ["delete", "del", "remove", "rem", "rm"]
+
+if flag in config.remove:
+	...
+```
