@@ -13,7 +13,7 @@
 /global   #server-agnostic config
 	some-global-config-topic.json
 	some-global-config-topic.json
-/<server id> #server-specific config
+/<server id>   #server-specific config
 	some-server-specific-topic.json
 	some-server-specific-topic.json
 	some-server-specific-topic.json
@@ -28,6 +28,7 @@
 	* Detailed explanation (probably an explicit metadata field)
 	* Usage (documenting all parameters and flags)
 * Certain terminology should be global for standardization - e.g.:
+
 ```python
 config.remove = ["delete", "del", "remove", "rem", "rm"]
 
