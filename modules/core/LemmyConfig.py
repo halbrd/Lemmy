@@ -208,7 +208,7 @@ class LemmyConfig:
 			"ccomm": {
 				"function": Lcmds.ccomm,
 				"enabled": True,
-				"moderator": True,
+				"moderator": False,
 				"description": "Manage custom commands"
 			},
 			"coinflip": {

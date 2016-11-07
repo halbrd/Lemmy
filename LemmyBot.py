@@ -59,7 +59,7 @@ class LemmyBot:
 				if dmsg.command is not None:
 					if dmsg.command in self.config.command and self.config.command[dmsg.command]["enabled"]:
 						if self.config.command[dmsg.command]["moderator"] and not Lutils.IsModOrAbove(msg.author):
-							await self.client.send_message(msg.channel, self.constants.error.symbol + " " + self.constants.errNotMod)
+							await self.client.send_message(msg.channel, self.constants.error.symbol + " " + self.constants.error.notMod)
 						else:
 							await self.config.command[dmsg.command]["function"](self, msg, dmsg)
 					# Message is a custom command
@@ -73,6 +73,11 @@ class LemmyBot:
 						requiredParamCount = responseTemplate.count("{}")
 						totalParamCount = len(re.findall("{[^{}]*}", responseTemplate))
 						suppliedParamCount = len(dmsg.params)
+
+						if requiredParamCount > 1 and suppliedParamCount == 1:
+							dmsg.params = [dmsg.params[0] for i in range(requiredParamCount)]
+							suppliedParamCount = requiredParamCount
+
 						if suppliedParamCount == totalParamCount:
 							responseTemplate = re.sub("{[^{}]+}", "{}", responseTemplate)
 							await self.client.send_message(msg.channel, responseTemplate.format(*dmsg.params))
@@ -286,7 +291,7 @@ class LemmyBot:
 
 			print(Lutils.TitleBox("Listening For Messages"))
 
-			if len(rainbowRoles) > 0:
+			if False and len(rainbowRoles) > 0:
 				print(Lutils.TitleBox("Rainbowing Rainbows"))
 
 				colours = [
