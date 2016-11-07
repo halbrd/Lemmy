@@ -252,5 +252,11 @@ class LemmyConfig:
 				"enabled": True,
 				"moderator": False,
 				"description": "Get a random gif with search terms"
+			},
+			"fusion": {
+				"function": Lcmds.fusion,
+				"enabled": True,
+				"moderator": False,
+				"description": "Get a Pokemon fusion"
 			}
 		}
