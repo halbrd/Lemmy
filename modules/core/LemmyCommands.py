@@ -620,7 +620,7 @@ async def ccomm(self, msg, dmsg):
 		if flag == "-list":
 			# await self.client.send_message(msg.channel, "```\n" + "\n".join([(key + " : " + self.customCommands[key]) for key in self.customCommands]) + "\n```")
 
-			commands = [(key + " : " + self.customCommands[key]) for key in self.customCommands]
+			commands = [key for key in self.customCommands]
 
 			messages = [""]
 			currentMessageIndex = 0
