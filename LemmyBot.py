@@ -259,35 +259,35 @@ class LemmyBot:
 
 			# 	await self.client.send_message(server.default_channel, "A great person once said, " + sentence)
 
-			with open("pics/displaypics/white-lemmy.png", "rb") as dp:
-				await self.client.edit_profile(username="Lemmy", avatar=dp.read())
+			with open("pics/displaypics/angular.png", "rb") as dp:
+				await self.client.edit_profile(username="Angulemmy", avatar=dp.read())
 			await self.client.change_status(game=discord.Game(name="!help for info"))
 
 			logging.getLogger("discord.gateway").setLevel(logging.CRITICAL)
 
-			print(Lutils.TitleBox("Set Up Rainbow Stuff"))
-			rainbowRoleIds = Lutils.GetConfigAttribute("rainbows", "roles")
-
-			# roles = [role for role in server.roles for server in self.client.servers] # This didn't work, as it returned BTS for every server for some reason
-			roles = []
-			for server in self.client.servers:
-				for role in server.roles:
-					roles.append(role)
-			print("roles: " + ", ".join([role.name for role in roles]))
-
-			allRainbowRoleIds = [role.id for role in roles if role.name == "rainbow"]
-			for roleId in allRainbowRoleIds:
-				if roleId not in rainbowRoleIds:
-					rainbowRoleIds.append(roleId)
-			Lutils.SaveConfigAttribute("rainbows", "roles", rainbowRoleIds)
-
-			rainbowRoles = []
-
-			for roleId in rainbowRoleIds:
-				role = discord.utils.find(lambda role: role.id == roleId, roles)
-				if role is not None:
-					print("Found new rainbow role in server " + role.server.name)
-					rainbowRoles.append(role)
+			# print(Lutils.TitleBox("Set Up Rainbow Stuff"))
+			# rainbowRoleIds = Lutils.GetConfigAttribute("rainbows", "roles")
+			#
+			# # roles = [role for role in server.roles for server in self.client.servers] # This didn't work, as it returned BTS for every server for some reason
+			# roles = []
+			# for server in self.client.servers:
+			# 	for role in server.roles:
+			# 		roles.append(role)
+			# print("roles: " + ", ".join([role.name for role in roles]))
+			#
+			# allRainbowRoleIds = [role.id for role in roles if role.name == "rainbow"]
+			# for roleId in allRainbowRoleIds:
+			# 	if roleId not in rainbowRoleIds:
+			# 		rainbowRoleIds.append(roleId)
+			# Lutils.SaveConfigAttribute("rainbows", "roles", rainbowRoleIds)
+			#
+			# rainbowRoles = []
+			#
+			# for roleId in rainbowRoleIds:
+			# 	role = discord.utils.find(lambda role: role.id == roleId, roles)
+			# 	if role is not None:
+			# 		print("Found new rainbow role in server " + role.server.name)
+			# 		rainbowRoles.append(role)
 
 			print(Lutils.TitleBox("Listening For Messages"))
 
