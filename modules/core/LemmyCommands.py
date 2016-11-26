@@ -709,7 +709,7 @@ async def dump(self, msg, dmsg):
 			f.write(payload)
 
 async def hero(self, msg, dmsg):
-	heroes = ["Genji", "McCree", "Pharah", "Reaper", "Soldier: 76", "Tracer", "Bastion", "Hanzo", "Junkrat", "Mei", "Torbjorn", "Widowmaker", "D.Va", "Reinhardt", "Roadhog", "Winston", "Zarya", "Ana", "Lucio", "Mercy", "Symmetra", "Zenyatta"]
+	heroes = ["Sombra", "Genji", "McCree", "Pharah", "Reaper", "Soldier: 76", "Tracer", "Bastion", "Hanzo", "Junkrat", "Mei", "Torbjorn", "Widowmaker", "D.Va", "Reinhardt", "Roadhog", "Winston", "Zarya", "Ana", "Lucio", "Mercy", "Symmetra", "Zenyatta"]
 	await self.client.send_message(msg.channel, msg.author.mention + " `" + random.choice(heroes) + "`")
 
 async def rainbow(self, msg, dmsg):
