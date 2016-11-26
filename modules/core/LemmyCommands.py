@@ -758,8 +758,51 @@ async def gifr(self, msg, dmsg):
 async def roll(self, msg, dmsg):
 	def parseRoll(roll):
 		if not re.fullmatch("(\d)*d(\d)+(k[hl])?", roll):
-			return None
-		# Finish this
+			raise ValueError("Malformed dice roll: " + roll)
+
+		count = ""
+		value = ""
+		keep = ""
+		i = 0
+		# Get count
+		if roll[0].isnumeric():
+			while roll[i] != "d":
+				count += roll[i]
+				i += 1
+
+		# Get value
+		i += 1
+		while i < len(roll) and roll[i] != "k":
+			value += roll[i]
+			i += 1
+
+		# Get keep
+		if i < len(roll):
+			keep = roll[i:i+1]
+
+		count = 1 if count == "" else int(count)
+		value = int(value)
+
+		rolls = random.sample(range(1, value + 1), count)
+		result = None
+		resultIndex = None
+		repr = None
+		if keep == "kh":
+			result = max(rolls)
+			resultIndex = rolls.index(result)
+		elif keep == "kl":
+			result = min(rolls)
+			resultIndex = rolls.index(result)
+		else:
+			result = sum(rolls)
+
+		if resultIndex is None:
+			repr = "[ " + " ".join(rolls) + " ]"
+		else:
+			repr = "[ " + " ".join(rolls[:resultIndex]) + " < " + rolls[resultIndex] + " > " + " ".join(rolls[resultIndex + 1:]) + " ]"
+
+		return [repr, result]
+
 
 
 	queryString = "".join(dmsg.params).replace(" ", "").replace("+", " + ").replace("-", " - ")
@@ -768,6 +811,24 @@ async def roll(self, msg, dmsg):
 		if not queryPhrases[i] in ["+", "-"]:
 			await self.client.send_message(msg.channel, self.constants.error.symbol + " Malformed statement: expected `+` or `-`, got " + queryPhrases[i])
 			return
+
+	output = ""
+	runningTotal = 0
+	for i in range(len(queryPhrases)):
+		if i % 2 == 0:
+			rollResult = parseRoll(queryPhrases[i])
+			output += rollResult[0]
+			if i == 0 or queryResult[i-1] == "+":
+				runningTotal += rollResult[1]
+			else:
+				runningTotal -= rollResult[1]
+		else:
+			output += " " + queryPhrases[i] + " "
+
+	await self.client.send_message(msg.channel, output + " = **" + str(runningTotal) + "**")
+
+
+
 
 	# await self.client.send_message(msg.channel, self.constants.error.symbol + " Malformed dice roll: " + roll)
 

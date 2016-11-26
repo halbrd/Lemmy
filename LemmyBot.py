@@ -259,8 +259,8 @@ class LemmyBot:
 
 			# 	await self.client.send_message(server.default_channel, "A great person once said, " + sentence)
 
-			with open("pics/displaypics/angular.png", "rb") as dp:
-				await self.client.edit_profile(username="Angulemmy", avatar=dp.read())
+			with open("pics/displaypics/white-lemmy.png", "rb") as dp:
+				await self.client.edit_profile(username="Lemmy", avatar=dp.read())
 			await self.client.change_status(game=discord.Game(name="!help for info"))
 
 			logging.getLogger("discord.gateway").setLevel(logging.CRITICAL)
@@ -347,5 +347,4 @@ class LemmyBot:
 			self.client.run(token)
 		except Exception as e:
 			print("ERROR logging into Discord! (" + str(e) + ")")
-			input("Press enter to exit.\n")
 			quit()
