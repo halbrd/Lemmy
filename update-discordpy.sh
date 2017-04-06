@@ -1,1 +1,0 @@
-sudo pip3.5 install --upgrade git+https://github.com/Rapptz/discord.py@async
