@@ -261,7 +261,7 @@ class LemmyBot:
 
 			with open("pics/displaypics/white-lemmy.png", "rb") as dp:
 				await self.client.edit_profile(username="Lemmy", avatar=dp.read())
-			await self.client.change_status(game=discord.Game(name="!help for info"))
+			await self.client.change_status(game=discord.Game(name="/help for info"))
 
 			logging.getLogger("discord.gateway").setLevel(logging.CRITICAL)
 

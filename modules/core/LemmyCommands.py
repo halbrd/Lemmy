@@ -863,3 +863,8 @@ async def fusion(self, msg, dmsg):
 	img = soup.find(id="pk_img")
 
 	await self.client.send_message(msg.channel, str(name.string) + "\n" + str(img.get("src")))
+
+async def gifembedtest(self, msg, dmsg):
+	embed = discord.Embed()
+	embed.set_thumbnail(url="https://will.sx/img.gif")
+	await self.client.send_message(msg.channel, embed=embed)

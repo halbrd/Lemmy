@@ -264,5 +264,11 @@ class LemmyConfig:
 				"enabled": True,
 				"moderator": False,
 				"description": "Roll D&D dice (eg. 2d20kh)"
+			},
+			"gifembedtest": {
+				"function": Lcmds.gifembedtest,
+				"enabled": True,
+				"moderator": False,
+				"description": ""
 			}
 		}

@@ -7,6 +7,7 @@ import datetime
 import re
 from math import sin, cos, ceil
 import os
+import os.path
 import json
 
 class DecomposedMessage:
@@ -17,9 +18,9 @@ class DecomposedMessage:
 
 def ParseMessage(messageText):
 	decomposedArray = shlex.split(messageText)
-	
+
 	command = decomposedArray[0].lower() if len(decomposedArray) > 0 else None
-	
+
 	params = []
 	i = 1
 	while i < len(decomposedArray) and decomposedArray[i][0] != "-":
@@ -37,13 +38,21 @@ def ParseMessage(messageText):
 	return DecomposedMessage(command, params, flags)
 
 async def SendEmote(client, msg):
-	#await client.send_message(msg.channel, "**" + msg.author.name + "**")
-	await client.send_file(msg.channel, "pics/emotes/" + msg.content + ".png", content=msg.author.name)
+	if os.path.isfile("pics/emotes/" + msg.content + ".gif"):
+		embed = discord.Embed()
+		embed.set_thumbnail(url="http://lynq.me/lemmy/emotes/" + msg.content + ".gif")
+		await client.send_message(msg.channel, msg.author.name, embed=embed)
+	else:
+		await client.send_file(msg.channel, "pics/emotes/" + msg.content + ".png", content=msg.author.name)
 	await client.delete_message(msg)
 
 async def SendSticker(client, msg):
-	#await client.send_message(msg.channel, "**" + msg.author.name + "**")
-	await client.send_file(msg.channel, "pics/stickers/" + msg.content + ".png", content=msg.author.name)
+	if os.path.isfile("pics/stickers/" + msg.content + ".gif"):
+		embed = discord.Embed()
+		embed.set_thumbnail(url="http://lynq.me/lemmy/stickers/" + msg.content + ".gif")
+		await client.send_message(msg.channel, msg.author.name, embed=embed)
+	else:
+		await client.send_file(msg.channel, "pics/stickers/" + msg.content + ".png", content=msg.author.name)
 	await client.delete_message(msg)
 
 async def SendTemp(client, msg):
@@ -104,7 +113,7 @@ def CombineImages(images):
 	height = max([image.size[1] for image in images])
 
 	result = Image.new("RGBA", (width, height))
-	
+
 	i = 0
 	horizontalPointer = 0
 	while i < len(images):
