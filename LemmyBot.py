@@ -33,7 +33,7 @@ class LemmyBot:
 
 		### Load major member variables ###
 		self.res = Lres.LemmyResources()
-		self.tags = Ltags.LemmyTags()
+		# self.tags = Ltags.LemmyTags()
 		self.constants = Lconst.LemmyConstants()
 		self.callLogger = None
 		self.radio = Lradio.LemmyRadio(None, None)
@@ -264,52 +264,8 @@ class LemmyBot:
 			await self.client.change_status(game=discord.Game(name="/help for info"))
 
 			logging.getLogger("discord.gateway").setLevel(logging.CRITICAL)
-
-			# print(Lutils.TitleBox("Set Up Rainbow Stuff"))
-			# rainbowRoleIds = Lutils.GetConfigAttribute("rainbows", "roles")
-			#
-			# # roles = [role for role in server.roles for server in self.client.servers] # This didn't work, as it returned BTS for every server for some reason
-			# roles = []
-			# for server in self.client.servers:
-			# 	for role in server.roles:
-			# 		roles.append(role)
-			# print("roles: " + ", ".join([role.name for role in roles]))
-			#
-			# allRainbowRoleIds = [role.id for role in roles if role.name == "rainbow"]
-			# for roleId in allRainbowRoleIds:
-			# 	if roleId not in rainbowRoleIds:
-			# 		rainbowRoleIds.append(roleId)
-			# Lutils.SaveConfigAttribute("rainbows", "roles", rainbowRoleIds)
-			#
-			# rainbowRoles = []
-			#
-			# for roleId in rainbowRoleIds:
-			# 	role = discord.utils.find(lambda role: role.id == roleId, roles)
-			# 	if role is not None:
-			# 		print("Found new rainbow role in server " + role.server.name)
-			# 		rainbowRoles.append(role)
-
+			
 			print(Lutils.TitleBox("Listening For Messages"))
-
-			if False and len(rainbowRoles) > 0:
-				print(Lutils.TitleBox("Rainbowing Rainbows"))
-
-				colours = [
-				discord.Colour.red(),
-				discord.Colour.orange(),
-				discord.Colour.gold(),
-				discord.Colour.green(),
-				discord.Colour.blue(),
-				discord.Colour.purple()
-				]
-				i = 0
-
-				while True:
-					for role in rainbowRoles:
-						await self.client.edit_role(role.server, role, colour=colours[i])
-						print("", end="")
-						i = (i + 1) % len(colours)
-
 
 		@self.client.event
 		async def on_message_edit(before, after):
