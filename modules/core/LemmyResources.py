@@ -1,6 +1,5 @@
 # Lemmy's stuff
 import LemmyUtils as Lutils
-from LemmyRadio import LemmyRadio
 
 # Other stuff
 import os

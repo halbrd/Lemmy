@@ -1,6 +1,5 @@
 # Lemmy's stuff
 import LemmyUtils as Lutils
-import LemmyRadio as Lradio
 import RandomLenny
 
 # Other stuff
@@ -103,9 +102,6 @@ async def userinfo(self, msg, dmsg):
 
 			if user.voice_channel is not None:
 				message += "\nCurrently talking in " + user.voice_channel.mention + "."
-
-			# if user.game_id is not None:
-			# 	message += "\nCurrent playing " + str(user.game_id) + "."
 
 			await self.client.send_message(msg.channel, message)
 
@@ -569,7 +565,6 @@ async def fusion(self, msg, dmsg):
 		await self.client.send_message(msg.channel, self.constants.error.symbol + " Pokemon not found: " + dmsg.params[1] + ".")
 		return
 
-	#await self.client.send_message(msg.channel, "http://pokemon.alexonsager.net/{}/{}".format(poke1, poke2))
 	page = requests.get("http://pokemon.alexonsager.net/{}/{}".format(poke1, poke2)).text
 	soup = BeautifulSoup(page, 'html.parser')
 	name = soup.find(id="pk_name")

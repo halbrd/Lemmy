@@ -7,11 +7,7 @@ import LemmyUtils as Lutils
 import LemmyCommands as Lcmds
 import LemmyResources as Lres
 import LemmyConstants as Lconst
-import LemmyTags as Ltags
-import LemmyRadio as Lradio
 import LemmyConfig as Lconf
-from LemmyRadio import LemmyRadio
-from FloodProtector import FloodProtector
 from CallLogger import CallLogger
 
 # Other stuff
@@ -19,28 +15,18 @@ import discord
 import asyncio
 import datetime
 import codecs
-import shlex
-import os
 import re
 from PIL import Image
-import random
 import logging
 
 class LemmyBot:
 	def __init__(self, token):
-		#if not discord.opus.is_loaded():
-		#	discord.opus.load_opus('libopus-0.dll')
 
 		### Load major member variables ###
 		self.res = Lres.LemmyResources()
-		# self.tags = Ltags.LemmyTags()
 		self.constants = Lconst.LemmyConstants()
 		self.callLogger = None
-		self.radio = Lradio.LemmyRadio(None, None)
 		self.config = Lconf.LemmyConfig()
-		self.floodProtectors = {
-			"emote": FloodProtector(self.config.cooldown["emote"])
-		}
 		self.clientId = Lutils.GetConfigAttribute("global", "clientId")
 		self.customCommands = Lutils.GetConfig("customcommands")
 
@@ -64,8 +50,6 @@ class LemmyBot:
 							await self.config.command[dmsg.command]["function"](self, msg, dmsg)
 					# Message is a custom command
 					elif dmsg.command in self.customCommands:
-						#await self.client.send_message(msg.channel, self.customCommands[dmsg.command])
-
 						def replaceDefaults(string):
 							return re.sub(r"{([^{}]+)}", r"\1", string)
 
@@ -89,39 +73,23 @@ class LemmyBot:
 
 			# Message is an emote
 			elif msg.content in self.res.emotes and msg.author != self.client.user:
-				if self.floodProtectors["emote"].Ready(msg.author.id):
-					await Lutils.SendEmote(self.client, msg)
-					self.floodProtectors["emote"].Sent(msg.author.id)
-					Lutils.LogEmoteUse(self.res, msg.author, msg.content)
-				else:
-					await self.client.delete_message(msg)
+				await Lutils.SendEmote(self.client, msg)
+				Lutils.LogEmoteUse(self.res, msg.author, msg.content)
 
 			# Message is a sticker
 			elif msg.content in self.res.stickers and msg.author != self.client.user:
-				if self.floodProtectors["emote"].Ready(msg.author.id):
-					await Lutils.SendSticker(self.client, msg)
-					self.floodProtectors["emote"].Sent(msg.author.id)
-					Lutils.LogEmoteUse(self.res, msg.author, msg.content)
-				else:
-					await self.client.delete_message(msg)
+				await Lutils.SendSticker(self.client, msg)
+				Lutils.LogEmoteUse(self.res, msg.author, msg.content)
 
 			# Message is a Skype emote
 			elif re.match("\(" + self.res.skype.emoteMatch + "\)", msg.content):
-				if self.floodProtectors["emote"].Ready(msg.author.id):
-					await Lutils.SendSkypeEmote(self.client, msg)
-					self.floodProtectors["emote"].Sent(msg.author.id)
-					Lutils.LogEmoteUse(self.res, msg.author, msg.content[1:-1])
-				else:
-					await self.client.delete_message(msg)
+				await Lutils.SendSkypeEmote(self.client, msg)
+				Lutils.LogEmoteUse(self.res, msg.author, msg.content[1:-1])
 
 			# Message is a Skype flag
 			elif re.match("\(flag:" + self.res.skype.flagMatch + "\)", msg.content):
-				if self.floodProtectors["emote"].Ready(msg.author.id):
-					await Lutils.SendSkypeFlag(self.client, msg)
-					self.floodProtectors["emote"].Sent(msg.author.id)
-					Lutils.LogEmoteUse(self.res, msg.author, msg.content[1:-1])
-				else:
-					await self.client.delete_message(msg)
+				await Lutils.SendSkypeFlag(self.client, msg)
+				Lutils.LogEmoteUse(self.res, msg.author, msg.content[1:-1])
 
 			else:
 				imageMatch = "(" + "|".join(self.res.emotes) + "|" + "|".join(self.res.stickers) + ")"
@@ -145,14 +113,6 @@ class LemmyBot:
 
 					for image in imageTerms:
 						Lutils.LogEmoteUse(self.res, msg.author, image)
-
-			tagMatch = "(" + "|".join([x for x in self.tags.db]) + ")"
-
-			# Ampersand-prefixed tags
-			for match in re.findall("&" + tagMatch, msg.content):
-				await self.client.send_message(msg.channel, Lutils.GetPingText(self, msg, match))
-				await self.client.send_message(msg.channel, "Note: !james is deprecated, and has been replaced with native Discord roles and the !role command. Use @tag to ping a tag.")
-
 
 		@self.client.event
 		async def on_ready():
@@ -237,34 +197,12 @@ class LemmyBot:
 			for channel in channelList:
 				print("[" + Lutils.StripUnicode(channel.server.name) + "] " + Lutils.StripUnicode(channel.name.strip()))
 
-			# print(Lutils.TitleBox("Sending Online Message"))
-
-			# channelList = []
-			# for server in self.client.servers:
-			# 	for channel in server.channels:
-			# 		channelList.append(channel)
-
-			# for server in self.client.servers:
-			# 	words = []
-			# 	for channel in server.channels:
-			# 		logs = self.client.logs_from(channel, limit=10)
-			# 		async for message in logs:
-			# 			if message.content:
-			# 				words = words + message.content.split()
-
-			# 	sentence = ""
-			# 	for _ in range(random.randint(5, 15)):
-			# 		sentence += random.choice(words) + " "
-			# 	sentence += "."
-
-			# 	await self.client.send_message(server.default_channel, "A great person once said, " + sentence)
-
 			with open("pics/displaypics/white-lemmy.png", "rb") as dp:
 				await self.client.edit_profile(username="Lemmy", avatar=dp.read())
 			await self.client.change_status(game=discord.Game(name="/help for info"))
 
 			logging.getLogger("discord.gateway").setLevel(logging.CRITICAL)
-			
+
 			print(Lutils.TitleBox("Listening For Messages"))
 
 		@self.client.event
