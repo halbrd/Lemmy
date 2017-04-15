@@ -76,7 +76,8 @@ def StripUnicode(string):
 	return "".join(stripped)
 
 def IsAdmin(member):
-	return "administrator" in [role.name for role in member.roles]
+	#return "administrator" in [role.name for role in member.roles]
+	return member.id == "77041679726551040"
 
 def IsModOrAbove(member):
 	return "administrator" in [role.name for role in member.roles] or "moderator" in [role.name for role in member.roles] or "robots" in [role.name for role in member.roles]
@@ -130,19 +131,19 @@ def LogEmoteUse(res, sender, emote):
 	res.sqlConnection.commit()
 
 async def LogMessage(msg):
-	metadata = Colorize("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]", "black") + " " + Colorize(msg.author.name, "cyan") + " => " + Colorize(("(private channel)" if msg.channel.is_private else msg.channel.name), "green") + ": "
+	metadata = Colorize("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]", "black") + " " + Colorize(msg.author.name, "cyan") + " => " + Colorize(msg.channel.server.name + "/" + ("(private channel)" if msg.channel.is_private else msg.channel.name), "green") + ": "
 	tab = "".join([" " for _ in range(len(metadata))])
 	print(metadata + ("(Non-text message or file)" if not msg.content else RemoveUnicode(msg.content).replace("\n", "\n" + tab)))
 
 async def LogMessageEdit(before, after):
-	metadata = Colorize("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]", "black") + " " + Colorize(before.author.name, "cyan") + " /> " + Colorize(("(private channel)" if before.channel.is_private else before.channel.name), "green") + ": "
+	metadata = Colorize("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]", "black") + " " + Colorize(before.author.name, "cyan") + " /> " + Colorize(msg.channel.server.name + "/" + ("(private channel)" if before.channel.is_private else before.channel.name), "green") + ": "
 	tab = "".join([" " for _ in range(len(metadata))])
 	print(metadata + ("(Non-text message or file)" if not before.content else RemoveUnicode(before.content).replace("\n", "\n" + tab)))
 	print(tab[:-3] + "└> ", end="")
 	print("(Non-text message or file)" if not after.content else RemoveUnicode(after.content).replace("\n", "\n" + tab))
 
 async def LogMessageDelete(msg):
-	metadata = Colorize("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]", "black") + " " + Colorize(msg.author.name, "cyan") + "? x> " + Colorize(("(private channel)" if msg.channel.is_private else msg.channel.name), "green") + ": "
+	metadata = Colorize("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]", "black") + " " + Colorize(msg.author.name, "cyan") + "? x> " + Colorize(msg.channel.server.name + "/" + ("(private channel)" if msg.channel.is_private else msg.channel.name), "green") + ": "
 	tab = "".join([" " for _ in range(len(metadata))])
 	print(metadata + ("(Non-text message or file)" if not msg.content else RemoveUnicode(msg.content).replace("\n", "\n" + tab)))
 

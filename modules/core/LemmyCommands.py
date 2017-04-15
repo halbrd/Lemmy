@@ -22,34 +22,28 @@ import aiohttp
 import requests
 from bs4 import BeautifulSoup
 
+SENT_PM_MESSAGE = ":mailbox_with_mail: Sent in private messages."
+
 async def help(self, msg, dmsg):
 	reply = "Lemmy reference page: http://lynq.me/lemmy\n"
-	reply += "Commands available: " + ", ".join([commandText for commandText, commandInfo in self.config.command.items()])
+	reply += "Commands available:\n"# + ", ".join([commandText for commandText, commandInfo in self.config.command.items()])
+	for command, commandInfo in sorted(self.config.command.items()):
+		reply += "`" + command + "`\n"
+		reply += "    " + commandInfo["description"] + "\n"
+		# if "usage" in commandInfo:
+		# 	reply += "  Usage:\n"
+		# 	reply += commandInfo["usage"]
 
-	# reply += "\n"
-	# reply += "\nCommand terminology: `!command parameter -flag flagParameter`"
-	# reply += "\n\n```"
-	#
-	# commands = []
-	# for commandText, commandInfo in self.config.command.items():
-	# 	notes = []
-	# 	if not commandInfo["enabled"]: notes.append("disabled")
-	# 	if commandInfo["moderator"]: notes.append("moderator+")
-	#
-	# 	command = self.config.symbol[msg.server.id] + commandText + "    " + ("[" if len(notes) > 0 else "") + ", ".join(notes) + ("]" if len(notes) > 0 else "")
-	# 	command += "\n    " + commandInfo["description"]
-	#
-	# 	commands.append(command)
-	# reply += "\n".join(commands)
-	# reply += "\n```"
+	await self.client.send_message(msg.channel, SENT_PM_MESSAGE)
+	await self.client.send_message(msg.author, reply)
 
-	await self.client.send_message(msg.channel, reply)
-
-async def emotes(self, msg, dmsg):
-	await self.client.send_message(msg.channel, "http://lynq.me/lemmy/#emotes")
-
-async def stickers(self, msg, dmsg):
-	await self.client.send_message(msg.channel, "http://lynq.me/lemmy/#stickers")
+async def logout(self, msg, dmsg):
+	print("User with id " + str(msg.author.id) + " attempting to initiate logout.")
+	if not Lutils.IsAdmin(msg.author):
+		await self.client.send_message(msg.channel, self.constants.error.symbol + " User is not admin.")
+	else:
+		await self.client.send_message(msg.channel, "Shutting down.")
+		await self.client.logout()
 
 async def lenny(self, msg, dmsg):
 	if len(dmsg.flags) == 0:
@@ -61,14 +55,6 @@ async def lenny(self, msg, dmsg):
 				await self.client.send_message(msg.channel, self.res.lenny)
 			elif flag == "-r":
 				await self.client.send_message(msg.channel, RandomLenny.randomLenny())
-
-async def logout(self, msg, dmsg):
-	print("User with id " + str(msg.author.id) + " attempting to initiate logout.")
-	if not Lutils.IsAdmin(msg.author):
-		await self.client.send_message(msg.channel, self.constants.error.symbol + " User is not admin.")
-	else:
-		await self.client.send_message(msg.channel, "Shutting down.")
-		await self.client.logout()
 
 async def refresh(self, msg, dmsg):
 	refreshedEmotes = [ os.path.splitext(f)[0] for f in listdir("pics/emotes") if isfile(join("pics/emotes",f)) ]
@@ -96,9 +82,6 @@ async def refresh(self, msg, dmsg):
 
 	await self.client.delete_message(msg)
 
-async def correct(self, msg, dmsg):
-	await self.client.send_message(msg.channel, "https://youtu.be/OoZN3CAVczs")
-
 async def eightball(self, msg, dmsg):
 	responses = ["It is certain.", "It is decidedly so.", "Without a doubt.", "Yes, definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Signs point to yes.", "Reply hazy try again.", "Ask again later.", "Better not tell you now.", "Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very doubtful."]
 	await self.client.send_message(msg.channel, msg.author.mention + " :8ball: " + random.choice(responses))
@@ -125,17 +108,6 @@ async def userinfo(self, msg, dmsg):
 			# 	message += "\nCurrent playing " + str(user.game_id) + "."
 
 			await self.client.send_message(msg.channel, message)
-			await self.client.send_message(msg.channel, "Note: This command is deprecated; use Discord's Developer Mode to get IDs.")
-
-async def channelinfo(self, msg, dmsg):
-	if len(dmsg.params) > 0:
-		channelName = dmsg.params[0]
-		channel = discord.utils.find(lambda m: m.name == channelName, [x for x in msg.channel.server.channels if x.type == discord.ChannelType.text])
-		if not channel:
-			await self.client.send_message(msg.channel, self.constants.error.symbol + " Channel not found.")
-		else:
-			await self.client.send_message(msg.channel, "**Channel name: **" + channel.mention + "\n**ID: **" + channel.id)
-		await self.client.send_message("Note: This command is deprecated; use Discord's Developer Mode to get IDs.")
 
 async def james(self, msg, dmsg):
 	if len(dmsg.params) > 0:
@@ -257,7 +229,6 @@ async def role(self, msg, dmsg):
 	# List roles
 	# Add role
 	# Delete role
-	# Make james perform these actions
 
 	# Load role metadata
 	with open("db/config/roles.json", "r") as f:
@@ -355,10 +326,6 @@ async def role(self, msg, dmsg):
 	else:
 		print("roleData updated.")
 
-
-async def happening(self, msg, dmsg):
-	await self.client.send_message(msg.channel, "https://i.imgur.com/bYGOUHP.gif")
-
 async def ruseman(self, msg, dmsg):
 	await self.client.send_file(msg.channel, "pics/ruseman/" + random.choice(os.listdir("pics/ruseman/")))
 
@@ -423,13 +390,6 @@ async def lemmycoin(self, msg, dmsg):
 									self.res.sqlConnection.commit()
 									await self.client.send_message(msg.channel, "**L$" + str(amount) + "** successfully sent to " + target.mention + " by " + msg.author.mention + ".")
 
-async def channelids(self, msg, dmsg):
-	ret = ""
-	for channel in msg.channel.server.channels:
-		ret += channel.name + " : " + channel.id + "\n"
-	await self.client.send_message(msg.channel, ret)
-	await self.client.send_message("Note: This command is deprecated; use Discord's Developer Mode to get IDs.")
-
 async def serverinfo(self, msg, dmsg):
 	#await self.client.send_message(msg.channel, msg.channel.server.name + ": " + msg.channel.server.id)
 	server = msg.server
@@ -445,7 +405,6 @@ async def serverinfo(self, msg, dmsg):
 	response += "\n**AFK timeout length:** " + str(server.afk_timeout) + " minutes"
 	response += "\n**Icon URL:** " + server.icon_url
 
-
 	await self.client.send_message(msg.channel, response)
 
 async def choose(self, msg, dmsg):
@@ -453,15 +412,7 @@ async def choose(self, msg, dmsg):
 	options = " ".join(params).split(" OR ")
 	options = [x for x in options if x != ""]
 	if len(options) > 0:
-		# await self.client.send_message(msg.channel, msg.author.mention + "\n```\n" + random.choice(options) + "\n```")
 		await self.client.send_message(msg.channel, msg.author.mention + "   `" + random.choice(options) + "`")
-
-async def tts(self, msg, dmsg):
-	await self.client.send_message(msg.channel, msg.content[5:], tts=True)
-	await self.client.delete_message(msg)
-
-async def playgame(self, msg, dmsg):
-	await self.client.change_status(game=(discord.Game(name=dmsg.params[0]) if len(dmsg.params) > 0 else None))
 
 async def tilt(self, msg, dmsg):
 	if len(dmsg.params) > 0:
@@ -487,80 +438,8 @@ async def tilt(self, msg, dmsg):
 					Lutils.RotateImage("pics/stickers/" + dmsg.params[0] + ".png", angle * -1)
 				await Lutils.SendTemp(self.client, msg)
 
-async def radio(self, msg, dmsg):
-	#await self.client.send_message(msg.channel, self.constants.error.symbol + " This command has been disabled due to the overwhelming probability that everything will explode upon invocation.")
-
-	for fullFlag in dmsg.flags:
-		flag = fullFlag[0]
-
-		if flag == "-init":
-			self.radio.radioChannel = Lutils.FindChannelById(msg.server.channels, self.config.radioVoiceChannel[msg.server.id])
-			self.radio.infoChannel = Lutils.FindChannelById(msg.server.channels, self.config.radioInfoChannel[msg.server.id])
-			self.radio.voiceConnection = await self.client.join_voice_channel(self.radio.radioChannel)
-
-		elif flag == "-exit":
-			await self.radio.voiceConnection.disconnect()
-			self.radio.radioChannel = None
-			self.radio.infoChannel = None
-
-		elif flag == "-pause":
-			await self.radio.Pause()
-
-		elif flag == "-resume":
-			await self.radio.Resume()
-
-		elif flag == "-queue":
-			if len(fullFlag) == 1:
-				await self.client.send_message(msg.channel, self.constants.error.symbol + " No source was given.")
-			else:
-				source = fullFlag[1]
-				song = Lradio.Song("youtube", source, "Placeholder Youtube Title")
-				await self.radio.QueueSong(song)
-
-		elif flag == "-next":
-			self.radio.NextSong()
-
-		elif flag == "-prev":
-			self.radio.PrevSong()
-
-		elif flag == "-viewqueue":
-			await self.client.send_message(msg.channel, str([x.source for x in self.radio.queue]))
-
-		elif flag == "-shuffletag":
-			if len(fullFlag) < 2:
-				await self.client.send_message(msg.channel, self.constants.error.symbol + " No tag was given.")
-			else:
-				tag = fullFlag[1]
-				tagConverter = {
-					"cafe del mar": "Cafe Del Mar",
-					"payday": "PAYDAY 2 Official Soundtrack"
-				}
-
-				if tag.lower() not in tagConverter:
-					await self.client.send_message(msg.channel, self.constants.error.symbol + " Tag not recognized (available tags: " + ", ".join([x for x in tagConverter]) + ")")
-				else:
-					convertedTag = tagConverter[tag]
-					await self.radio.ShuffleTag(self.client, convertedTag)
-
-		elif flag == "-playyt":
-			if len(fullFlag) < 2:
-				await self.client.send_message(msg.channel, self.constants.error.symbol + " No URL was given")
-			else:
-				url = fullFlag[1]
-				try:
-					await self.radio.PlayYoutubeVideo(self.client, url)
-				except Exception as e:
-					await self.client.send_message(msg.channel, self.constants.error.symbol + " " + str(e))
-
-		elif flag == "-interlude":
-			await self.radio.LoopSong("N:\\Misc\\Interlude.m4a")
-
 async def skypeemotes(self, msg, dmsg):
-	await self.client.send_message(msg.channel, "   ".join(self.res.skype.emotes))
-
-async def thisisfine(self, msg, dmsg):
-	#await self.client.send_file(msg.channel, "pics/originals/ThisIsFine.png")
-	await self.client.send_message(msg.channel, "http://i.imgur.com/YfAZJky.png")
+	await self.client.send_message(msg.channel, "To send a Skype emote, send the emote name surrounded by parentheses (). For example: (inlove)\nAvailable Skype emotes:\n" + ", ".join(sorted(self.res.skype.emotes)))
 
 async def lol(self, msg, dmsg):
 	for fullFlag in dmsg.flags:
@@ -598,28 +477,11 @@ async def lol(self, msg, dmsg):
 					matchDesc = re.sub("<\/?[a-zA-Z]*>", "", matchDesc)
 					await self.client.send_message(msg.channel, "**" + matchName + "**\n" + matchDesc)
 
-async def joinlink(self, msg, dmsg):
-	await self.client.send_message(msg.channel, discord.utils.oauth_url(self.clientId))
-
-async def leave(self, msg, dmsg):
-	if not Lutils.IsAdmin(msg.author):
-		await self.client.send_message(msg.channel, self.constants.error.symbol + " " + self.constants.error.notAdmin)
-	else:
-		await self.client.send_message(msg.channel, "Really remove Lemmy from the server? Type the name of the server to confirm.")
-		reply = await self.client.wait_for_message(timeout=10, author=msg.author, channel=msg.channel)
-		if reply is None or reply.content != msg.channel.server.name:
-			await self.client.send_message(msg.channel, "Removal cancelled.")
-		else:
-			await self.client.send_message(msg.channel, "Removal confirmed. To re-add Lemmy to the server, use this link: " + discord.utils.oauth_url(self.clientId))
-			await self.client.leave_server(msg.channel.server)
-
 async def ccomm(self, msg, dmsg):
 	for fullFlag in dmsg.flags:
 		flag = fullFlag[0]
 
 		if flag == "-list":
-			# await self.client.send_message(msg.channel, "```\n" + "\n".join([(key + " : " + self.customCommands[key]) for key in self.customCommands]) + "\n```")
-
 			commands = [key for key in self.customCommands]
 
 			messages = [""]
@@ -662,81 +524,9 @@ async def ccomm(self, msg, dmsg):
 
 					await self.client.send_message(msg.channel, "Custom command '" + name + "' successfully deleted.")
 
-async def coinflip(self, msg, dmsg):
-	await self.client.send_message(msg.channel, random.choice(["Heads!", "Tails!"]))
-
-async def emoji(self, msg, dmsg):
-	for fullFlag in dmsg.flags:
-		flag = fullFlag[0]
-
-		if flag == "-list":
-			response = ""
-
-			for emoji in msg.server.emojis:
-				response += "Name: " + emoji.name + "\n"
-				response += "Twitch managed: " + ("Yes" if emoji.managed else "No") + "\n"
-				response += "URL: " + emoji.url + "\n"
-				response += "\n"
-
-			await self.client.send_message(msg.channel, response)
-
-		elif flag == "-add" and False:
-			# This is pretty much completely broken
-
-			emoji = discord.Emoji(name = fullFlag[1], require_colons = True, managed = False, server = msg.channel.server, roles = [], url = "https://discordapp.com/api/users/77041679726551040/avatars/8af5538665bb31bd73d002dd2a599652.jpg")
-
-			msg.server.emojis.append(emoji)
-
-			await self.client.send_message(msg.channel, "Somehow this command executed without crashing")
-
-async def resetprofile(self, msg, dmsg):
-	with open("pics/displaypics/white-lemmy.png", "rb") as dp:
-		await self.client.edit_profile(username="Lemmy", avatar=dp.read())
-		await self.client.send_message(msg.channel, "Profile reset.")
-
-async def dump(self, msg, dmsg):
-	logs = {}
-	for channel in msg.channel.server.channels:
-		logs[channel.name] = self.client.logs_from(channel, limit=999999999)
-	for channelName in logs:
-		payload = ""
-		async for message in logs[channelName]:
-			try:
-				payload += "[" + message.timestamp.strftime("%Y-%m-%d %H:%M:%S") + "] " + message.author.name + ": " + message.content + "\n"
-			except Exception as e:
-				payload += "[Error appending message: " + str(e) + "]"
-		with open(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "_" + msg.channel.server.name + '_' + channelName + '_dump.txt', 'w') as f:
-			f.write(payload)
-
 async def hero(self, msg, dmsg):
-	heroes = ["Sombra", "Genji", "McCree", "Pharah", "Reaper", "Soldier: 76", "Tracer", "Bastion", "Hanzo", "Junkrat", "Mei", "Torbjorn", "Widowmaker", "D.Va", "Reinhardt", "Roadhog", "Winston", "Zarya", "Ana", "Lucio", "Mercy", "Symmetra", "Zenyatta"]
-	await self.client.send_message(msg.channel, msg.author.mention + " `" + random.choice(heroes) + "`")
-
-async def rainbow(self, msg, dmsg):
-	try:
-		roleName = dmsg.params[0]
-	except IndexError:
-		await self.client.send_message(msg.channel, self.constants.error.symbol + " No role given.")
-	finally:
-		role = discord.utils.find(lambda role: role.name == roleName, msg.channel.server.roles)
-
-		if role is None:
-			await self.client.send_message(msg.channel, self.constants.error.symbol + " No role with name '" + roleName + "' on this server.'")
-		else:
-			colours = [
-			discord.Colour.red(),
-			discord.Colour.orange(),
-			discord.Colour.gold(),
-			discord.Colour.green(),
-			discord.Colour.blue(),
-			discord.Colour.purple()
-			]
-			i = 0
-
-			while True:
-				await self.client.edit_role(msg.channel.server, role, colour=colours[i])
-				print("editing role")
-				i = (i + 1) % len(colours)
+	heroes = ["Genji", "McCree", "Pharah", "Reaper", "Soldier: 76", "Tracer", "Bastion", "Hanzo", "Junkrat", "Mei", "Torbjorn", "Widowmaker", "D.Va", "Reinhardt", "Roadhog", "Winston", "Zarya", "Lucio", "Mercy", "Symmetra", "Zenyatta", "Ana", "Sombra", "Orisa"]
+	await self.client.send_message(msg.channel, msg.author.mention + " " + random.choice(heroes) + "")
 
 async def genjimain(self, msg, dmsg):
 	await self.client.send_message(msg.channel, random.choice(["http://i.imgur.com/ezKaQot.gifv", "http://i.imgur.com/pzoNbDk.png", "https://i.imgur.com/GakPwPr.jpg", "http://i.imgur.com/E5AxL8b.jpg"]))
@@ -754,83 +544,6 @@ async def gifr(self, msg, dmsg):
 				await self.client.send_message(msg.channel, url)
 			else:
 				await self.client.send_message(msg.channel, "Your search terms gave no results.")
-
-async def roll(self, msg, dmsg):
-	def parseRoll(roll):
-		if not re.fullmatch("(\d)*d(\d)+(k[hl])?", roll):
-			raise ValueError("Malformed dice roll: " + roll)
-
-		count = ""
-		value = ""
-		keep = ""
-		i = 0
-		# Get count
-		if roll[0].isnumeric():
-			while roll[i] != "d":
-				count += roll[i]
-				i += 1
-
-		# Get value
-		i += 1
-		while i < len(roll) and roll[i] != "k":
-			value += roll[i]
-			i += 1
-
-		# Get keep
-		if i < len(roll):
-			keep = roll[i:i+1]
-
-		count = 1 if count == "" else int(count)
-		value = int(value)
-
-		rolls = random.sample(range(1, value + 1), count)
-		result = None
-		resultIndex = None
-		repr = None
-		if keep == "kh":
-			result = max(rolls)
-			resultIndex = rolls.index(result)
-		elif keep == "kl":
-			result = min(rolls)
-			resultIndex = rolls.index(result)
-		else:
-			result = sum(rolls)
-
-		if resultIndex is None:
-			repr = "[ " + " ".join(rolls) + " ]"
-		else:
-			repr = "[ " + " ".join(rolls[:resultIndex]) + " < " + rolls[resultIndex] + " > " + " ".join(rolls[resultIndex + 1:]) + " ]"
-
-		return [repr, result]
-
-
-
-	queryString = "".join(dmsg.params).replace(" ", "").replace("+", " + ").replace("-", " - ")
-	queryPhrases = queryString.split()
-	for i in range(1, len(queryPhrases), 2):
-		if not queryPhrases[i] in ["+", "-"]:
-			await self.client.send_message(msg.channel, self.constants.error.symbol + " Malformed statement: expected `+` or `-`, got " + queryPhrases[i])
-			return
-
-	output = ""
-	runningTotal = 0
-	for i in range(len(queryPhrases)):
-		if i % 2 == 0:
-			rollResult = parseRoll(queryPhrases[i])
-			output += rollResult[0]
-			if i == 0 or queryResult[i-1] == "+":
-				runningTotal += rollResult[1]
-			else:
-				runningTotal -= rollResult[1]
-		else:
-			output += " " + queryPhrases[i] + " "
-
-	await self.client.send_message(msg.channel, output + " = **" + str(runningTotal) + "**")
-
-
-
-
-	# await self.client.send_message(msg.channel, self.constants.error.symbol + " Malformed dice roll: " + roll)
 
 async def fusion(self, msg, dmsg):
 	if len(dmsg.params) < 2:
@@ -863,8 +576,3 @@ async def fusion(self, msg, dmsg):
 	img = soup.find(id="pk_img")
 
 	await self.client.send_message(msg.channel, str(name.string) + "\n" + str(img.get("src")))
-
-async def gifembedtest(self, msg, dmsg):
-	embed = discord.Embed()
-	embed.set_thumbnail(url="https://will.sx/img.gif")
-	await self.client.send_message(msg.channel, embed=embed)
