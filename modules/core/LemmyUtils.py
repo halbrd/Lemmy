@@ -136,7 +136,7 @@ async def LogMessage(msg):
 	print(metadata + ("(Non-text message or file)" if not msg.content else RemoveUnicode(msg.content).replace("\n", "\n" + tab)))
 
 async def LogMessageEdit(before, after):
-	metadata = Colorize("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]", "black") + " " + Colorize(before.author.name, "cyan") + " /> " + Colorize(("(private channel)" if before.channel.is_private else (msg.channel.server.name + "/" + before.channel.name)), "green") + ": "
+	metadata = Colorize("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]", "black") + " " + Colorize(before.author.name, "cyan") + " /> " + Colorize(("(private channel)" if before.channel.is_private else (before.channel.server.name + "/" + before.channel.name)), "green") + ": "
 	tab = "".join([" " for _ in range(len(metadata))])
 	print(metadata + ("(Non-text message or file)" if not before.content else RemoveUnicode(before.content).replace("\n", "\n" + tab)))
 	print(tab[:-3] + "└> ", end="")
