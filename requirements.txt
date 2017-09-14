@@ -1,5 +1,3 @@
-Python 3.5+
-discord.py async beta
-stagger (unconfirmed)
+discord.py
 Pillow
 fuzzywuzzy
