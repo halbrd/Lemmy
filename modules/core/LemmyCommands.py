@@ -478,19 +478,20 @@ async def ccomm(self, msg, dmsg):
 		flag = fullFlag[0]
 
 		if flag == "-list":
-			commands = [key for key in self.customCommands]
+			commands = sorted([key for key in self.customCommands])
 
 			messages = [""]
 			currentMessageIndex = 0
 			for command in commands:
 				if len(messages[currentMessageIndex]) + len(command) > 1990:
-					messages[currentMessageIndex] += ""
+					messages[currentMessageIndex] = messages[currentMessageIndex][:-2]
 					messages.append("")
 					currentMessageIndex += 1
-				messages[currentMessageIndex] += command + "\n"
+				messages[currentMessageIndex] += command + ", "
 
 			for message in messages:
 				await self.client.send_message(msg.channel, "```\n" + message + "\n```")
+				# await self.client.send_message(msg.channel, SENT_PM_MESSAGE)
 
 		elif flag in ["-set", "-add"]:
 			if len(fullFlag) < 3:
@@ -501,10 +502,12 @@ async def ccomm(self, msg, dmsg):
 
 				replaced = name in self.customCommands
 
-				self.customCommands[name.lower()] = string
-				Lutils.SaveConfigAttribute("customcommands", name.lower(), string)
-
-				await self.client.send_message(msg.channel, "Custom command '" + name + "' successfully " + ("updated" if replaced else "created") + ".")
+				if replaced:
+					await self.client.send_message(msg.channel, self.constants.error.symbol + " Custom command '" + name + "' already exists.")
+				else:
+					self.customCommands[name.lower()] = string
+					Lutils.SaveConfigAttribute("customcommands", name.lower(), string)
+					await self.client.send_message(msg.channel, "Custom command '" + name + "' successfully " + ("updated" if replaced else "created") + ".")
 
 		elif flag in ["-del", "-delete", "-rem", "-remove"]:
 			if len(fullFlag) < 2:
@@ -525,14 +528,14 @@ async def hero(self, msg, dmsg):
 	await self.client.send_message(msg.channel, msg.author.mention + " " + random.choice(heroes) + "")
 
 async def genjimain(self, msg, dmsg):
-	await self.client.send_message(msg.channel, random.choice(["http://i.imgur.com/ezKaQot.gifv", "http://i.imgur.com/pzoNbDk.png", "https://i.imgur.com/GakPwPr.jpg", "http://i.imgur.com/E5AxL8b.jpg"]))
+	await self.client.send_message(msg.channel, random.choice(["http://i.imgur.com/ezKaQot.gifv", "http://i.imgur.com/pzoNbDk.png", "https://i.imgur.com/GakPwPr.jpg", "http://i.imgur.com/E5AxL8b.jpg", "https://i.imgur.com/rN86p5t.png"]))
 
 async def gifr(self, msg, dmsg):
 	if len(dmsg.params) < 1:
 		await self.client.send_message(msg.channel, self.constants.error.symbol + " No search term given.")
 	else:
 		searchParams = "+".join(dmsg.params)
-		searchTerm = "http://api.giphy.com/v1/gifs/random?&api_key=dc6zaTOxFJmzC&tag=" + searchParams
+		searchTerm = "http://api.giphy.com/v1/gifs/random?&api_key=dc6zaTOxFJmzC&tag=" + searchParams   # I don't know where this key came from, but it works ¯\_(ツ)_/¯
 		async with aiohttp.get(searchTerm) as request:
 			result = await request.json()
 			if result["data"] != []:
