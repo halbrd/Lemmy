@@ -34,7 +34,13 @@ class Lemmy:
 		# register events
 		@self.client.event
 		async def on_message(message):
-			self.log(f'({message.channel.server.name}) {message.author.name} => #{message.channel.name}: {message.content}')
+			context = message.channel.server.name if not type(message.channel) == discord.channel.PrivateChannel else None
+			recipient = '#' + message.channel.name if not type(message.channel) == discord.channel.PrivateChannel else self.client.user.name
+
+			context_phrase = f'({context}) ' if context else ''
+			attachments_phrase = ' +' + '📎' * len(message.attachments) if len(message.attachments) > 0 else ''
+
+			self.log(f'{context_phrase}{message.author.name} => {recipient}{attachments_phrase}: {message.content}')
 
 			# pass the event to the modules
 			for _, module in self.modules.items():

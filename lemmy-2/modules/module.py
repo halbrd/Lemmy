@@ -9,7 +9,7 @@ class Module:
     async def call_functions(self, message):
         terms = Module.deconstruct_message(message)
 
-        if terms[0] in self.commands:
+        if len(terms) > 0 and terms[0] in self.commands:
             exit_code = await self.commands[terms[0]](message, terms[1:])
 
             # I was really torn over using exit codes or exceptions for this
