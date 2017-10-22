@@ -13,4 +13,4 @@ class Tests(Module):
 
 	cmd_channel_type_usage = [ 'channel_type' ]
 	async def cmd_channel_type(self, message, args):
-		await self.client.send_message(message.channel, type(message.channel)
+		await self.client.send_message(message.channel, type(message.channel))
