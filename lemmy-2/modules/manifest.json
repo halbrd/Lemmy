@@ -1,6 +1,6 @@
 {
-    "core": "Core",
-    "lenny": "Lenny",
-    "tests": "Tests",
-    "translate": "Translate"
+	"core": "Core",
+	"lenny": "Lenny",
+	"tests": "Tests",
+	"translate": "Translate"
 }
