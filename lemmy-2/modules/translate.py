@@ -17,7 +17,7 @@ class Translate(Module):
 		destination_prefix = 'destination='
 		if args[0].startswith(destination_prefix):
 			if len(args) == 1:   # there isn't an expression to translate
-				return 'usage'
+				raise Module.CommandError
 
 			destination = args[0][len(destination_prefix):].lower()
 
@@ -26,13 +26,14 @@ class Translate(Module):
 		reverse_language_lookup = { v: k for k, v in googletrans.LANGUAGES.items() }
 
 		if not destination in reverse_language_lookup:
-			return 'usage'
+			raise Module.CommandError
 
 		destination = reverse_language_lookup[destination]
 
 		expression = ' '.join(args)
 		translator = googletrans.Translator()
-		await self.client.send_message(message.channel, translator.translate(expression, dest=destination).text)
+		translation = translator.translate(expression, dest=destination)
+		await self.client.send_message(message.channel, translation.text)
 
 	cmd_translate_languages_usage = [ 'translate_languages' ]
 	async def cmd_translate_languages(self, message, args):

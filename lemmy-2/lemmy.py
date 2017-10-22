@@ -22,14 +22,8 @@ class Lemmy:
 		self.client = discord.Client()
 		self.modules = {}
 
-		# import config
-		if not os.path.isfile('config.json'):
-			raise NoConfigException
-
-		self.config = json.load(open('config.json', 'r'))
-
-		# load modules
-		self.load_modules()
+		# perform setup
+		self.load_all()
 
 		# register events
 		@self.client.event
@@ -54,6 +48,9 @@ class Lemmy:
 		self.log('Logging in...')
 		self.client.run(token)
 
+		# at this point the bot has shut down
+		self.log('Shut down.')
+
 
 	def log(self, message):
 		output = '[{}] {}'.format(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), message)
@@ -63,6 +60,18 @@ class Lemmy:
 		if self.config['log_file']:
 			with open(self.config['log_file'], 'a') as f:
 				f.write(output + '\n')
+
+
+	def load_all(self):
+		self.load_config()
+		self.load_modules()
+
+
+	def load_config(self):
+		if not os.path.isfile('config.json'):
+			raise NoConfigException
+
+		self.config = json.load(open('config.json', 'r'))
 
 
 	def load_modules(self):
@@ -90,4 +99,5 @@ class Lemmy:
 if __name__ == '__main__':
 	if not os.path.isfile('config.json'):
 		raise NoConfigException
+
 	lemmy = Lemmy(json.load(open('config.json', 'r'))['token'])

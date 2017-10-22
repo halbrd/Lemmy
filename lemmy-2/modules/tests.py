@@ -9,8 +9,8 @@ class Tests(Module):
 
 	cmd_send_success_usage = [ 'example' ]
 	async def cmd_send_success(self, message, args):
-		raise Module.CommandSuccess()
+		raise Module.CommandSuccess
 
 	cmd_channel_type_usage = [ 'channel_type' ]
 	async def cmd_channel_type(self, message, args):
-		await self.client.send_message(message.channel, type(message.channel))
+		await self.client.send_message(message.channel, type(message.channel)
