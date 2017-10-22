@@ -46,9 +46,6 @@ class Lemmy:
 			for _, module in self.modules.items():
 				await module.on_message(message)
 
-			if message.content == '$shutdown' and message.author.id == '77041679726551040':
-				await self.client.logout()
-
 		@self.client.event
 		async def on_ready():
 			self.log('Logged in.')
@@ -75,7 +72,18 @@ class Lemmy:
 			module = importlib.import_module(module_name)
 			importlib.reload(module)   # changes to the module will be loaded (for if this was called again while the bot is running)
 			class_ = getattr(module, class_name)
-			self.modules[class_name] = class_(self.client)
+			self.modules[class_name] = class_(self)
+
+
+	def config_try_key(self, *path):
+		node = self.config
+		for step in path:
+			if type(node) == dict and step in node:
+				node = node[step]
+			else:
+				raise KeyError(step)
+
+		return node
 
 
 

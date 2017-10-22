@@ -1,4 +1,11 @@
 {
 	"token": "YOUR_TOKEN_HERE",
-	"log_file": null
+	"log_file": null,
+	"default_symbol": "/",
+	"admin_users": [ "12345678901234567" ],
+	"server_config": {
+		"12345678901234567": {
+			"symbol": "$"
+		}
+	}
 }

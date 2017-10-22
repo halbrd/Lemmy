@@ -1,4 +1,6 @@
 {
+    "core": "Core",
     "lenny": "Lenny",
-    "tests": "Tests"
+    "tests": "Tests",
+    "translate": "Translate"
 }
