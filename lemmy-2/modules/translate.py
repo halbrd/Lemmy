@@ -1,40 +1,41 @@
 from module import Module
 import googletrans
 
+# TODO: specify source
+# TODO: flags
+
 class Translate(Module):
 	info = 'Translates text to English'
 
 	cmd_translate_usage = [
 		'translate <expression>',
-		'translate destination=<language> <expression>'
+		'translate source=<language> destination=<language> <expression>'
 	]
-	async def cmd_translate(self, message, args):
+	async def cmd_translate(self, message, args, kwargs):
 		if not args:
-			return 'usage'
-
-		destination = 'english'
-
-		destination_prefix = 'destination='
-		if args[0].startswith(destination_prefix):
-			if len(args) == 1:   # there isn't an expression to translate
-				raise Module.CommandError
-
-			destination = args[0][len(destination_prefix):].lower()
-
-			del args[0]
-
-		reverse_language_lookup = { v: k for k, v in googletrans.LANGUAGES.items() }
-
-		if not destination in reverse_language_lookup:
 			raise Module.CommandError
 
-		destination = reverse_language_lookup[destination]
+		source = kwargs['source'].lower() if 'source' in kwargs else None
+		destination = kwargs['destination'].lower() if 'destination' in kwargs else 'english'
+
+		if source is not None and source not in googletrans.LANGUAGES and source not in googletrans.LANGCODES:
+			raise Module.CommandError
+
+		if destination not in googletrans.LANGUAGES and destination not in googletrans.LANGCODES:
+			raise Module.CommandError
+
+		if source is not None:
+			source = googletrans.LANGUAGES[source] if source in googletrans.LANGUAGES else googletrans.LANGCODES[source]
+		destination = googletrans.LANGUAGES[destination] if destination in googletrans.LANGUAGES else googletrans.LANGCODES[destination]
 
 		expression = ' '.join(args)
 		translator = googletrans.Translator()
-		translation = translator.translate(expression, dest=destination)
-		await self.client.send_message(message.channel, translation.text)
+		if source is None:
+			translation = translator.translate(expression, dest=destination)
+		else:
+			translation = translator.translate(expression, src=source, dest=destination)
+		await self.client.send_message(message.channel, f'{translation.origin} `[{googletrans.LANGUAGES[translation.src].title()}] => [{googletrans.LANGUAGES[translation.dest].title()}]` {translation.text}')
 
 	cmd_translate_languages_usage = [ 'translate_languages' ]
-	async def cmd_translate_languages(self, message, args):
-		await self.client.send_message(message.channel, ', '.join([ v for k, v in googletrans.LANGUAGES.items() ]))
+	async def cmd_translate_languages(self, message, args, kwargs):
+		await self.client.send_message(message.channel, ', '.join([ v.title() for k, v in googletrans.LANGUAGES.items() ]))
