@@ -17,21 +17,19 @@ class Example(Module):
 			'function',
 			'function <argument>'
 		]
-	async def cmd_function(self, message, args):
-		# do function stuff,
-		# then return an exit code:
-		#   None = all good
-		#   'usage' = function was called improperly
-		#   'success' = whatever the function was supposed to do was successfully done; no specific response required
+	async def cmd_function(self, message, args, kwargs):
+		# do function stuff
+		# you can send an error reaction by raising a CommandError (which by default also sends the usage information),
+		# send a success reaction by raising a CommandSuccess,
+		# or indicate that the caller does not have the right permission with a CommandNotAllowed
 
 		# try to do stuff
-		# when a problem is discovered, return 'usage'
-
+		# when a problem is discovered, raise CommandError
 		if len(args) == 0:
 			await self.client.send_message(message.channel, 'Default message!')
 		elif len(args) == 1:
 			await self.client.send_message(message.channel, 'You gave the argument: ' + args[0])
 		else:
-			return 'usage'
+			raise Module.CommandError
 
 # remember to add your module to manifest.json

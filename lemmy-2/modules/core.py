@@ -4,7 +4,7 @@ class Core(Module):
 	info = 'Contains basic bot-related functions'
 
 	cmd_shutdown_usage = [ 'shutdown' ]
-	async def cmd_shutdown(self, message, args):
+	async def cmd_shutdown(self, message, args, kwargs):
 		if message.author.id in self.lemmy.config["admin_users"]:
 			self.lemmy.log('Shutting down...')
 			await self.send_success(message)
@@ -13,7 +13,7 @@ class Core(Module):
 			raise Module.CommandNotAllowed
 
 	cmd_reload_usage = [ 'reload' ]
-	async def cmd_reload(self, message, args):
+	async def cmd_reload(self, message, args, kwargs):
 		if message.author.id in self.lemmy.config["admin_users"]:
 			self.lemmy.log('Reloading...')
 
