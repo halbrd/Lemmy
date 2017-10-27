@@ -58,7 +58,7 @@ class Lemmy:
 		print(output)
 
 		if self.config['log_file']:
-			with open(self.config['log_file'], 'a') as f:
+			with open(self.config['log_file'], 'a', encoding='utf8') as f:
 				f.write(output + '\n')
 
 
