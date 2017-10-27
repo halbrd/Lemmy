@@ -1,4 +1,5 @@
 from module import Module
+import asyncio
 
 class Tests(Module):
 	info = 'Tests features of lemmy-2'
@@ -18,3 +19,10 @@ class Tests(Module):
 	cmd_dump_args_usage = [ 'I can\'t be bothered writing this' ]
 	async def cmd_dump_args(self, message, args, kwargs):
 		await self.client.send_message(message.channel, f'args:\n{str(args)}\nkwargs:\n{str(kwargs)}')
+
+	cmd_react_usage = [ 'react <emojis>' ]
+	async def cmd_react(self, message, args, kwargs):
+		loop = asyncio.get_event_loop()
+		for emoji in args:
+			# holy crap, this naturally works synchronously?
+			await self.client.add_reaction(message, emoji)
