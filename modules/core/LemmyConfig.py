@@ -33,7 +33,7 @@ class LemmyConfig:
 			},
 			"lenny": {
 				"function": Lcmds.lenny,
-				"enabled": True,
+				"enabled": False,
 				"moderator": False,
 				"description": "Get a Lenny"
 			},
