@@ -1,9 +1,6 @@
 from module import Module
 import googletrans
 
-# TODO: specify source
-# TODO: flags
-
 class Translate(Module):
 	info = 'Translates text to English'
 
@@ -34,8 +31,8 @@ class Translate(Module):
 			translation = translator.translate(expression, dest=destination)
 		else:
 			translation = translator.translate(expression, src=source, dest=destination)
-		await self.client.send_message(message.channel, f'{translation.origin} `[{googletrans.LANGUAGES[translation.src].title()}] => [{googletrans.LANGUAGES[translation.dest].title()}]` {translation.text}')
+		await self.client.send_message(message.channel, f'{translation.origin} `[{googletrans.LANGUAGES[translation.src.lower()].title()}] => [{googletrans.LANGUAGES[translation.dest.lower()].title()}]` {translation.text}')
 
 	cmd_translate_languages_usage = [ 'translate_languages' ]
 	async def cmd_translate_languages(self, message, args, kwargs):
-		await self.client.send_message(message.channel, ', '.join([ v.title() for k, v in googletrans.LANGUAGES.items() ]))
+		await self.client.send_message(message.channel, ', '.join([ f'{v.title()} `[{k}]`' for k, v in googletrans.LANGUAGES.items() ]))
