@@ -59,10 +59,7 @@ class Module:
 		kwargs = terms['kwargs']
 
 		# resolve command symbol
-		try:
-			symbol = self.lemmy.config_try_key("server_config", message.channel.server.id, "symbol")
-		except ( AttributeError, KeyError ):
-			symbol = self.lemmy.config["default_symbol"]
+		symbol = self.lemmy.resolve_symbol(message.channel)
 
 		# call command and handle result
 		if len(args) > 0 and args[0].startswith(symbol):

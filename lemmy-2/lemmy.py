@@ -46,7 +46,11 @@ class Lemmy:
 
 		# log in
 		self.log('Logging in...')
-		self.client.run(token)
+		# wrap this in a try block to gracefully shut down the bot when a KeyboardInterrupt is sent
+		try:
+			self.client.run(token)
+		except KeyboardInterrupt:
+			pass
 
 		# at this point the bot has shut down
 		self.log('Shut down.')
@@ -93,6 +97,14 @@ class Lemmy:
 				raise KeyError(step)
 
 		return node
+
+
+	def resolve_symbol(self, channel):
+		try:
+			symbol = self.config_try_key("server_config", channel.server.id, "symbol")
+		except ( AttributeError, KeyError ):
+			symbol = self.config["default_symbol"]
+		return symbol
 
 
 
