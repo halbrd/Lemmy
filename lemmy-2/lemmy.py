@@ -29,7 +29,7 @@ class Lemmy:
 		@self.client.event
 		async def on_message(message):
 			context = message.channel.server.name if not type(message.channel) == discord.channel.PrivateChannel else None
-			recipient = '#' + message.channel.name if not type(message.channel) == discord.channel.PrivateChannel else ', '.join([user.name for user in message.channel.recipients])
+			recipient = '#' + message.channel.name if not type(message.channel) == discord.channel.PrivateChannel else ', '.join( list( { user.name for user in message.channel.recipients }.union({ self.client.user.name }) - { message.author.name } ) )
 
 			context_phrase = f'({context}) ' if context else ''
 			attachments_phrase = ' +' + '📎' * len(message.attachments) if len(message.attachments) > 0 else ''
