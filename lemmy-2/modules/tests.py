@@ -12,6 +12,19 @@ class Tests(Module):
 	async def cmd_send_success(self, message, args, kwargs):
 		raise Module.CommandSuccess
 
+	cmd_send_not_allowed_usage = [ 'send_not_allowed' ]
+	async def cmd_send_not_allowed(self, message, args, kwargs):
+		raise Module.CommandNotAllowed
+
+	cmd_send_dm_usage = [ 'send_dm direct_message <public_message>' ]
+	async def cmd_send_dm(self, message, args, kwargs):
+		if len(args) == 0:
+			raise Module.CommandDM
+		elif len(args) == 1:
+			raise Module.CommandDM(args[0])
+		else:
+			raise Module.CommandDM(args[0], args[1])
+
 	cmd_channel_type_usage = [ 'channel_type' ]
 	async def cmd_channel_type(self, message, args, kwargs):
 		await self.client.send_message(message.channel, type(message.channel))
