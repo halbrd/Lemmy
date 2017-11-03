@@ -16,6 +16,33 @@ class Module:
 			self.message = message
 			super().__init__(message)
 
+	class CommandDM(Exception):
+		def __init__(self, direct_message, public_message=None):
+			self.direct_message = direct_message
+			self.public_message = public_message
+			super().__init__(direct_message)
+
+	async def send_error(self, message, comment=None):
+		await self.client.add_reaction(message, '❌')
+		if comment:
+			await self.client.send_message(message.channel, comment)
+
+	async def send_success(self, message, comment=None):
+		await self.client.add_reaction(message, '✅')
+		if comment:
+			await self.client.send_message(message.channel, comment)
+
+	async def send_not_allowed(self, message, comment=None):
+		await self.client.add_reaction(message, '🔒')
+		if comment:
+			await self.client.send_message(message.channel, comment)
+
+	async def send_dm(self, message, direct_message, public_message=None):
+		await self.client.add_reaction(message, '📨')
+		await self.client.send_message(message.author, direct_message)
+		if public_message:
+			await self.client.send_message(message.channel, public_message)
+
 	def __init__(self, lemmy):
 		self.lemmy = lemmy
 		self.client = lemmy.client   # this line is arguably bad taste code, but the name binding removes a *lot* of typing
@@ -51,6 +78,8 @@ class Module:
 					await self.send_success(message, e.message)
 				except Module.CommandNotAllowed as e:
 					await self.send_not_allowed(message, e.message)
+				except Module.CommandDM as e:
+					await self.send_dm(message, e.direct_message, e.public_message)
 
 	@staticmethod
 	def deconstruct_message(message):
@@ -94,18 +123,3 @@ class Module:
 			'args': args,
 			'kwargs': kwargs
 		}
-
-	async def send_error(self, message, comment=None):
-		await self.client.add_reaction(message, '❌')
-		if comment:
-			await self.client.send_message(message.channel, comment)
-
-	async def send_success(self, message, comment=None):
-		await self.client.add_reaction(message, '✅')
-		if comment:
-			await self.client.send_message(message.channel, comment)
-
-	async def send_not_allowed(self, message, comment=None):
-		await self.client.add_reaction(message, '🔒')
-		if comment:
-			await self.client.send_message(message.channel, comment)
