@@ -1,22 +1,29 @@
 from module import Module
-import asyncio
 
 class Tests(Module):
-	info = 'Tests features of lemmy-2'
+	docs = {
+		'description': 'Tests features of lemmy-2'
+	}
 
-	cmd_send_error_usage = [ 'send_error', 'send_error <message>' ]
+	docs_send_error = {
+		'description': 'Simulates an error occurring',
+		'usage': 'send_error <message>',
+		'examples': [ 'send_error', 'send_error \'This is what you did wrong!\'' ]
+	}
 	async def cmd_send_error(self, message, args, kwargs):
 		raise Module.CommandError(args[0] if args else None)
 
-	cmd_send_success_usage = [ 'example' ]
+	docs_send_success = {
+		'description': 'Simulates an action successfully completing'
+	}
 	async def cmd_send_success(self, message, args, kwargs):
 		raise Module.CommandSuccess
 
-	cmd_send_not_allowed_usage = [ 'send_not_allowed' ]
-	async def cmd_send_not_allowed(self, message, args, kwargs):
-		raise Module.CommandNotAllowed
-
-	cmd_send_dm_usage = [ 'send_dm direct_message <public_message>' ]
+	docs_send_dm = {
+		'description': 'Sends a direct message',
+		'usage': 'send_dm direct_message <public_message>',
+		'examples': [ 'send_error \'This message only goes to the recipient!\'', 'send_error \'This message goes to the command caller\' \'This message goes to the channel\'' ]
+	}
 	async def cmd_send_dm(self, message, args, kwargs):
 		if len(args) == 0:
 			raise Module.CommandDM
@@ -25,17 +32,19 @@ class Tests(Module):
 		else:
 			raise Module.CommandDM(args[0], args[1])
 
-	cmd_channel_type_usage = [ 'channel_type' ]
+	docs_channel_type = {
+		'description': 'Returns the type of the active channel'
+	}
 	async def cmd_channel_type(self, message, args, kwargs):
 		await self.client.send_message(message.channel, type(message.channel))
 
-	cmd_dump_args_usage = [ 'I can\'t be bothered writing this' ]
+	docs_dump_args = {
+		'description': 'Returns the args and kwargs parsed from the message',
+		'usage': 'dump_args <args> <kwargs>',
+		'examples': [ 'dump_args a d=1 b e=2 c f=3' ]
+	}
 	async def cmd_dump_args(self, message, args, kwargs):
 		await self.client.send_message(message.channel, f'args:\n{str(args)}\nkwargs:\n{str(kwargs)}')
 
-	cmd_react_usage = [ 'react <emojis>' ]
-	async def cmd_react(self, message, args, kwargs):
-		loop = asyncio.get_event_loop()
-		for emoji in args:
-			# holy crap, this naturally works synchronously?
-			await self.client.add_reaction(message, emoji)
+	async def cmd_no_docs(self, message, args, kwargs):
+		await self.client.send_message(message.channel, 'This command has no docs to test the help text')

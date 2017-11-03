@@ -69,7 +69,7 @@ class Module:
 				try:
 					await self.commands[args[0]](message, args[1:], kwargs)
 				except Module.CommandError as e:
-					usage_message = 'Usage:\n' + '\n'.join(['`' + form + '`' for form in getattr(self, f'cmd_{args[0]}_usage')])
+					usage_message = ('Usage: `' + self.get_docs_attr(args[0], 'usage') + '`') if self.get_docs_attr(args[0], 'usage') else None
 					await self.send_error(message, e.message or usage_message)
 				except Module.CommandSuccess as e:
 					await self.send_success(message, e.message)
@@ -120,3 +120,51 @@ class Module:
 			'args': args,
 			'kwargs': kwargs
 		}
+
+	def get_docs_attr(self, command, attr, default=None):
+		try:
+			return getattr(self, f'docs_{command}')[attr]
+		except (AttributeError, KeyError):
+			return default
+
+	def get_module_docs_attr(self, attr, default=None):
+		try:
+			return getattr(self, 'docs')[attr]
+		except (AttributeError, KeyError):
+			return default
+
+	def help_text(self, command=None, symbol=''):
+		# if a command is being inspected, verify that it exists
+		if command and not hasattr(self, f'cmd_{command}'):
+			raise AttributeError(f'Module \'{type(self).__name__}\' has no command \'{command}\'')
+
+		# formulate title
+		if not command:   # asking about the module
+			syntax = 'md'
+			title = f'<module {type(self).__name__}>'
+		else:   # asking about a command
+			syntax = 'apacheconf'
+			title = symbol + (self.get_docs_attr(command, 'usage') or command)
+		title = f'```{syntax}\n{title}\n```'
+
+		# formulate description
+		description = self.get_docs_attr(command, 'description') if command else self.get_module_docs_attr('description')
+
+		# formulate 'generic list' (examples or list of commands)
+		if not command:
+			if not self.commands:   # no commands in module
+				generic_list = 'This module has no commands'
+			else:
+				generic_list = 'Commands in this module: ' + ', '.join([f'`{symbol}{command_name}`' for command_name, function in self.commands.items()])
+		else:
+			examples = self.get_docs_attr(command, 'examples')
+			if not examples:
+				generic_list = None
+			else:
+				generic_list = 'Examples: ' + ('\n  ' if len(examples) > 1 else '') + '\n  '.join(f'`{symbol}{example}`' for example in examples)
+
+		# filter Nones out and put the rest into a list
+		lines = list(filter(lambda line: line is not None, [title, description, generic_list]))
+
+		# convert to string and return
+		return '\n'.join(lines)

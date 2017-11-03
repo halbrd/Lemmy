@@ -1,7 +1,9 @@
 from module import Module
 
 class Example(Module):
-	info = 'Explains how to write a module for Lemmy'
+	docs = {
+		'description': 'Explains how to write a module for Lemmy'
+	}
 
 	def __init__(self, client):
 		Module.__init__(self, client)
@@ -13,10 +15,11 @@ class Example(Module):
 		# you can also call self.call_functions or super(Module, self).call_functions if you just want to add extra functionality on top of the usual
 		# otherwise, don't define on_message
 
-	cmd_function_usage = [
-			'function',
-			'function <argument>'
-		]
+	docs_function = {
+		'description': 'Performs an action',   # explain the function's purpose as succintly as possible
+		'usage': 'function kwarg=value <optional_kwarg=other_value> arg <optional_arg>',   # represent how to use the function in a technical way; don't define this if the command is self-explanatory
+		'examples': [ 'function', 'function arg', 'function kwarg=value arg' ]   # give as few examples as necessary to adequately show how the function can be used; don't define this if the command is self-explanatory or usage explains it clearly enough
+	}
 	async def cmd_function(self, message, args, kwargs):
 		# do function stuff
 		# you can send an error reaction by raising a CommandError (which by default also sends the usage information),

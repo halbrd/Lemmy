@@ -2,12 +2,15 @@ from module import Module
 import googletrans
 
 class Translate(Module):
-	info = 'Translates text to English'
+	docs = {
+		'description': 'Translates text between languages using Google Translate'
+	}
 
-	cmd_translate_usage = [
-		'translate <expression>',
-		'translate source=<language> destination=<language> <expression>'
-	]
+	docs_translate = {
+		'description': 'Translates text between languages',
+		'usage': 'translate <source=language> <destination=language> phrase',
+		'examples': [ 'translate Kartoffel', 'translate source=de pommes', 'translate destination=korean bong bong' ]
+	}
 	async def cmd_translate(self, message, args, kwargs):
 		if not args:
 			raise Module.CommandError
@@ -33,6 +36,8 @@ class Translate(Module):
 			translation = translator.translate(expression, src=source, dest=destination)
 		await self.client.send_message(message.channel, f'{translation.origin} `[{googletrans.LANGUAGES[translation.src.lower()].title()}] => [{googletrans.LANGUAGES[translation.dest.lower()].title()}]` {translation.text}')
 
-	cmd_translate_languages_usage = [ 'translate_languages' ]
+	docs_translate_languages = {
+		'description': 'Lists available languages and codes'
+	}
 	async def cmd_translate_languages(self, message, args, kwargs):
 		await self.client.send_message(message.channel, ', '.join([ f'{v.title()} `[{k}]`' for k, v in googletrans.LANGUAGES.items() ]))
