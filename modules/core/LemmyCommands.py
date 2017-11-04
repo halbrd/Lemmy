@@ -27,11 +27,11 @@ async def help(self, msg, dmsg):
 	reply = "Lemmy reference page: http://lynq.me/lemmy\n"
 	reply += "Commands available:\n"# + ", ".join([commandText for commandText, commandInfo in self.config.command.items()])
 	for command, commandInfo in sorted(self.config.command.items()):
-		reply += "`" + command + "`\n"
-		reply += "    " + commandInfo["description"] + "\n"
-		# if "usage" in commandInfo:
-		# 	reply += "  Usage:\n"
-		# 	reply += commandInfo["usage"]
+		if commandInfo['enabled']:
+			reply += "`" + command + "`" + " - " + commandInfo["description"] + "\n"
+			# if "usage" in commandInfo:
+			# 	reply += "  Usage:\n"
+			# 	reply += commandInfo["usage"]
 
 	await self.client.send_message(msg.channel, SENT_PM_MESSAGE)
 	await self.client.send_message(msg.author, reply)
