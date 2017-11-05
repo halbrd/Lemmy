@@ -7,7 +7,8 @@ class Core(Module):
 	}
 
 	docs_shutdown = {
-		'description': 'Gracefully stops and disconnects Lemmy (requires admin)'
+		'description': 'Gracefully stops and disconnects Lemmy',
+		'admin_only': True
 	}
 	async def cmd_shutdown(self, message, args, kwargs):
 		if message.author.id in self.lemmy.config["admin_users"]:
@@ -18,7 +19,8 @@ class Core(Module):
 			raise Module.CommandNotAllowed
 
 	docs_reload = {
-		'description': 'Reloads modules from disk (requires admin)'
+		'description': 'Reloads modules from disk',
+		'admin_only': True
 	}
 	async def cmd_reload(self, message, args, kwargs):
 		if message.author.id in self.lemmy.config["admin_users"]:
@@ -69,7 +71,8 @@ class Core(Module):
 					# we want to append the command description if available
 					command_description = self.lemmy.modules[module_name].get_docs_attr(command_name, 'description')
 					command_description = ' - ' + command_description if command_description else ''
-					lines.append(f'    {symbol}{command_name}{command_description}')
+					lock_or_spaces = '🔒' if self.lemmy.modules[module_name].get_docs_attr(command_name, 'admin_only', default=False) else '  '
+					lines.append(f' {lock_or_spaces} {symbol}{command_name}{command_description}')
 
 			lines.append('```')
 			lines.append(f'`{symbol}help <Module>` or `{symbol}help <command>` for more info')

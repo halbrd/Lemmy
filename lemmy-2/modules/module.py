@@ -64,19 +64,23 @@ class Module:
 		# call command and handle result
 		if len(args) > 0 and args[0].startswith(symbol):
 			args[0] = args[0][len(symbol):]
+			command = args[0]
 
-			if args[0] in self.commands:
-				try:
-					await self.commands[args[0]](message, args[1:], kwargs)
-				except Module.CommandError as e:
-					usage_message = ('Usage: `' + self.get_docs_attr(args[0], 'usage') + '`') if self.get_docs_attr(args[0], 'usage') else None
-					await self.send_error(message, e.message or usage_message)
-				except Module.CommandSuccess as e:
-					await self.send_success(message, e.message)
-				except Module.CommandNotAllowed as e:
-					await self.send_not_allowed(message, e.message)
-				except Module.CommandDM as e:
-					await self.send_dm(message, e.direct_message, e.public_message)
+			if command in self.commands:
+				if self.get_docs_attr(command, 'admin_only', default=False) and not message.author.id in self.lemmy.config['admin_users']:
+					await self.send_not_allowed(message)
+				else:
+					try:
+						await self.commands[command](message, args[1:], kwargs)
+					except Module.CommandError as e:
+						usage_message = ('Usage: `' + self.get_docs_attr(command, 'usage') + '`') if self.get_docs_attr(command, 'usage') else None
+						await self.send_error(message, e.message or usage_message)
+					except Module.CommandSuccess as e:
+						await self.send_success(message, e.message)
+					except Module.CommandNotAllowed as e:
+						await self.send_not_allowed(message, e.message)
+					except Module.CommandDM as e:
+						await self.send_dm(message, e.direct_message, e.public_message)
 
 	@staticmethod
 	def deconstruct_message(message):
@@ -111,7 +115,7 @@ class Module:
 		# remove trailing empty term
 		while len(terms) > 0 and terms[-1] == '':
 			del terms[-1]
-		
+
 		kwarg_match = re.compile('([a-z]+)=(\S+)|[\'"`](.+)[\'"`]')
 		args = [ term for term in terms if not re.fullmatch(kwarg_match, term) ]
 		kwargs = { match.group(1): match.group(2) for match in filter(lambda match: match is not None, map(lambda term: re.fullmatch(kwarg_match, term), terms)) }

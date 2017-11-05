@@ -18,7 +18,8 @@ class Example(Module):
 	docs_function = {
 		'description': 'Performs an action',   # explain the function's purpose as succintly as possible
 		'usage': 'function kwarg=value <optional_kwarg=other_value> arg <optional_arg>',   # represent how to use the function in a technical way; don't define this if the command is self-explanatory
-		'examples': [ 'function', 'function arg', 'function kwarg=value arg' ]   # give as few examples as necessary to adequately show how the function can be used; don't define this if the command is self-explanatory or usage explains it clearly enough
+		'examples': [ 'function', 'function arg', 'function kwarg=value arg' ],   # give as few examples as necessary to adequately show how the function can be used; don't define this if the command is self-explanatory or usage explains it clearly enough
+		'admin_only': False   # not necessary to define this unless it's true
 	}
 	async def cmd_function(self, message, args, kwargs):
 		# do function stuff
