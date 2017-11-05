@@ -110,4 +110,5 @@ class Core(Module):
 	}
 	async def cmd_about(self, message, args, kwargs):
 		title = '```fix\n=========================================\n=  _                                    =\n= | |    ___ _ __ ___  _ __ ___  _   _  =\n= | |   / _ \ \'_ ` _ \| \'_ ` _ \| | | | =\n= | |__|  __/ | | | | | | | | | | |_| | =\n= |_____\___|_| |_| |_|_| |_| |_|\__, | =\n=                                |___/  =\n=========================================\n Your friendly neighbourhood Discord bot\n  Created by https://github.com/halbrd\n```'
-		await self.client.send_message(message.channel, title)
+		repo_link = '  Lemmy is free and open source software, hosted at\nhttps://github.com/halbrd/Lemmy. Bug reports and\n                       pull requests are welcome.'
+		await self.client.send_message(message.channel, title + '\n' + repo_link)
