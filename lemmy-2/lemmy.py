@@ -19,11 +19,11 @@ class Lemmy:
 
 
 	def __init__(self, token):
+		# perform setup that should not be performed again (i.e. in a reload)
 		self.client = discord.Client()
-		self.modules = {}
 
-		# perform setup
-		self.load_all()
+		# perform synchronous setup
+		self.load_all_sync()
 
 		# register events
 		@self.client.event
@@ -42,10 +42,14 @@ class Lemmy:
 
 		@self.client.event
 		async def on_ready():
+			# perform asynchronous setup
+			await self.load_all_async()
+
 			self.log('Logged in.')
 
 		# log in
 		self.log('Logging in...')
+
 		# wrap this in a try block to gracefully shut down the bot when a KeyboardInterrupt is sent
 		try:
 			self.client.run(token)
@@ -54,7 +58,6 @@ class Lemmy:
 
 		# at this point the bot has shut down
 		self.log('Shut down.')
-
 
 	def log(self, message):
 		output = '[{}] {}'.format(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), message)
@@ -65,11 +68,12 @@ class Lemmy:
 			with open(self.config['log_file'], 'a', encoding='utf8') as f:
 				f.write(output + '\n')
 
-
-	def load_all(self):
+	def load_all_sync(self):
 		self.load_config()
 		self.load_modules()
 
+	async def load_all_async(self):
+		await self.load_playing_message()
 
 	def load_config(self):
 		if not os.path.isfile('config.json'):
@@ -77,8 +81,8 @@ class Lemmy:
 
 		self.config = json.load(open('config.json', 'r'))
 
-
 	def load_modules(self):
+		self.modules = {}
 		manifest = json.load(open('modules/manifest.json', 'r'))
 
 		for module_name, class_name in manifest.items():
@@ -87,24 +91,25 @@ class Lemmy:
 			class_ = getattr(module, class_name)
 			self.modules[class_name] = class_(self)
 
+	async def load_playing_message(self):
+		await self.client.change_presence(game=discord.Game(name=self.get_config_key_or_default('playing_message')))
 
-	def config_try_key(self, *path):
+	def get_config_key_or_default(self, *path, default=None):
 		node = self.config
 		for step in path:
 			if type(node) == dict and step in node:
 				node = node[step]
 			else:
-				raise KeyError(step)
+				return default
 
 		return node
 
-
 	def resolve_symbol(self, channel):
+		default_symbol = self.config["default_symbol"]
 		try:
-			symbol = self.config_try_key("server_config", channel.server.id, "symbol")
-		except ( AttributeError, KeyError ):
-			symbol = self.config["default_symbol"]
-		return symbol
+			return self.get_config_key_or_default("server_config", channel.server.id, "symbol", default=default_symbol)
+		except AttributeError:
+			return default_symbol
 
 
 

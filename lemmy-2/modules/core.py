@@ -24,7 +24,8 @@ class Core(Module):
 		if message.author.id in self.lemmy.config["admin_users"]:
 			self.lemmy.log('Reloading...')
 
-			self.lemmy.load_all()
+			self.lemmy.load_all_sync()
+			await self.lemmy.load_all_async()
 
 			self.lemmy.log('Reloaded.')
 			await self.send_success(message)
@@ -50,7 +51,7 @@ class Core(Module):
 
 			'''
 			Before we start getting any help text, we need to consider what the symbol should be.
-			Since, if `broadcast` is false, we will be sending the message to a different channel 
+			Since, if `broadcast` is false, we will be sending the message to a different channel
 			(that is, a direct message) than the one the help command was called from, our `symbol`
 			variable might not be accurate. Therefore, if we are sending the help message directly
 			to the user, we need to call resolve_symbol again and pass None to get the default symbol.
