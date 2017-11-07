@@ -64,7 +64,7 @@ class Module:
 		# call command and handle result
 		if len(args) > 0 and args[0].startswith(symbol):
 			args[0] = args[0][len(symbol):]
-			command = args[0]
+			command = args[0].replace('-', '_')
 
 			if command in self.commands:
 				if self.get_docs_attr(command, 'admin_only', default=False) and not message.author.id in self.lemmy.config['admin_users']:
