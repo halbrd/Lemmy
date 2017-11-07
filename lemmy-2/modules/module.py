@@ -142,33 +142,37 @@ class Module:
 		if command and not hasattr(self, f'cmd_{command}'):
 			raise AttributeError(f'Module \'{type(self).__name__}\' has no command \'{command}\'')
 
-		# formulate title
-		if not command:   # asking about the module
-			syntax = 'md'
-			title = f'<module {type(self).__name__}>'
-		else:   # asking about a command
-			syntax = 'apacheconf'
-			title = symbol + (self.get_docs_attr(command, 'usage') or command)
-		title = f'```{syntax}\n{title}\n```'
+		lines = []
 
-		# formulate description
-		description = self.get_docs_attr(command, 'description') if command else self.get_module_docs_attr('description')
-
-		# formulate 'generic list' (examples or list of commands)
-		if not command:
-			if not self.commands:   # no commands in module
-				generic_list = 'This module has no commands'
-			else:
-				generic_list = 'Commands in this module: ' + ', '.join([f'`{symbol}{command_name}`' for command_name, function in self.commands.items()])
-		else:
+		# asking about a specific command
+		if command:
+			# title
+			lines.append(f'```apacheconf\n' + symbol + (self.get_docs_attr(command, 'usage') or command) + '\n```')
+			# description
+			lines.append(self.get_docs_attr(command, 'description'))
+			# examples
 			examples = self.get_docs_attr(command, 'examples')
-			if not examples:
-				generic_list = None
-			else:
-				generic_list = 'Examples: ' + ('\n  ' if len(examples) > 1 else '') + '\n  '.join(f'`{symbol}{example}`' for example in examples)
+			if examples:
+				lines.append('Examples: ' + ('\n  ' if len(examples) > 1 else '') + '\n  '.join(f'`{symbol}{example}`' for example in examples))
+
+		# asking about the module generally
+		# the resultant text should be wrapped in a diff code block by whatever calls for it
+		else:
+			# title
+			name = type(self).__name__
+			module_description = self.get_module_docs_attr('description')
+			module_description = f' - {module_description}' if module_description else ''
+			lines.append(f'+ {name}{module_description}')
+			# commands
+			for command_name in self.commands.keys():
+				# we want to append the command description if available
+				command_description = self.get_docs_attr(command_name, 'description')
+				command_description = ' - ' + command_description if command_description else ''
+				lock_or_spaces = '🔒' if self.get_docs_attr(command_name, 'admin_only', default=False) else '  '
+				lines.append(f' {lock_or_spaces} {symbol}{command_name}{command_description}')
 
 		# filter Nones out and put the rest into a list
-		lines = list(filter(lambda line: line is not None, [title, description, generic_list]))
+		lines = list(filter(lambda line: line is not None, lines))
 
 		# convert to string and return
 		return '\n'.join(lines)

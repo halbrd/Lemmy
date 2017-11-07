@@ -43,6 +43,7 @@ class Core(Module):
 		broadcast = 'broadcast' in kwargs and bool(kwargs['broadcast'])
 		symbol = self.lemmy.resolve_symbol(message.channel)
 
+		# general help text
 		if len(args) == 0:
 			# get our module manifest
 			manifest = { module_name: [ command_name for command_name, command in module.commands.items() ] for module_name, module in self.lemmy.modules.items() }
@@ -61,18 +62,8 @@ class Core(Module):
 			if not broadcast:
 				symbol = self.lemmy.resolve_symbol(None)
 
-			for module_name, commands in manifest.items():
-				# we want to append the module description if available
-				module_description = self.lemmy.modules[module_name].get_module_docs_attr('description')
-				module_description = ' - ' + module_description if module_description else ''
-				lines.append(f'+ {module_name}{module_description}')
-
-				for command_name in commands:
-					# we want to append the command description if available
-					command_description = self.lemmy.modules[module_name].get_docs_attr(command_name, 'description')
-					command_description = ' - ' + command_description if command_description else ''
-					lock_or_spaces = '🔒' if self.lemmy.modules[module_name].get_docs_attr(command_name, 'admin_only', default=False) else '  '
-					lines.append(f' {lock_or_spaces} {symbol}{command_name}{command_description}')
+			for module_name in manifest.keys():
+				lines.append(self.lemmy.modules[module_name].help_text(symbol=symbol))
 
 			lines.append('```')
 			lines.append(f'`{symbol}help <Module>` or `{symbol}help <command>` for more info')
@@ -85,19 +76,20 @@ class Core(Module):
 					await self.client.send_message(message.channel, text)
 				else:
 					await self.send_dm(message, text)
+
+		# help text pertaining to a specific topic
 		else:
 			topic = args[0]
 			help_texts = []
 
-			# user is asking about a module
+			# check if user is asking about a module
 			if topic in self.lemmy.modules.keys():
-				help_texts.append(self.lemmy.modules[topic].help_text(symbol=symbol))
+				help_texts.append('```diff\n' + self.lemmy.modules[topic].help_text(symbol=symbol) + '\n```' + f'\n`{symbol}help <command>` for more info')
 
-			# user is asking about a command
-			else:
-				for module_name, module in self.lemmy.modules.items():
-					if topic in module.commands.keys():
-						help_texts.append(self.lemmy.modules[module_name].help_text(topic, symbol=symbol))
+			# check if user is asking about a command
+			for module_name, module in self.lemmy.modules.items():
+				if topic in module.commands.keys():
+					help_texts.append(self.lemmy.modules[module_name].help_text(topic, symbol=symbol))
 
 			if not help_texts:
 				raise Module.CommandError(f'\'{topic}\' is not a module or command')

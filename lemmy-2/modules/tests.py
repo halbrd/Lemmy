@@ -48,3 +48,9 @@ class Tests(Module):
 
 	async def cmd_no_docs(self, message, args, kwargs):
 		await self.client.send_message(message.channel, 'This command has no docs to test the help text')
+
+	cmd_Tests = {
+		'description': 'Tests overlapping module/command names'
+	}
+	async def cmd_Tests(self, message, args, kwargs):
+		await self.client.send_message(message.channel, 'This command has the same name as a module to test the help text')
