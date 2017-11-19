@@ -11,10 +11,7 @@ sys.path.append('modules')
 
 class Lemmy:
 	class NoConfigException(Exception):
-		def __init__(self, message=None):
-			if message is None:
-				message = 'config.json does not exist (create it from config.example.json)'
-
+		def __init__(self, message='config.json does not exist (create it from config.example.json)'):
 			super(NoConfigException, self).__init__(message)
 
 
