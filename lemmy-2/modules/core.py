@@ -11,28 +11,22 @@ class Core(Module):
 		'admin_only': True
 	}
 	async def cmd_shutdown(self, message, args, kwargs):
-		if message.author.id in self.lemmy.config["admin_users"]:
-			self.lemmy.log('Shutting down...')
-			await self.send_success(message)
-			await self.client.logout()
-		else:
-			raise Module.CommandNotAllowed
+		self.lemmy.log('Shutting down...')
+		await self.send_success(message)
+		await self.client.logout()
 
 	docs_reload = {
 		'description': 'Reloads modules from disk',
 		'admin_only': True
 	}
 	async def cmd_reload(self, message, args, kwargs):
-		if message.author.id in self.lemmy.config["admin_users"]:
-			self.lemmy.log('Reloading...')
+		self.lemmy.log('Reloading...')
 
-			self.lemmy.load_all_sync()
-			await self.lemmy.load_all_async()
+		self.lemmy.load_all_sync()
+		await self.lemmy.load_all_async()
 
-			self.lemmy.log('Reloaded.')
-			await self.send_success(message)
-		else:
-			raise Module.CommandNotAllowed
+		self.lemmy.log('Reloaded.')
+		await self.send_success(message)
 
 	docs_help = {
 		'description': 'Returns documentation for bot functions',
@@ -63,7 +57,7 @@ class Core(Module):
 				symbol = self.lemmy.resolve_symbol(None)
 
 			for module_name in manifest.keys():
-				lines.append(self.lemmy.modules[module_name].help_text(symbol=symbol))
+				lines.append(self.lemmy.modules[module_name].get_help_text(symbol=symbol))
 
 			lines.append('```')
 			lines.append(f'`{symbol}help <Module>` or `{symbol}help <command>` for more info')
@@ -84,12 +78,12 @@ class Core(Module):
 
 			# check if user is asking about a module
 			if topic in self.lemmy.modules.keys():
-				help_texts.append('```diff\n' + self.lemmy.modules[topic].help_text(symbol=symbol) + '\n```' + f'\n`{symbol}help <command>` for more info')
+				help_texts.append('```diff\n' + self.lemmy.modules[topic].get_help_text(symbol=symbol) + '\n```' + f'\n`{symbol}help <command>` for more info')
 
 			# check if user is asking about a command
 			for module_name, module in self.lemmy.modules.items():
 				if topic in module.commands.keys():
-					help_texts.append(self.lemmy.modules[module_name].help_text(topic, symbol=symbol))
+					help_texts.append(self.lemmy.modules[module_name].get_help_text(topic, symbol=symbol))
 
 			if not help_texts:
 				raise Module.CommandError(f'\'{topic}\' is not a module or command')

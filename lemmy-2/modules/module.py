@@ -67,6 +67,7 @@ class Module:
 			command = args[0].replace('-', '_')
 
 			if command in self.commands:
+				# check if the user is permitted to use this command
 				if self.get_docs_attr(command, 'admin_only', default=False) and not message.author.id in self.lemmy.config['admin_users']:
 					await self.send_not_allowed(message)
 				else:
@@ -137,7 +138,7 @@ class Module:
 		except (AttributeError, KeyError):
 			return default
 
-	def help_text(self, command=None, symbol=''):
+	def get_help_text(self, command=None, symbol=''):
 		# if a command is being inspected, verify that it exists
 		if command and not hasattr(self, f'cmd_{command}'):
 			raise AttributeError(f'Module \'{type(self).__name__}\' has no command \'{command}\'')
