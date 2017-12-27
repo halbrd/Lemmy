@@ -95,3 +95,6 @@ class Tests(Module):
 			embed.add_field(name=field['name'], value=field['value'], inline=field['inline'])
 
 		await self.client.send_message(message.channel, f'```json\n{json.dumps(embed_data, sort_keys=True, indent=2)}\n```', embed=embed)
+
+	async def cmd_print_raw(self, message, args, kwargs):
+		await self.client.send_message(message.channel, '```\n' + message.content + '\n```')
