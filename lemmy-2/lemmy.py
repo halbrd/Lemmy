@@ -47,11 +47,14 @@ class Lemmy:
 		# log in
 		self.log('Logging in...')
 
-		# wrap this in a try block to gracefully shut down the bot when a KeyboardInterrupt is sent
+		# run the bot
+		loop = asyncio.get_event_loop()
 		try:
-			self.client.run(token)
+			loop.run_until_complete(self.client.start(token))
 		except KeyboardInterrupt:
-			pass
+			loop.run_until_complete(self.client.logout())
+		finally:
+			loop.close()
 
 		# at this point the bot has shut down
 		self.log('Shut down.')
