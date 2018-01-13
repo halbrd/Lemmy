@@ -22,14 +22,18 @@ class Module:
 			self.public_message = public_message
 			super().__init__(direct_message)
 
-	async def send_error(self, message, comment=None):
+	async def send_error(self, message, comment=None, comment_wrapping=True):
 		await self.client.add_reaction(message, '❌')
 		if comment:
+			if comment_wrapping:
+				comment = f'```diff\n- {comment}\n```'
 			await self.client.send_message(message.channel, comment)
 
-	async def send_success(self, message, comment=None):
+	async def send_success(self, message, comment=None, comment_wrapping=True):
 		await self.client.add_reaction(message, '✅')
 		if comment:
+			if comment_wrapping:
+				comment = f'```diff\n+ {comment}\n```'
 			await self.client.send_message(message.channel, comment)
 
 	async def send_not_allowed(self, message, comment=None):
