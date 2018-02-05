@@ -1,6 +1,8 @@
 # Lemmy
 Your friendly neighbourhood Discord bot
 
+Note: Lemmy is being re-written in /lemmy-2. The new codebase is much nicer.
+
 # Lemmy Reference Page
 Reference for the non-technical side of Lemmy can be found at http://lynq.me/lemmy/
 
