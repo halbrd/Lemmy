@@ -1,41 +1,42 @@
 from module import Module
 import json
 import random
+import re
 
-class jebrim(Module):
-	jsonKey = 'jebrimLinks'
-	jsonLocation = 'modules/jebrimTweets.json'
+class Jebrim(Module):
+	json_key = 'jebrim_links'
+	json_location = 'modules/jebrim_tweets.json'
 
 	docs = {
-		'description': 'Posts jebrim tweets'
+		'description': 'Posts random jebrim tweets'
 	}
 
 	def __init__(self, client):
 		Module.__init__(self, client)
-		jsonData = json.load(open(jebrim.jsonLocation,'r'))
-		self.tweetList = jsonData[jebrim.jsonKey]
+		jsonData = json.load(open(Jebrim.json_location, 'r'))
+		self.tweet_list = jsonData[Jebrim.json_key]
 
 
 	docs_addjebrim = {
-		'description': 'add link to jebrim tweet to the list'
+		'description': 'Add link to Jebrim tweet to the list'
 	}
 
 	async def cmd_addjebrim(self, message, args, kwargs):
-		if args[0] in self.tweetList:
+		if args[0] in self.tweet_list:
 			await self.send_error(message)
 		else:
-			if not args[0].startswith("http"):
-				await self.send_error(message)
-				await self.client.send_message(message.channel, "Please send valid link")
-			else:
-				self.tweetList.append(args[0])
-				await self.send_success(message)
-				jsonData = {jebrim.jsonKey : self.tweetList}
-				json.dump(jsonData, open(jebrim.jsonLocation , 'w'))
+			if not re.match('https?://', args[0]):
+				await self.send_error(message, comment='Please send valid link')
+				return
+
+			self.tweet_list.append(args[0])
+			jsonData = {Jebrim.json_key : self.tweet_list}
+			json.dump(jsonData, open(Jebrim.json_location, 'w'), indent=4)
+			await self.send_success(message)
 
 	docs_jebrim = {
-		'description': 'Posts jebrim tweet'
+		'description': 'Posts random Jebrim tweet'
 	}
 
 	async def cmd_jebrim(self, message, args, kwargs):
-		await self.client.send_message(message.channel, random.choice(self.tweetList))
+		await self.client.send_message(message.channel, random.choice(self.tweet_list))
