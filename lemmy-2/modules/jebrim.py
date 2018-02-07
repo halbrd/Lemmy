@@ -5,7 +5,7 @@ import re
 
 class Jebrim(Module):
 	json_key = 'jebrim_links'
-	json_location = 'modules/jebrim_tweets.json'
+	json_location = 'config/jebrim/jebrim_tweets.json'
 
 	docs = {
 		'description': 'Posts random Jebrim tweets'

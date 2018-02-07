@@ -1,0 +1,12 @@
+{
+	"token": "MjI1MjI4MTAxMDYyMzYxMDg5.DVtCIA.J9MpdqgGFfNCoKpIe5ieg-3a6fI",
+	"log_file": null,
+	"default_symbol": "/",
+	"admin_users": [ "12345678901234567"],
+	"playing_message": null,
+	"server_config": {
+		"12345678901234567": {
+			"symbol": "$"
+		}
+	}
+}
