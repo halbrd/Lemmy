@@ -10,7 +10,6 @@ class Jebrim(Module):
 	docs = {
 		'description': 'Posts random Jebrim tweets'
 	}
-
 	def __init__(self, client):
 		Module.__init__(self, client)
 		json_data = json.load(open(Jebrim.json_location, 'r'))
