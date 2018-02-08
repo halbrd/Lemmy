@@ -5,7 +5,7 @@ import re
 
 class Jebrim(Module):
 	json_key = 'jebrim_links'
-	json_location = 'config/jebrim/jebrim_tweets.json'
+	json_location = 'config/jebrim/tweets.json'
 
 	docs = {
 		'description': 'Posts random Jebrim tweets'
@@ -15,7 +15,6 @@ class Jebrim(Module):
 		Module.__init__(self, client)
 		json_data = json.load(open(Jebrim.json_location, 'r'))
 		self.tweet_list = json_data[Jebrim.json_key]
-
 
 	docs_addjebrim = {
 		'description': 'Add link to Jebrim tweet to the list'
