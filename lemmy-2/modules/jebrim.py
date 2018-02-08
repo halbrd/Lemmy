@@ -4,7 +4,7 @@ import random
 import re
 
 class Jebrim(Module):
-	json_location = 'config/jebrim/tweets.json'
+	json_location = 'data/jebrim/tweets.json'
 
 	docs = {
 		'description': 'Posts random Jebrim quotes'
