@@ -15,7 +15,7 @@ class Jebrim(Module):
 		self.tweet_list = json_data['links']
 
 	docs_addjebrim = {
-		'description': 'Add a link to a Jebrim screenshot to the list',
+		'description': 'Add a new Jebrim screenshot to the list (Imgur direct links only)',
 		'usage': 'addjebrim link'
 	}
 	async def cmd_addjebrim(self, message, args, kwargs):
@@ -23,7 +23,7 @@ class Jebrim(Module):
 			await self.send_error(message)
 			return
 
-		if not re.match('https?://.+\.(png|jpg|jpeg|gif)', args[0]):
+		if not re.match('https://i\.imgur\.com/[A-Za-z0-9]+\.(png|jpg)/?', args[0]):
 			await self.send_error(message)
 			return
 
