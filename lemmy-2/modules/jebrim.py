@@ -14,11 +14,11 @@ class Jebrim(Module):
 		json_data = json.load(open(Jebrim.json_location, 'r'))
 		self.tweet_list = json_data['links']
 
-	docs_addjebrim = {
+	docs_add_jebrim = {
 		'description': 'Add a new Jebrim screenshot to the list (Imgur direct links only)',
 		'usage': 'addjebrim link'
 	}
-	async def cmd_addjebrim(self, message, args, kwargs):
+	async def cmd_add_jebrim(self, message, args, kwargs):
 		if args[0] in self.tweet_list:
 			await self.send_error(message)
 			return
