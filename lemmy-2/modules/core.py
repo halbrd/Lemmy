@@ -40,7 +40,7 @@ class Core(Module):
 		# general help text
 		if len(args) == 0:
 			# get our module manifest
-			manifest = { module_name: [ command_name for command_name, command in module._commands.items() ] for module_name, module in self.lemmy.modules.items() }
+			manifest = { module_name: [ command_name for command_name, command in module.commands.items() ] for module_name, module in self.lemmy.modules.items() }
 
 			# construct message initially as a list of lines, for convenience
 			lines = []
@@ -82,7 +82,7 @@ class Core(Module):
 
 			# check if user is asking about a command
 			for module_name, module in self.lemmy.modules.items():
-				if topic in module._commands.keys():
+				if topic in module.commands.keys():
 					help_texts.append(self.lemmy.modules[module_name].get_help_text(topic, symbol=symbol))
 
 			if not help_texts:

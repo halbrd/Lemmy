@@ -197,9 +197,9 @@ class LemmyBot:
 			for channel in channelList:
 				print("[" + Lutils.StripUnicode(channel.server.name) + "] " + Lutils.StripUnicode(channel.name.strip()))
 
-			with open("pics/displaypics/white-lemmy.png", "rb") as dp:
-				#await self.client.edit_profile(username="Lemmy", avatar=dp.read())
-				await self.client.edit_profile(username="Lemmy")
+			with open("pics/displaypics/active.png", "rb") as dp:
+				await self.client.edit_profile(username="Lemmy", avatar=dp.read())
+				#await self.client.edit_profile(username="Lemmy")
 			await self.client.change_presence(game=discord.Game(name="/help for info", url="https://halbrd.com"))
 
 			logging.getLogger("discord.gateway").setLevel(logging.CRITICAL)
