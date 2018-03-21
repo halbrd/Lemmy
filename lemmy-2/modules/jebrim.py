@@ -16,7 +16,7 @@ class Jebrim(Module):
 
 	docs_add_jebrim = {
 		'description': 'Add a new Jebrim screenshot to the list (Imgur direct links only)',
-		'usage': 'addjebrim link'
+		'usage': 'add_jebrim link'
 	}
 	async def cmd_add_jebrim(self, message, args, kwargs):
 		if args[0] in self.tweet_list:
