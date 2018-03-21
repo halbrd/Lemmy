@@ -1,4 +1,6 @@
 import re
+import json
+import os
 
 class Module:
 	class CommandError(Exception):
@@ -182,3 +184,24 @@ class Module:
 
 		# convert to string and return
 		return '\n'.join(lines)
+
+	def load_data(self, document_name):
+		target_directory = f'data/{self.__class__.__name__}/'
+		target_file = target_directory + f'{document_name}.json'
+
+		# check that directory exists
+		if not os.path.isdir(target_directory):
+			os.makedirs(target_directory)
+
+		# check that file exists
+		if not os.path.isfile(target_file):
+			with open(target_file, 'w') as f:
+				f.write('{}')
+
+		# get data
+		with open(target_file, 'r') as f:
+			return json.load(f)
+
+	def save_data(self, document_name, data):
+		with open(f'data/{self.__class__.__name__}/{document_name}.json', 'w') as f:
+			json.dump(data, f, indent='\t')
