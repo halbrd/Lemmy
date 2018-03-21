@@ -50,7 +50,8 @@ class Module:
 	def __init__(self, lemmy):
 		self.lemmy = lemmy
 		self.client = lemmy.client   # this line is arguably bad taste code, but the name binding removes a *lot* of typing
-		self.commands = { function[4:]: getattr(self, function) for function in dir(self) if function.startswith('cmd_') }
+
+		self._commands = { function[4:]: getattr(self, function) for function in dir(self) if function.startswith('cmd_') }
 
 	async def on_message(self, message):
 		if message.author != self.client.user:
@@ -70,13 +71,13 @@ class Module:
 			args[0] = args[0][len(symbol):]
 			command = args[0].replace('-', '_')
 
-			if command in self.commands:
+			if command in self._commands:
 				# check if the user is permitted to use this command
 				if self.get_docs_attr(command, 'admin_only', default=False) and not message.author.id in self.lemmy.config['admin_users']:
 					await self.send_not_allowed(message)
 				else:
 					try:
-						await self.commands[command](message, args[1:], kwargs)
+						await self._commands[command](message, args[1:], kwargs)
 					except Module.CommandError as e:
 						usage_message = ('Usage: `' + self.get_docs_attr(command, 'usage') + '`') if self.get_docs_attr(command, 'usage') else None
 						await self.send_error(message, e.message or usage_message)
@@ -169,7 +170,7 @@ class Module:
 			module_description = f' - {module_description}' if module_description else ''
 			lines.append(f'+ {name}{module_description}')
 			# commands
-			for command_name in self.commands.keys():
+			for command_name in self._commands.keys():
 				# we want to append the command description if available
 				command_description = self.get_docs_attr(command_name, 'description')
 				command_description = ' - ' + command_description if command_description else ''
