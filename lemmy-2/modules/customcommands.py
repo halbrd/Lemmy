@@ -41,13 +41,8 @@ class CustomCommands(Module):
 				if command in self.commands:
 					await self.client.send_message(message.channel, self.commands[command])
 
-	docs_ccomm_list = {
-		'description': 'Lists all custom commands'
-	}
-	async def cmd_ccomm_list(self, message, args, kwargs):
-		column_count = 6
-		commands = sorted(self.commands.keys(), key=lambda command: (len(command), command))
-
+	@staticmethod
+	def make_table(elements, column_count=6):
 		# determine how many elements are in each column
 		column_base_length = len(commands) // column_count
 		column_extra_count = len(commands) % column_count
@@ -55,8 +50,6 @@ class CustomCommands(Module):
 		# add the extras to the end of the relevant columns
 		for i in range(column_extra_count):
 			column_lengths[i] += 1
-
-		print(column_lengths)
 
 		# assemble columns
 		columns = []
@@ -78,14 +71,23 @@ class CustomCommands(Module):
 		while rows[-1][-1] is None:
 			rows[-1].pop()
 
-		from pprint import pprint
-		pprint(rows)
-
 		# convert rows to text
 		text = '\n'.join([ '  '.join(row) for row in rows ])
-		text = f'```\n{text}\n```'
 
-		await self.client.send_message(message.channel, text)
+		# TODO: chunk text
+
+		# TODO: return list of chunks
+
+	docs_ccomm_list = {
+		'description': 'Lists all custom commands'
+	}
+	async def cmd_ccomm_list(self, message, args, kwargs):
+		commands = sorted(self.commands.keys(), key=lambda command: (len(command), command))
+
+		table_chunks = CustomCommands.make_table(commands)
+
+		for chunk in table_chunks:
+			await self.client.send_message(message.channel, chunk)
 
 	docs_ccomm_search = {
 		'description': 'Searches for a custom command',
