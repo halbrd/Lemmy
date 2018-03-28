@@ -43,9 +43,13 @@ class CustomCommands(Module):
 
 	@staticmethod
 	def make_table(elements, column_count=6):
+		# if there are fewer elements to display than column_count, we need to reduce column_count to match
+		if len(elements) < column_count:
+			column_count = len(elements)
+
 		# determine how many elements are in each column
-		column_base_length = len(commands) // column_count
-		column_extra_count = len(commands) % column_count
+		column_base_length = len(elements) // column_count
+		column_extra_count = len(elements) % column_count
 		column_lengths = [ column_base_length for _ in range(column_count) ]
 		# add the extras to the end of the relevant columns
 		for i in range(column_extra_count):
@@ -56,10 +60,10 @@ class CustomCommands(Module):
 		for column_index in range(len(column_lengths)):
 			column_start_index = sum(column_lengths[:column_index])
 			column_end_index = sum(column_lengths[:column_index + 1])
-			columns.append(commands[column_start_index:column_end_index])
+			columns.append(elements[column_start_index:column_end_index])
 
 		# pad elements
-		for i, column in enumerate(columns):
+		for i, column in enumerate(columns[:-1]):
 			column_width = max([ len(element) for element in column ])
 			for j, element in enumerate(column):
 				columns[i][j] = element + ' ' * (column_width - len(element))
@@ -72,11 +76,7 @@ class CustomCommands(Module):
 			rows[-1].pop()
 
 		# convert rows to text
-		text = '\n'.join([ '  '.join(row) for row in rows ])
-
-		# TODO: chunk text
-
-		# TODO: return list of chunks
+		return '\n'.join([ '  '.join(row) for row in rows ])
 
 	docs_ccomm_list = {
 		'description': 'Lists all custom commands'
@@ -84,7 +84,7 @@ class CustomCommands(Module):
 	async def cmd_ccomm_list(self, message, args, kwargs):
 		commands = sorted(self.commands.keys(), key=lambda command: (len(command), command))
 
-		table_chunks = CustomCommands.make_table(commands)
+		table_chunks = self.lemmy.chunk_text(CustomCommands.make_table(commands), chunk_prefix='```\n', chunk_suffix='\n```')
 
 		for chunk in table_chunks:
 			await self.client.send_message(message.channel, chunk)
@@ -95,10 +95,29 @@ class CustomCommands(Module):
 		'examples': [ 'ccomm_search hmmm' ]
 	}
 	async def cmd_ccomm_search(self, message, args, kwargs):
-		return
+		if len(args) != 1:
+			await self.send_error(message)
+			return
+
+		commands = filter(lambda command: args[0] in command, self.commands.keys())
+		commands = sorted(commands, key=lambda command: (len(command), command))
+
+		# if the search term is matched exactly, highlight it (needs `md` syntax highlighting)
+		commands = [ command if command != args[0] else f'< {args[0]} >' for command in commands ]
+
+		if not commands:
+			await self.client.send_message(message.channel, f'```\nNo results.\n```')
+			return
+
+		table_chunks = self.lemmy.chunk_text(CustomCommands.make_table(commands), chunk_prefix='```md\n', chunk_suffix='\n```')
+
+		for chunk in table_chunks:
+			await self.client.send_message(message.channel, chunk)
 
 	@staticmethod
 	def validate_command_name(name):
+		# TODO: decide on limitations
+
 		# allow only ASCII characters
 		if not all(ord(char) < 128 for char in name):
 			return False
@@ -107,33 +126,34 @@ class CustomCommands(Module):
 
 	@staticmethod
 	def validate_command_value(value):
+		# TODO: 2000 characters
 		return True
 
-	docs_ccomm_add = {
+	docs_ccomm_create = {
 		'description': 'Adds a new custom command',
 		'usage': 'ccomm_add command_name contents',
 		'examples': [ 'ccomm_add lenny ( ͡° ͜ʖ ͡°)' ]
 	}
-	async def cmd_ccomm_add(self, message, args, kwargs):
+	async def cmd_ccomm_create(self, message, args, kwargs):
 		if len(args) != 2:
-			self.send_error(message)
+			await self.send_error(message)
 			return
 
 		if args[0] in self.commands:
-			self.send_error(message, comment=f'`{args[0]}` is already a command')
+			await self.send_error(message, comment=f'`{args[0]}` is already a command')
 			return
 
 		if not CustomCommands.validate_command_name(args[0]):
-			self.send_error(message, comment=f'`{args[0]}` is an invalid name')
+			await self.send_error(message, comment=f'`{args[0]}` is an invalid name')
 			return
 
 		if not CustomCommands.validate_command_value(args[1]):
-			self.send_error(message, comment=f'`{args[1]}` is an invalid value')
+			await self.send_error(message, comment=f'`{args[1]}` is an invalid value')
 			return
 
 		self.commands[args[0]] = args[1]
 		self.save_commands()
-		self.send_success(message)
+		await self.send_success(message)
 
 	docs_ccomm_edit = {
 		'description': 'Edits an existing custom command',
@@ -142,16 +162,16 @@ class CustomCommands(Module):
 	}
 	async def cmd_ccomm_edit(self, message, args, kwargs):
 		if len(args) != 2:
-			self.send_error(message)
+			await self.send_error(message)
 			return
 
 		if not args[0] in self.commands:
-			self.send_error(message, comment=f'`{args[0]}` is not a command')
+			await self.send_error(message, comment=f'`{args[0]}` is not a command')
 			return
 
 		self.commands[args[0]] = args[1]
 		self.save_commands()
-		self.send_success(message)
+		await self.send_success(message)
 
 	docs_ccomm_delete = {
 		'description': 'Deletes and existing custom command',
@@ -160,13 +180,13 @@ class CustomCommands(Module):
 	}
 	async def cmd_ccomm_delete(self, message, args, kwargs):
 		if len(args) != 1:
-			self.send_error(message)
+			await self.send_error(message)
 			return
 
 		if not args[0] in self.commands:
-			self.send_error(message, comment=f'`{args[0]}` is not a command')
+			await self.send_error(message, comment=f'`{args[0]}` is not a command')
 			return
 
 		del self.commands[args[0]]
 		self.save_commands()
-		self.send_success(message)
+		await self.send_success(message)
