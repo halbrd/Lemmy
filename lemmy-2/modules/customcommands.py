@@ -1,5 +1,7 @@
 from module import Module
 
+from itertools import zip_longest
+
 class CustomCommands(Module):
 	docs = {
 		'description': 'Posts custom-defined commands'
@@ -43,80 +45,52 @@ class CustomCommands(Module):
 		'description': 'Lists all custom commands'
 	}
 	async def cmd_ccomm_list(self, message, args, kwargs):
-		# TODO: check with 0 to columncount-many commands
-
-		# break commands into columns
-		column_count = 5
+		column_count = 6
 		commands = sorted(self.commands.keys(), key=lambda command: (len(command), command))
 
-		# # left to right, top to bottom
-		# columns = [ [] for _ in range(3) ]
-		#
-		# for i in range(column_count):
-		# 	columns[i] = commands[i::column_count]
+		# determine how many elements are in each column
+		column_base_length = len(commands) // column_count
+		column_extra_count = len(commands) % column_count
+		column_lengths = [ column_base_length for _ in range(column_count) ]
+		# add the extras to the end of the relevant columns
+		for i in range(column_extra_count):
+			column_lengths[i] += 1
 
-		# # top to bottom, left to right
-		# one_third_point = len(commands) // 3 + 1
-		# two_thirds_point = 2 * len(commands) // 3 + 1
-		#
-		# columns = [
-		# 	commands[:one_third_point],
-		# 	commands[one_third_point:two_thirds_point],
-		# 	commands[two_thirds_point:]
-		# ]
+		print(column_lengths)
 
-		# top to bottom, left to right
+		# assemble columns
 		columns = []
+		for column_index in range(len(column_lengths)):
+			column_start_index = sum(column_lengths[:column_index])
+			column_end_index = sum(column_lengths[:column_index + 1])
+			columns.append(commands[column_start_index:column_end_index])
 
-		# function to find the index that is the end of the n-1th column and the start of the nth column
-		def nth_divider(n):
-			return n * len(commands) // column_count
+		# pad elements
+		for i, column in enumerate(columns):
+			column_width = max([ len(element) for element in column ])
+			for j, element in enumerate(column):
+				columns[i][j] = element + ' ' * (column_width - len(element))
 
-		for i in range(column_count):
-			start_index = nth_divider(i)
-			end_index = nth_divider(i + 1)
-			columns.append(commands[start_index:end_index])
+		# assemble rows
+		rows = [ list(row) for row in zip_longest(*columns) ]
 
+		# remove any Nones added by zip_longest from the last row
+		while rows[-1][-1] is None:
+			rows[-1].pop()
 
-		# add empty entries so longer columns don't get their bottom cells chopped off by zip()
-		max_column_length = max([ len(column) for column in columns ])
-		for column in columns:
-			if len(column) < max_column_length:
-				column.append('')
+		from pprint import pprint
+		pprint(rows)
 
-		# pad cell values
-		widths = [ max([ len(command) for command in column ]) for column in columns ]
+		# convert rows to text
+		text = '\n'.join([ '  '.join(row) for row in rows ])
+		text = f'```\n{text}\n```'
 
-		for i, column in enumerate(columns[:-1]):   # don't need to pad the last column; should save us some characters
-			for j in range(len(column)):
-				columns[i][j] = columns[i][j] + ' ' * (widths[i] - len(columns[i][j]))
-
-		# convert to rows
-		rows = list(zip(*columns))
-		rows = [ '  '.join(row) for row in rows ]
-
-		# chunk rows to avoid 2000 character limit
-		character_limit = 2000
-		extra_characters = len('```\n\n```')
-
-		chunks = [ [] ]
-		for row in rows:
-			if sum([ len(row) for row in chunks[-1] ]) + len('\n' * len(chunks[-1])) + extra_characters + len(row) <= character_limit:   # there's still room
-				chunks[-1].append(row)
-			else:
-				chunks.append([row])
-
-		# send chunks
-		for rows in chunks:
-			r = '```\n' + '\n'.join(rows) + '\n```'
-			print(len(r))
-			print(r)
-			await self.client.send_message(message.channel, r)
+		await self.client.send_message(message.channel, text)
 
 	docs_ccomm_search = {
 		'description': 'Searches for a custom command',
 		'usage': 'ccomm_search search_term',
-		'examples' [ 'ccomm_search ttt' ]
+		'examples': [ 'ccomm_search hmmm' ]
 	}
 	async def cmd_ccomm_search(self, message, args, kwargs):
 		return
