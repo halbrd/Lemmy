@@ -2,7 +2,7 @@ from module import Module
 
 from itertools import zip_longest
 import emoji
-import time
+import re
 
 class CustomCommands(Module):
 	docs = {
@@ -11,11 +11,41 @@ class CustomCommands(Module):
 
 	BLACKLISTED_EMOJI = set(emoji.UNICODE_EMOJI)
 
+	ALREADY_EXISTS_MESSAGE = lambda name: f'`{name}` is already a command'
+	DOES_NOT_EXIST_MESSAGE = lambda name: f'`{name}` is not a command'
+	INVALID_NAME_MESSAGE = lambda name: f'`{name}` is an invalid name (must be 20 characters or fewer, no emojis or whitespace)'
+	INVALID_VALUE_MESSAGE = lambda value: f'`{value}` is an invalid value'
+
 	def load_commands(self):
 		self.commands = self.load_data('commands')
 
 	def save_commands(self):
 		self.save_data('commands', self.commands)
+
+	@staticmethod
+	def validate_command_name(name):
+		# length
+		if len(name) > 20:
+			return False
+
+		# no emojis or fun allowed
+		for character in name:
+			if character in CustomCommands.BLACKLISTED_EMOJI:
+				return False
+
+		# no whitespace
+		if re.search(r'\s', name):
+			return False
+
+		return True
+
+	@staticmethod
+	def validate_command_value(value):
+		if len(value) > 2000:
+			# wait, this shouldn't be possible
+			return False
+
+		return True
 
 	@staticmethod
 	def compress_text(text, max_length=50):
@@ -25,47 +55,47 @@ class CustomCommands(Module):
 
 	def create_command(self, name, value):
 		if name in self.commands:
-			raise ValueError(f'`{name}` is already a command')
+			raise ValueError(CustomCommands.ALREADY_EXISTS_MESSAGE(name))
 
 		if not CustomCommands.validate_command_name(name):
 			preview = CustomCommands.compress_text(name)
-			raise ValueError(f'`{preview}` is an invalid name')
+			raise ValueError(CustomCommands.INVALID_NAME_MESSAGE(preview))
 
 		if not CustomCommands.validate_command_value(value):
 			preview = CustomCommands.compress_text(value)
-			raise ValueError(f'`{preview}` is an invalid value')
+			raise ValueError(CustomCommands.INVALID_VALUE_MESSAGE(preview))
 
 		self.commands[name] = value
 		self.save_commands()
 
 	def edit_command(self, name, value):
 		if not name in self.commands:
-			raise ValueError(f'`{name}` is not a command')
+			raise ValueError(CustomCommands.DOES_NOT_EXIST_MESSAGE(name))
 
 		if not CustomCommands.validate_command_value(value):
 			preview = CustomCommands.compress_text(value)
-			raise ValueError(f'`{preview}` is an invalid value')
+			raise ValueError(CustomCommands.INVALID_VALUE_MESSAGE(preview))
 
 		self.commands[name] = value
 		self.save_commands()
 
 	def delete_command(self, name):
 		if not name in self.commands:
-			raise ValueError(f'`{name}` is not a command')
+			raise ValueError(CustomCommands.DOES_NOT_EXIST_MESSAGE(name))
 
 		del self.commands[name]
 		self.save_commands()
 
 	def rename_command(self, old_name, new_name):
 		if not old_name in self.commands:
-			raise ValueError(f'`{old_name}` is not a command')
+			raise ValueError(CustomCommands.DOES_NOT_EXIST_MESSAGE(old_name))
 
 		if new_name in self.commands:
-			raise ValueError(f'`{new_name}` is already a command')
+			raise ValueError(CustomCommands.ALREADY_EXISTS_MESSAGE(new_name))
 
 		if not CustomCommands.validate_command_name(new_name):
 			preview = CustomCommands.compress_text(new_name)
-			raise ValueError(f'`{preview}` is an invalid name')
+			raise ValueError(CustomCommands.INVALID_NAME_MESSAGE(name))
 
 		self.commands[new_name] = self.commands[old_name]
 		del self.commands[old_name]
@@ -98,27 +128,6 @@ class CustomCommands(Module):
 
 				if command in self.commands:
 					await self.client.send_message(message.channel, self.commands[command])
-
-	@staticmethod
-	def validate_command_name(name):
-		# length
-		if len(name) > 20:
-			return False
-
-		# no emojis or fun allowed
-		for character in name:
-			if character in CustomCommands.BLACKLISTED_EMOJI:
-				return False
-
-		return True
-
-	@staticmethod
-	def validate_command_value(value):
-		if len(value) > 2000:
-			# wait, this shouldn't be possible
-			return False
-
-		return True
 
 	@staticmethod
 	def make_table(elements, column_count=6):
