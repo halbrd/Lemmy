@@ -63,13 +63,13 @@ class Core(Module):
 			lines.append(f'`{symbol}help <Module>` or `{symbol}help <command>` for more info')
 
 			text = '\n'.join(lines)
-			if broadcast:
-				await self.client.send_message(message.channel, text)
-			else:
-				if type(message.channel) == discord.channel.PrivateChannel:   # we don't want to add the sent_dm emoji reaction if the user is talking to Lemmy directly
-					await self.client.send_message(message.channel, text)
-				else:
-					await self.send_dm(message, text)
+			# if broadcast:
+			await self.client.send_message(message.channel, text)
+			# else:
+			# 	if type(message.channel) == discord.channel.PrivateChannel:   # we don't want to add the sent_dm emoji reaction if the user is talking to Lemmy directly
+			# 		await self.client.send_message(message.channel, text)
+			# 	else:
+			# 		await self.send_dm(message, text)
 
 		# help text pertaining to a specific topic
 		else:
