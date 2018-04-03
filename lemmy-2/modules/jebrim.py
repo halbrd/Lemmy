@@ -4,22 +4,20 @@ import random
 import re
 
 class Jebrim(Module):
-	json_location = 'data/jebrim/tweets.json'
-
 	docs = {
 		'description': 'Posts random Jebrim quotes'
 	}
 	def __init__(self, client):
 		Module.__init__(self, client)
-		json_data = json.load(open(Jebrim.json_location, 'r'))
-		self.tweet_list = json_data['links']
+
+		self.tweets = self.load_data('tweets')['links']
 
 	docs_add_jebrim = {
 		'description': 'Add a new Jebrim screenshot to the list (Imgur direct links only)',
-		'usage': 'addjebrim link'
+		'usage': 'add_jebrim link'
 	}
 	async def cmd_add_jebrim(self, message, args, kwargs):
-		if args[0] in self.tweet_list:
+		if args[0] in self.tweets:
 			await self.send_error(message)
 			return
 
@@ -27,9 +25,9 @@ class Jebrim(Module):
 			await self.send_error(message)
 			return
 
-		self.tweet_list.append(args[0])
-		json_data = { 'links' : self.tweet_list }
-		json.dump(json_data, open(Jebrim.json_location, 'w'), indent=4)
+		self.tweets.append(args[0])
+		data = { 'links' : self.tweets }
+		self.save_data('tweets', data)
 		await self.send_success(message)
 
 	docs_jebrim = {
