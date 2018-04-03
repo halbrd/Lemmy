@@ -13,6 +13,55 @@ class CustomCommands(Module):
 	def save_commands(self):
 		self.save_data('commands', self.commands)
 
+	@staticmethod
+	def compress_text(text, max_length=50):
+		compressed_text = text.split('\n')[0]
+		suffix = '...' if len(compressed_text) > max_length else ''
+		return compressed_text[:max_length] + suffix
+
+	def create_command(self, name, value):
+		if name in self.commands:
+			raise ValueError(f'`{name}` is already a command')
+
+		if not CustomCommands.validate_command_name(name):
+			raise ValueError(f'`{name}` is an invalid name')
+
+		if not CustomCommands.validate_command_value(value):
+			preview = CustomCommands.compress_text(value)
+			raise ValueError(f'`{preview}` is an invalid value')
+
+		self.commands[name] = value
+		self.save_commands()
+
+	def edit_command(self, name, value):
+		if not name in self.commands:
+			raise ValueError(f'`{name}` is not a command')
+
+		if not CustomCommands.validate_command_value(value):
+			preview = CustomCommands.compress_text(value)
+			raise ValueError(f'`{preview}` is an invalid value')
+
+		self.commands[name] = value
+		self.save_commands()
+
+	def delete_command(self, name):
+		if not name in self.commands:
+			raise ValueError(f'`{name}` is not a command')
+
+		del self.commands[name]
+		self.save_commands()
+
+	def rename_command(self, old_name, new_name):
+		if not old_name in self.commands:
+			raise ValueError(f'`{old_name}` is not a command')
+
+		if new_name in self.commands:
+			raise ValueError(f'`{new_name}` is already a command')
+
+		self.commands[new_name] = self.commands[old_name]
+		del self.commands[old_name]
+		self.save_commands()
+
 	def __init__(self, client):
 		Module.__init__(self, client)
 
@@ -139,21 +188,12 @@ class CustomCommands(Module):
 			await self.send_error(message)
 			return
 
-		if args[0] in self.commands:
-			await self.send_error(message, comment=f'`{args[0]}` is already a command')
-			return
-
-		if not CustomCommands.validate_command_name(args[0]):
-			await self.send_error(message, comment=f'`{args[0]}` is an invalid name')
-			return
-
-		if not CustomCommands.validate_command_value(args[1]):
-			await self.send_error(message, comment=f'`{args[1]}` is an invalid value')
-			return
-
-		self.commands[args[0]] = args[1]
-		self.save_commands()
-		await self.send_success(message)
+		try:
+			self.create_command(args[0], args[1])
+		except ValueError as e:
+			await self.send_error(message, comment=str(e))
+		else:
+			await self.send_success(message)
 
 	docs_ccomm_edit = {
 		'description': 'Edits an existing custom command',
@@ -165,16 +205,15 @@ class CustomCommands(Module):
 			await self.send_error(message)
 			return
 
-		if not args[0] in self.commands:
-			await self.send_error(message, comment=f'`{args[0]}` is not a command')
-			return
-
-		self.commands[args[0]] = args[1]
-		self.save_commands()
-		await self.send_success(message)
+		try:
+			self.edit_command(args[0], args[1])
+		except ValueError as e:
+			await self.send_error(message, comment=str(e))
+		else:
+			await self.send_success(message)
 
 	docs_ccomm_delete = {
-		'description': 'Deletes and existing custom command',
+		'description': 'Deletes an existing custom command',
 		'usage': 'ccomm_delete command_name',
 		'examples': [ 'ccomm_delete lenny' ]
 	}
@@ -183,10 +222,26 @@ class CustomCommands(Module):
 			await self.send_error(message)
 			return
 
-		if not args[0] in self.commands:
-			await self.send_error(message, comment=f'`{args[0]}` is not a command')
+		try:
+			self.delete_command(args[0])
+		except ValueError as e:
+			await self.send_error(message, comment=str(e))
+		else:
+			await self.send_success(message)
+
+	docs_ccomm_rename = {
+		'description': 'Renames an existing custom command',
+		'usage': 'ccomm_rename current_name new_name',
+		'examples': [ 'ccomm_rename kappa grey_face' ]
+	}
+	async def cmd_ccomm_rename(self, message, args, kwargs):
+		if len(args) != 2:
+			await self.send_error(message)
 			return
 
-		del self.commands[args[0]]
-		self.save_commands()
-		await self.send_success(message)
+		try:
+			self.rename_command(args[0], args[1])
+		except ValueError as e:
+			await self.send_error(message, comment=str(e))
+		else:
+			await self.send_success(message)
