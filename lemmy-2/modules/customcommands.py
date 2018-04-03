@@ -1,11 +1,15 @@
 from module import Module
 
 from itertools import zip_longest
+import emoji
+import time
 
 class CustomCommands(Module):
 	docs = {
 		'description': 'Posts custom-defined commands'
 	}
+
+	BLACKLISTED_EMOJI = set(emoji.UNICODE_EMOJI)
 
 	def load_commands(self):
 		self.commands = self.load_data('commands')
@@ -15,8 +19,8 @@ class CustomCommands(Module):
 
 	@staticmethod
 	def compress_text(text, max_length=50):
+		suffix = '...' if len(text) > max_length else ''
 		compressed_text = text.split('\n')[0]
-		suffix = '...' if len(compressed_text) > max_length else ''
 		return compressed_text[:max_length] + suffix
 
 	def create_command(self, name, value):
@@ -24,7 +28,8 @@ class CustomCommands(Module):
 			raise ValueError(f'`{name}` is already a command')
 
 		if not CustomCommands.validate_command_name(name):
-			raise ValueError(f'`{name}` is an invalid name')
+			preview = CustomCommands.compress_text(name)
+			raise ValueError(f'`{preview}` is an invalid name')
 
 		if not CustomCommands.validate_command_value(value):
 			preview = CustomCommands.compress_text(value)
@@ -58,6 +63,10 @@ class CustomCommands(Module):
 		if new_name in self.commands:
 			raise ValueError(f'`{new_name}` is already a command')
 
+		if not CustomCommands.validate_command_name(new_name):
+			preview = CustomCommands.compress_text(new_name)
+			raise ValueError(f'`{preview}` is an invalid name')
+
 		self.commands[new_name] = self.commands[old_name]
 		del self.commands[old_name]
 		self.save_commands()
@@ -89,6 +98,27 @@ class CustomCommands(Module):
 
 				if command in self.commands:
 					await self.client.send_message(message.channel, self.commands[command])
+
+	@staticmethod
+	def validate_command_name(name):
+		# length
+		if len(name) > 20:
+			return False
+
+		# no emojis or fun allowed
+		for character in name:
+			if character in CustomCommands.BLACKLISTED_EMOJI:
+				return False
+
+		return True
+
+	@staticmethod
+	def validate_command_value(value):
+		if len(value) > 2000:
+			# wait, this shouldn't be possible
+			return False
+
+		return True
 
 	@staticmethod
 	def make_table(elements, column_count=6):
@@ -131,6 +161,10 @@ class CustomCommands(Module):
 		'description': 'Lists all custom commands'
 	}
 	async def cmd_ccomm_list(self, message, args, kwargs):
+		if len(self.commands) == 0:
+			await self.client.send_message(message.channel, '```\nNo custom commands.\n```')
+			return
+
 		commands = sorted(self.commands.keys(), key=lambda command: (len(command), command))
 
 		table_chunks = self.lemmy.chunk_text(CustomCommands.make_table(commands), chunk_prefix='```\n', chunk_suffix='\n```')
@@ -139,7 +173,7 @@ class CustomCommands(Module):
 			await self.client.send_message(message.channel, chunk)
 
 	docs_ccomm_search = {
-		'description': 'Searches for a custom command',
+		'description': 'Lists all custom commands that contain a given string',
 		'usage': 'ccomm_search search_term',
 		'examples': [ 'ccomm_search hmmm' ]
 	}
@@ -163,21 +197,6 @@ class CustomCommands(Module):
 		for chunk in table_chunks:
 			await self.client.send_message(message.channel, chunk)
 
-	@staticmethod
-	def validate_command_name(name):
-		# TODO: decide on limitations
-
-		# allow only ASCII characters
-		if not all(ord(char) < 128 for char in name):
-			return False
-
-		return True
-
-	@staticmethod
-	def validate_command_value(value):
-		# TODO: 2000 characters
-		return True
-
 	docs_ccomm_create = {
 		'description': 'Adds a new custom command',
 		'usage': 'ccomm_add command_name contents',
@@ -196,7 +215,7 @@ class CustomCommands(Module):
 			await self.send_success(message)
 
 	docs_ccomm_edit = {
-		'description': 'Edits an existing custom command',
+		'description': 'Edits the value an existing custom command',
 		'usage': 'ccomm_edit command_name new_contents',
 		'examples': [ 'ccomm_edit lenny ( ͡ಠ ʖ̯ ͡ಠ)' ]
 	}
@@ -232,7 +251,7 @@ class CustomCommands(Module):
 	docs_ccomm_rename = {
 		'description': 'Renames an existing custom command',
 		'usage': 'ccomm_rename current_name new_name',
-		'examples': [ 'ccomm_rename kappa grey_face' ]
+		'examples': [ 'ccomm_rename kappa greyface' ]
 	}
 	async def cmd_ccomm_rename(self, message, args, kwargs):
 		if len(args) != 2:
