@@ -34,4 +34,4 @@ class Jebrim(Module):
 		'description': 'Posts a random Jebrim quote'
 	}
 	async def cmd_jebrim(self, message, args, kwargs):
-		await self.client.send_message(message.channel, random.choice(self.tweet_list))
+		await self.client.send_message(message.channel, random.choice(self.tweets))
