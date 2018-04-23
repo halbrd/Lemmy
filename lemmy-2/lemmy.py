@@ -13,7 +13,7 @@ sys.path.append('modules')
 class Lemmy:
 	class NoConfigException(Exception):
 		def __init__(self, message='config.json does not exist (create it from config.example.json)'):
-			super(NoConfigException, self).__init__(message)
+			super().__init__(message)
 
 	def __init__(self, token):
 		# perform setup that should not be performed again (i.e. in a reload)
@@ -136,6 +136,6 @@ class Lemmy:
 
 if __name__ == '__main__':
 	if not os.path.isfile('config.json'):
-		raise NoConfigException
+		raise Lemmy.NoConfigException
 
 	lemmy = Lemmy(json.load(open('config.json', 'r'))['token'])
