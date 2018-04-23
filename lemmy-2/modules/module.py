@@ -89,6 +89,8 @@ class Module:
 						await self.send_not_allowed(message, e.message)
 					except Module.CommandDM as e:
 						await self.send_dm(message, e.direct_message, e.public_message)
+					except Exception as e:
+						await self.send_error(message, comment=str(e))
 
 	@staticmethod
 	def deconstruct_message(message):
