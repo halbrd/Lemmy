@@ -1,4 +1,7 @@
+import sys
+sys.path.append('..')
 from module import Module
+
 import json
 import random
 import re
