@@ -1,3 +1,5 @@
+import sys
+sys.path.append('..')
 from module import Module
 
 class Example(Module):

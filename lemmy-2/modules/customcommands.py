@@ -1,3 +1,5 @@
+import sys
+sys.path.append('..')
 from module import Module
 
 from itertools import zip_longest
