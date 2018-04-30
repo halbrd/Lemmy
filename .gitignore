@@ -2,6 +2,9 @@
 credentials.txt
 .DS_Store
 
+# 'normal' log location
+log.txt
+
 
 
 # Byte-compiled / optimized / DLL files
