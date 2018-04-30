@@ -1,4 +1,7 @@
+import sys
+sys.path.append('..')
 from module import Module
+
 import googletrans
 
 class Translate(Module):
