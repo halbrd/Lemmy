@@ -1,8 +1,9 @@
 {
 	"core": "Core",
 	"lenny": "Lenny",
-	"tests": "Tests",
 	"translate": "Translate",
 	"jebrim": "Jebrim",
-	"customcommands": "CustomCommands"
+	"customcommands": "CustomCommands",
+	"oldlemmyhelp": "OldLemmyHelp",
+	"musicbothelp": "MusicBotHelp"
 }
