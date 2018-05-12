@@ -183,7 +183,7 @@ class CustomCommands(Module):
 
 	docs_ccomm_search = {
 		'description': 'Lists all custom commands that contain a given string',
-		'usage': 'ccomm_search search_term',
+		'usage': 'ccomm_search <search term>',
 		'examples': [ 'ccomm_search hmmm' ]
 	}
 	async def cmd_ccomm_search(self, message, args, kwargs):
@@ -208,7 +208,7 @@ class CustomCommands(Module):
 
 	docs_ccomm_create = {
 		'description': 'Adds a new custom command',
-		'usage': 'ccomm_add command_name contents',
+		'usage': 'ccomm_add <command name> <contents>',
 		'examples': [ 'ccomm_add lenny ( ͡° ͜ʖ ͡°)' ]
 	}
 	async def cmd_ccomm_create(self, message, args, kwargs):
@@ -225,7 +225,7 @@ class CustomCommands(Module):
 
 	docs_ccomm_edit = {
 		'description': 'Edits the value an existing custom command',
-		'usage': 'ccomm_edit command_name new_contents',
+		'usage': 'ccomm_edit <command name> <new contents>',
 		'examples': [ 'ccomm_edit lenny ( ͡ಠ ʖ̯ ͡ಠ)' ]
 	}
 	async def cmd_ccomm_edit(self, message, args, kwargs):
@@ -242,7 +242,7 @@ class CustomCommands(Module):
 
 	docs_ccomm_delete = {
 		'description': 'Deletes an existing custom command',
-		'usage': 'ccomm_delete command_name',
+		'usage': 'ccomm_delete <command name>',
 		'examples': [ 'ccomm_delete lenny' ]
 	}
 	async def cmd_ccomm_delete(self, message, args, kwargs):
@@ -259,7 +259,7 @@ class CustomCommands(Module):
 
 	docs_ccomm_rename = {
 		'description': 'Renames an existing custom command',
-		'usage': 'ccomm_rename current_name new_name',
+		'usage': 'ccomm_rename <current name> <new name>',
 		'examples': [ 'ccomm_rename kappa greyface' ]
 	}
 	async def cmd_ccomm_rename(self, message, args, kwargs):
