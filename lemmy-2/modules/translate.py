@@ -1,4 +1,7 @@
+import sys
+sys.path.append('..')
 from module import Module
+
 import googletrans
 
 class Translate(Module):
@@ -8,7 +11,7 @@ class Translate(Module):
 
 	docs_translate = {
 		'description': 'Translates text between languages',
-		'usage': 'translate <source=language> <destination=language> phrase',
+		'usage': 'translate <source=language> <destination=language> <phrase>',
 		'examples': [ 'translate Kartoffel', 'translate source=de pommes', 'translate destination=korean bong bong' ]
 	}
 	async def cmd_translate(self, message, args, kwargs):

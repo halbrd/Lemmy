@@ -1,7 +1,10 @@
 {
 	"core": "Core",
 	"lenny": "Lenny",
-	"tests": "Tests",
 	"translate": "Translate",
-	"jebrim": "Jebrim"
+	"jebrim": "Jebrim",
+	"customcommands": "CustomCommands",
+	"oldlemmyhelp": "OldLemmyHelp",
+	"musicbothelp": "MusicBotHelp",
+	"memes": "Memes"
 }

@@ -6,14 +6,14 @@ import os.path
 import json
 import importlib
 import sys
+import re
 
 sys.path.append('modules')
 
 class Lemmy:
 	class NoConfigException(Exception):
 		def __init__(self, message='config.json does not exist (create it from config.example.json)'):
-			super(NoConfigException, self).__init__(message)
-
+			super().__init__(message)
 
 	def __init__(self, token):
 		# perform setup that should not be performed again (i.e. in a reload)
@@ -111,10 +111,31 @@ class Lemmy:
 		except AttributeError:
 			return default_symbol
 
+	def chunk_text(self, text, chunk_length=2000, chunk_prefix='', chunk_suffix=''):
+		rows = text.splitlines()
+
+		# for the time being, we're only going to break on linebreaks
+		if max([ len(row) for row in rows ]) + len(chunk_prefix) + len(chunk_suffix) > chunk_length:
+			raise ValueError('one or more rows exceed 2000 characters (with prefix and suffix)')
+
+		chunks = []
+		while rows:
+			if chunks and len(chunk_prefix + chunks[-1] + '\n' + rows[0] + chunk_suffix) <= chunk_length:
+				chunks[-1] += '\n' + rows[0]
+			else:
+				chunks.append(rows[0])
+			del rows[0]
+
+		# append prefixes and suffixes
+		for i in range(len(chunks)):
+			chunks[i] = chunk_prefix + chunks[i] + chunk_suffix
+
+		return chunks
+
 
 
 if __name__ == '__main__':
 	if not os.path.isfile('config.json'):
-		raise NoConfigException
+		raise Lemmy.NoConfigException
 
 	lemmy = Lemmy(json.load(open('config.json', 'r'))['token'])

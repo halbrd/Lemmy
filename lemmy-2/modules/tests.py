@@ -1,3 +1,5 @@
+import sys
+sys.path.append('..')
 from module import Module
 
 import discord
@@ -25,7 +27,7 @@ class Tests(Module):
 
 	docs_send_dm = {
 		'description': 'Sends a direct message',
-		'usage': 'send_dm direct_message <public_message>',
+		'usage': 'send_dm <direct message> <public message>',
 		'examples': [ 'send_error \'This message only goes to the recipient!\'', 'send_error \'This message goes to the command caller\' \'This message goes to the channel\'' ]
 	}
 	async def cmd_send_dm(self, message, args, kwargs):
@@ -35,12 +37,6 @@ class Tests(Module):
 			raise Module.CommandDM(args[0])
 		else:
 			raise Module.CommandDM(args[0], args[1])
-
-	docs_channel_type = {
-		'description': 'Returns the type of the active channel'
-	}
-	async def cmd_channel_type(self, message, args, kwargs):
-		await self.client.send_message(message.channel, type(message.channel))
 
 	docs_dump_args = {
 		'description': 'Returns the args and kwargs parsed from the message',

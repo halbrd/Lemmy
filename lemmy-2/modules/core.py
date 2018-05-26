@@ -1,4 +1,7 @@
+import sys
+sys.path.append('..')
 from module import Module
+
 import discord
 
 class Core(Module):
@@ -40,11 +43,10 @@ class Core(Module):
 		# general help text
 		if len(args) == 0:
 			# get our module manifest
-			manifest = { module_name: [ command_name for command_name, command in module.commands.items() ] for module_name, module in self.lemmy.modules.items() }
+			manifest = { module_name: [ command_name for command_name, command in module._commands.items() ] for module_name, module in self.lemmy.modules.items() }
 
 			# construct message initially as a list of lines, for convenience
 			lines = []
-			lines.append('```diff')
 
 			'''
 			Before we start getting any help text, we need to consider what the symbol should be.
@@ -59,17 +61,18 @@ class Core(Module):
 			for module_name in manifest.keys():
 				lines.append(self.lemmy.modules[module_name].get_help_text(symbol=symbol))
 
-			lines.append('```')
-			lines.append(f'`{symbol}help <Module>` or `{symbol}help <command>` for more info')
-
 			text = '\n'.join(lines)
-			if broadcast:
-				await self.client.send_message(message.channel, text)
+
+			chunks = self.lemmy.chunk_text(text, chunk_prefix='```diff\n', chunk_suffix='```')
+
+			footer_message = f'`{symbol}help <Module>` or `{symbol}help <command>` for more info'
+			if len(chunks[-1] + '\n' + footer_message) <= 2000:
+				chunks[-1] += '\n' + footer_message
 			else:
-				if type(message.channel) == discord.channel.PrivateChannel:   # we don't want to add the sent_dm emoji reaction if the user is talking to Lemmy directly
-					await self.client.send_message(message.channel, text)
-				else:
-					await self.send_dm(message, text)
+				chunks.append(footer_message)
+
+			for chunk in chunks:
+				await self.client.send_message(message.channel, chunk)
 
 		# help text pertaining to a specific topic
 		else:
@@ -82,7 +85,7 @@ class Core(Module):
 
 			# check if user is asking about a command
 			for module_name, module in self.lemmy.modules.items():
-				if topic in module.commands.keys():
+				if topic in module._commands.keys():
 					help_texts.append(self.lemmy.modules[module_name].get_help_text(topic, symbol=symbol))
 
 			if not help_texts:
