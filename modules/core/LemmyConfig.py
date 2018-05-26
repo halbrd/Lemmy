@@ -63,7 +63,7 @@ class LemmyConfig:
 			},
 			"ruseman": {
 				"function": Lcmds.ruseman,
-				"enabled": True,
+				"enabled": False,
 				"moderator": False,
 				"description": "Get a random expression of rusedness"
 			},
@@ -117,7 +117,7 @@ class LemmyConfig:
 			},
 			"ccomm": {
 				"function": Lcmds.ccomm,
-				"enabled": True,
+				"enabled": False,
 				"moderator": False,
 				"description": "Manage custom commands"
 			},
@@ -129,7 +129,7 @@ class LemmyConfig:
 			},
 			"genjimain": {
 				"function": Lcmds.genjimain,
-				"enabled": True,
+				"enabled": False,
 				"moderator": False,
 				"description": "Get an insight into the lives of Genji players"
 			},
