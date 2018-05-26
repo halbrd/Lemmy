@@ -28,7 +28,7 @@ class LemmyBot:
 		self.callLogger = None
 		self.config = Lconf.LemmyConfig()
 		self.clientId = Lutils.GetConfigAttribute("global", "clientId")
-		self.customCommands = Lutils.GetConfig("customcommands")
+		self.customCommands = [] # Lutils.GetConfig("customcommands")   # <-- quick and dirty disable of custom commands
 
 		self.client = discord.Client()
 
