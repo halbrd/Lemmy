@@ -29,20 +29,6 @@ class OldLemmyHelp(Module):
 	async def cmd_refresh(self, message, args, kwargs):
 		pass
 
-	docs_fusion = {
-		'description': 'Fuses Pokemon together',
-		'usage': 'fusion <first Pokemon> <second Pokemon>',
-		'examples': [ 'fusion shellder voltorb' ]
-	}
-	async def cmd_fusion(self, message, args, kwargs):
-		pass
-
-	docs_genjimain = {
-		'description': 'Gives an insight into the lives of Genji mains'
-	}
-	async def cmd_genjimain(self, message, args, kwargs):
-		pass
-
 	docs_gifr = {
 		'description': 'Returns a random gif according to provided search terms',
 		'usage': 'gifr <search term>'
@@ -76,12 +62,6 @@ class OldLemmyHelp(Module):
 		'admin_only': True
 	}
 	async def cmd_restart(self, message, args, kwargs):
-		pass
-
-	docs_ruseman = {
-		'description': 'Returns a random expression of rusedness'
-	}
-	async def cmd_ruseman(self, message, args, kwargs):
 		pass
 
 	docs_serverinfo = {
