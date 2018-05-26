@@ -21,7 +21,7 @@ class LemmyConfig:
 		self.command = {
 			"help": {
 				"function": Lcmds.help,
-				"enabled": True,
+				"enabled": False,
 				"moderator": False,
 				"description": "...Wait, this seems self-referential..."
 			},
