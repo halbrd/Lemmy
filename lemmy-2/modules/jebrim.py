@@ -20,6 +20,10 @@ class Jebrim(Module):
 		'usage': 'jebrim_add <link>'
 	}
 	async def cmd_jebrim_add(self, message, args, kwargs):
+		if len(args) != 1:
+			await self.send_error(message)
+			return
+
 		if args[0] in self.tweets:
 			await self.send_error(message, comment='link already exists in database')
 			return
