@@ -211,7 +211,7 @@ class CustomCommands(Module):
 	docs_ccomm_create = {
 		'description': 'Adds a new custom command',
 		'usage': 'ccomm_create <command name> <contents>',
-		'examples': [ 'ccomm_create lenny ( ͡° ͜ʖ ͡°)' ]
+		'examples': [ 'ccomm_create jeffs https://i.imgur.com/biWAU5b.jpg', 'ccomm_create shards "Shards are the secret ingredient in the web scale sauce."' ]
 	}
 	async def cmd_ccomm_create(self, message, args, kwargs):
 		if len(args) != 2:
@@ -228,7 +228,7 @@ class CustomCommands(Module):
 	docs_ccomm_edit = {
 		'description': 'Edits the value an existing custom command',
 		'usage': 'ccomm_edit <command name> <new contents>',
-		'examples': [ 'ccomm_edit lenny ( ͡ಠ ʖ̯ ͡ಠ)' ]
+		'examples': [ 'ccomm_edit terrific http://i.imgur.com/tbdwRyb.gifv' ]
 	}
 	async def cmd_ccomm_edit(self, message, args, kwargs):
 		if len(args) != 2:
