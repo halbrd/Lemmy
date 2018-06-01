@@ -7,6 +7,7 @@ import json
 import importlib
 import sys
 import re
+from itertools import zip_longest
 
 sys.path.append('modules')
 
@@ -131,6 +132,43 @@ class Lemmy:
 			chunks[i] = chunk_prefix + chunks[i] + chunk_suffix
 
 		return chunks
+
+	@staticmethod
+	def make_table(elements, column_count=6):
+		# if there are fewer elements to display than column_count, we need to reduce column_count to match
+		if len(elements) < column_count:
+			column_count = len(elements)
+
+		# determine how many elements are in each column
+		column_base_length = len(elements) // column_count
+		column_extra_count = len(elements) % column_count
+		column_lengths = [ column_base_length for _ in range(column_count) ]
+		# add the extras to the end of the relevant columns
+		for i in range(column_extra_count):
+			column_lengths[i] += 1
+
+		# assemble columns
+		columns = []
+		for column_index in range(len(column_lengths)):
+			column_start_index = sum(column_lengths[:column_index])
+			column_end_index = sum(column_lengths[:column_index + 1])
+			columns.append(elements[column_start_index:column_end_index])
+
+		# pad elements
+		for i, column in enumerate(columns[:-1]):
+			column_width = max([ len(element) for element in column ])
+			for j, element in enumerate(column):
+				columns[i][j] = element + ' ' * (column_width - len(element))
+
+		# assemble rows
+		rows = [ list(row) for row in zip_longest(*columns) ]
+
+		# remove any Nones added by zip_longest from the last row
+		while rows[-1][-1] is None:
+			rows[-1].pop()
+
+		# convert rows to text
+		return '\n'.join([ '  '.join(row) for row in rows ])
 
 
 
