@@ -210,8 +210,8 @@ class CustomCommands(Module):
 
 	docs_ccomm_create = {
 		'description': 'Adds a new custom command',
-		'usage': 'ccomm_add <command name> <contents>',
-		'examples': [ 'ccomm_add lenny ( ͡° ͜ʖ ͡°)' ]
+		'usage': 'ccomm_create <command name> <contents>',
+		'examples': [ 'ccomm_create lenny ( ͡° ͜ʖ ͡°)' ]
 	}
 	async def cmd_ccomm_create(self, message, args, kwargs):
 		if len(args) != 2:
