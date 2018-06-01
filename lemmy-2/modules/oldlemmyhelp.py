@@ -8,13 +8,6 @@ class OldLemmyHelp(Module):
 		'description': 'Provides help documentation for Old Lemmy commands'
 	}
 
-	docs_8ball = {
-		'description': 'Provides a certified correct answer to your question',
-		'usage': '8ball <question>'
-	}
-	async def cmd_8ball(self, message, args, kwargs):
-		pass
-
 	docs_choose = {
 		'description': 'Chooses between the given options',
 		'usage': 'choose <option> or <option> or ...',
