@@ -51,7 +51,7 @@ class LemmyConfig:
 			},
 			"8ball": {
 				"function": Lcmds.eightball,
-				"enabled": True,
+				"enabled": False,
 				"moderator": False,
 				"description": "Get a certified correct answer to your question"
 			},
