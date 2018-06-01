@@ -76,7 +76,7 @@ class Core(Module):
 
 		# help text pertaining to a specific topic
 		else:
-			topic = args[0]
+			topic = args[0].replace('-', '_')
 			help_texts = []
 
 			# check if user is asking about a module
