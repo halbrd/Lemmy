@@ -161,7 +161,7 @@ class Module:
 			# examples
 			examples = self.get_docs_attr(command, 'examples')
 			if examples:
-				lines.append('Examples: ' + ('\n  ' if len(examples) > 1 else '') + '\n  '.join(f'`{symbol}{example}`' for example in examples))
+				lines.append('Examples:\n  ' + '\n  '.join(f'`{symbol}{example}`' for example in examples))
 
 		# asking about the module generally
 		# the resultant text should be wrapped in a diff code block by whatever calls for it
