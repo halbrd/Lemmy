@@ -86,11 +86,11 @@ class Lemmy:
 		self.modules = {}
 		manifest = json.load(open('modules/manifest.json', 'r'))
 
-		for module_name, class_name in manifest.items():
-			module = importlib.import_module(module_name)
+		for module_class_name in manifest['modules']:
+			module = importlib.import_module(module_class_name.lower())
 			importlib.reload(module)   # changes to the module will be loaded (for if this was called again while the bot is running)
-			class_ = getattr(module, class_name)
-			self.modules[class_name] = class_(self)
+			class_ = getattr(module, module_class_name)
+			self.modules[module_class_name] = class_(self)
 
 	async def load_playing_message(self):
 		await self.client.change_presence(game=discord.Game(name=self.get_config_key_or_default('playing_message')))
