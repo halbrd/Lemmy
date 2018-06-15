@@ -9,6 +9,7 @@ import sys
 import re
 from itertools import zip_longest
 import logging
+import signal
 
 sys.path.append('modules')
 
@@ -51,6 +52,14 @@ class Lemmy:
 
 		# run the bot
 		loop = asyncio.get_event_loop()
+
+		# enable the bot to respond to SIGINT/SIGTERM (Unix only)
+		try:
+			loop.add_signal_handler(signal.SIGINT, lambda: asyncio.ensure_future(self.handle_sigint()))
+			loop.add_signal_handler(signal.SIGTERM, lambda: asyncio.ensure_future(self.handle_sigterm()))
+		except NotImplementedError:
+			pass   # Lemmy is running in Windows - nothing we can do
+
 		try:
 			loop.run_until_complete(self.client.start(token))
 		except KeyboardInterrupt:
@@ -101,6 +110,10 @@ class Lemmy:
 
 		if self.config['log_file']:
 			self.logger.addHandler(logging.FileHandler(self.config['log_file']))
+
+	async def shutdown(self):
+		self.log('Shutting down...')
+		await self.client.logout()
 
 	def get_config_key_or_default(self, *path, default=None):
 		node = self.config
@@ -176,6 +189,14 @@ class Lemmy:
 
 		# convert rows to text
 		return '\n'.join([ '  '.join(row) for row in rows ])
+
+	async def handle_sigint(self):
+		self.log('Received SIGINT.')
+		await self.shutdown()
+
+	async def handle_sigterm(self):
+		self.log('Received SIGTERM.')
+		await self.shutdown()
 
 
 
