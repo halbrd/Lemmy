@@ -49,9 +49,10 @@ class Module:
 		if public_message:
 			await self.client.send_message(message.channel, public_message)
 
-	def __init__(self, lemmy):
+	def __init__(self, lemmy, enabled=True):
 		self.lemmy = lemmy
 		self.client = lemmy.client   # this line is arguably bad taste code, but the name binding removes a *lot* of typing
+		self.enabled = enabled
 
 		self._commands = { function[4:]: getattr(self, function) for function in dir(self) if function.startswith('cmd_') }
 
@@ -170,14 +171,16 @@ class Module:
 			name = type(self).__name__
 			module_description = self.get_module_docs_attr('description')
 			module_description = f' - {module_description}' if module_description else ''
-			lines.append(f'+ {name}{module_description}')
-			# commands
-			for command_name in self._commands.keys():
-				# we want to append the command description if available
-				command_description = self.get_docs_attr(command_name, 'description')
-				command_description = ' - ' + command_description if command_description else ''
-				lock_or_spaces = '🔒' if self.get_docs_attr(command_name, 'admin_only', default=False) else '  '
-				lines.append(f' {lock_or_spaces} {symbol}{command_name}{command_description}')
+			lines.append(f'{"+" if self.enabled else "-"} {name}{module_description}{"" if self.enabled else " [Disabled]"}')
+
+			# commands - only include if module is enabled
+			if self.enabled:
+				for command_name in self._commands.keys():
+					# we want to append the command description if available
+					command_description = self.get_docs_attr(command_name, 'description')
+					command_description = ' - ' + command_description if command_description else ''
+					lock_or_spaces = '🔒' if self.get_docs_attr(command_name, 'admin_only', default=False) else '  '
+					lines.append(f' {lock_or_spaces} {symbol}{command_name}{command_description}')
 
 		# filter Nones out and put the rest into a list
 		lines = list(filter(lambda line: line is not None, lines))

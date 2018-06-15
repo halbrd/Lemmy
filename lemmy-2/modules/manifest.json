@@ -1,3 +1,26 @@
 {
-	"modules": [ "Core", "Lenny", "Translate", "Jebrim", "CustomCommands", "OldLemmyHelp", "MusicBotHelp", "Memes" ]
+	"Core": {
+		"enabled": true
+	},
+	"Lenny": {
+		"enabled": true
+	},
+	"Translate": {
+		"enabled": true
+	},
+	"Jebrim": {
+		"enabled": true
+	},
+	"CustomCommands": {
+		"enabled": true
+	},
+	"OldLemmyHelp": {
+		"enabled": true
+	},
+	"MusicBotHelp": {
+		"enabled": false
+	},
+	"Memes": {
+		"enabled": true
+	}
 }

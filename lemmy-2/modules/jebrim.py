@@ -10,8 +10,8 @@ class Jebrim(Module):
 	docs = {
 		'description': 'Posts random Jebrim quotes'
 	}
-	def __init__(self, client):
-		Module.__init__(self, client)
+	def __init__(self, client, enabled=True):
+		Module.__init__(self, client, enabled)
 
 		self.tweets = self.load_data('tweets')['links']
 

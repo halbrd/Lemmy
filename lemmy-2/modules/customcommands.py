@@ -102,8 +102,8 @@ class CustomCommands(Module):
 		del self.commands[old_name]
 		self.save_commands()
 
-	def __init__(self, client):
-		Module.__init__(self, client)
+	def __init__(self, client, enabled=True):
+		Module.__init__(self, client, enabled)
 
 		self.load_commands()
 
