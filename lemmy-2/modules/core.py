@@ -14,9 +14,8 @@ class Core(Module):
 		'admin_only': True
 	}
 	async def cmd_shutdown(self, message, args, kwargs):
-		self.lemmy.log('Shutting down...')
 		await self.send_success(message)
-		await self.client.logout()
+		await self.lemmy.shutdown()
 
 	docs_reload = {
 		'description': 'Reloads modules from disk',
