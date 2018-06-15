@@ -8,6 +8,7 @@ import importlib
 import sys
 import re
 from itertools import zip_longest
+import logging
 
 sys.path.append('modules')
 
@@ -63,22 +64,19 @@ class Lemmy:
 	def log(self, message):
 		output = '[{}] {}'.format(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), message)
 
-		print(output)
-
-		if self.config['log_file']:
-			with open(self.config['log_file'], 'a', encoding='utf8') as f:
-				f.write(output + '\n')
+		self.logger.info(output)
 
 	def load_all_sync(self):
 		self.load_config()
 		self.load_modules()
+		self.setup_logging()
 
 	async def load_all_async(self):
 		await self.load_playing_message()
 
 	def load_config(self):
 		if not os.path.isfile('config.json'):
-			raise NoConfigException
+			raise Lemmy.NoConfigException
 
 		self.config = json.load(open('config.json', 'r'))
 
@@ -94,6 +92,15 @@ class Lemmy:
 
 	async def load_playing_message(self):
 		await self.client.change_presence(game=discord.Game(name=self.get_config_key_or_default('playing_message')))
+
+	def setup_logging(self):
+		logging.basicConfig(format='%(message)s', level=logging.WARNING)
+
+		self.logger = logging.getLogger('lemmy')
+		self.logger.setLevel(logging.INFO)
+
+		if self.config['log_file']:
+			self.logger.addHandler(logging.FileHandler(self.config['log_file']))
 
 	def get_config_key_or_default(self, *path, default=None):
 		node = self.config
