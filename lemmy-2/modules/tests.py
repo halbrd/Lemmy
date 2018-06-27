@@ -94,3 +94,43 @@ class Tests(Module):
 
 	async def cmd_print_raw(self, message, args, kwargs):
 		await self.client.send_message(message.channel, '```\n' + message.content + '\n```')
+
+	async def cmd_james_matrix(self, message, args, kwargs):
+		game_role_names = { 'r6', 'halo', 'humanfallflat', 'overwatch', 'hots', 'contagion', 'civ', 'spyfall', 'killingfloor', 'payday', 'warframe', 'masseffect', 'fortnite', 'ttt', 'showdown', 'starbound', 'arena', 'lol', 'tabletop', 'pubg', 'diablo', 'divinity', 'starcraft', 'csgo', 'minecraft', 'gtav' }
+		game_roles = [ role for role in message.channel.server.roles if role.name in game_role_names ]
+
+		game_role_members = sorted(list(filter(lambda member: len(list(set(game_roles) & set(member.roles))) > 0, message.channel.server.members)), key=lambda member: len(member.roles), reverse=True)[:20]
+
+		matrix = {
+			member.name: {
+				role.name: role in member.roles
+				for role in game_roles
+			}
+			for member in game_role_members
+		}
+
+		output = ''
+
+		for i in range(6):
+			output += (' ' * 7) + '|'
+			for role in game_roles:
+				if len(role.name) > i:
+					output += role.name[i]
+				else:
+					output += ' '
+				output += '|'
+			output += '\n'
+
+		for member, memberships in matrix.items():
+			output += f'{member[:6]} '
+			if len(member) < 6:
+				output += ' ' * (6 - len(member))
+			output += '|'
+			for role, is_member in memberships.items():
+				output += '*' if is_member else ' '
+				output += '|'
+			output += '\n'
+
+		await self.client.send_message(message.channel, f'Game roles: `{list(map(lambda role: str(role), game_roles))}`')
+		await self.client.send_message(message.channel, f'Members in game roles: `{list(map(lambda member: member.name, game_role_members))}`')
+		await self.client.send_message(message.channel, f'Matrix: \n```\n{output}\n```')
