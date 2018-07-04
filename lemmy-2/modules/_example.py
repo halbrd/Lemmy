@@ -38,4 +38,4 @@ class Example(Module):
 		else:
 			raise Module.CommandError
 
-# remember to add your module to manifest.json
+# remember to add your module to config.json

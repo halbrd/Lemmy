@@ -91,9 +91,8 @@ class Lemmy:
 
 	def load_modules(self):
 		self.modules = {}
-		manifest = json.load(open('modules/manifest.json', 'r'))
 
-		for module_class_name in manifest['modules']:
+		for module_class_name in self.config['default_manifest']:
 			module = importlib.import_module(module_class_name.lower())
 			importlib.reload(module)   # changes to the module will be loaded (for if this was called again while the bot is running)
 			class_ = getattr(module, module_class_name)
