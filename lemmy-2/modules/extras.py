@@ -6,7 +6,7 @@ import random
 
 class Extras(Module):
 	docs = {
-		'description': ''
+		'description': 'Provides non-essential functions'
 	}
 
 	docs_8ball = {
