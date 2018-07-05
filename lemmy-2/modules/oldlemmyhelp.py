@@ -8,14 +8,6 @@ class OldLemmyHelp(Module):
 		'description': 'Provides help documentation for Old Lemmy commands'
 	}
 
-	docs_choose = {
-		'description': 'Chooses between the given options',
-		'usage': 'choose <option> or <option> or ...',
-		'examples': [ 'choose go left or go right or stay still' ]
-	}
-	async def cmd_choose(self, message, args, kwargs):
-		pass
-
 	docs_refresh = {
 		'description': 'Checks for new emotes and stickers'
 	}
