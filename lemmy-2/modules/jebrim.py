@@ -5,6 +5,7 @@ from module import Module
 import json
 import random
 import re
+import requests
 
 class Jebrim(Module):
 	docs = {
@@ -42,3 +43,12 @@ class Jebrim(Module):
 	}
 	async def cmd_jebrim(self, message, args, kwargs):
 		await self.client.send_message(message.channel, random.choice(self.tweets))
+
+	docs_is_jebrim_suspended = {
+		'description': 'Checks if Jebrim is suspended on Twitter'
+	}
+	async def cmd_is_jebrim_suspended(self, message, args, kwargs):
+		if 'This account has been suspended' in requests.get('https://twitter.com/jebrim').text:
+			await self.client.send_message(message.channel, 'Yes, Jebrim is suspended from Twitter.')
+		else:
+			await self.client.send_message(message.channel, 'No, Jebrim is not suspended from Twitter! :tada:')
