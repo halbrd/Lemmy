@@ -185,8 +185,9 @@ class Module:
 		# convert to string and return
 		return '\n'.join(lines)
 
-	def _load(self, file_location, default='{}', bytes=False):
-		full_path = f'data/{self.__class__.__name__}/{file_location}'
+	def _load(self, file_location, default='{}', static=False, bytes=False):
+		storage_type = 'static' if static else 'data'
+		full_path = f'{storage_type}/{self.__class__.__name__}/{file_location}'
 		directory = '/'.join(full_path.split('/')[:-1])
 
 		# check that directory exists
@@ -202,8 +203,9 @@ class Module:
 		with open(full_path, 'rb' if bytes else 'r') as f:
 			return f.read()
 
-	def _save(self, file_location, content, bytes=False):
-		full_path = f'data/{self.__class__.__name__}/{file_location}'
+	def _save(self, file_location, content, static=False, bytes=False):
+		storage_type = 'static' if static else 'data'
+		full_path = f'{storage_type}/{self.__class__.__name__}/{file_location}'
 		directory = '/'.join(full_path.split('/')[:-1])
 
 		# check that directory exists
@@ -216,8 +218,8 @@ class Module:
 		with open(full_path, 'wb' if bytes else 'w') as f:
 			f.write(content)
 
-	def load_data(self, document_name):
-		return json.loads(self._load(f'{document_name}.json'))
+	def load_data(self, document_name, static=False):
+		return json.loads(self._load(f'{document_name}.json', static=static))
 
-	def save_data(self, document_name, data):
-		self._save(f'{document_name}.json', json.dumps(data, indent='\t'))
+	def save_data(self, document_name, data, static=False):
+		self._save(f'{document_name}.json', json.dumps(data, indent='\t'), static=static)
