@@ -14,7 +14,7 @@ class Jebrim(Module):
 	def __init__(self, client):
 		Module.__init__(self, client)
 
-		self.tweets = self.load_data('tweets')['links']
+		self.tweets = self.load_data('tweets', static=True)['links']
 
 	docs_jebrim_add = {
 		'description': 'Adds a new Jebrim screenshot to the list',
@@ -35,7 +35,7 @@ class Jebrim(Module):
 
 		self.tweets.append(args[0])
 		data = { 'links' : self.tweets }
-		self.save_data('tweets', data)
+		self.save_data('tweets', data, static=True)
 		await self.send_success(message)
 
 	docs_jebrim = {
