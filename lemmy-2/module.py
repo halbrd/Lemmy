@@ -185,23 +185,39 @@ class Module:
 		# convert to string and return
 		return '\n'.join(lines)
 
-	def load_data(self, document_name):
-		target_directory = f'data/{self.__class__.__name__}/'
-		target_file = target_directory + f'{document_name}.json'
+	def _load(self, file_location, default='{}', bytes=False):
+		full_path = f'data/{self.__class__.__name__}/{file_location}'
+		directory = '/'.join(full_path.split('/')[:-1])
 
 		# check that directory exists
-		if not os.path.isdir(target_directory):
-			os.makedirs(target_directory)
+		if not os.path.isdir(directory):
+			os.makedirs(directory)
 
 		# check that file exists
-		if not os.path.isfile(target_file):
-			with open(target_file, 'w') as f:
-				f.write('{}')
+		if not os.path.isfile(full_path):
+			with open(full_path, 'w') as f:
+				f.write(default)
 
 		# get data
-		with open(target_file, 'r') as f:
-			return json.load(f)
+		with open(full_path, 'rb' if bytes else 'r') as f:
+			return f.read()
+
+	def _save(self, file_location, content, bytes=False):
+		full_path = f'data/{self.__class__.__name__}/{file_location}'
+		directory = '/'.join(full_path.split('/')[:-1])
+
+		# check that directory exists
+		if not os.path.isdir(directory):
+			os.makedirs(directory)
+
+		# no need to check that file exists
+
+		# save data
+		with open(full_path, 'wb' if bytes else 'w') as f:
+			f.write(content)
+
+	def load_data(self, document_name):
+		return json.loads(self._load(f'{document_name}.json'))
 
 	def save_data(self, document_name, data):
-		with open(f'data/{self.__class__.__name__}/{document_name}.json', 'w') as f:
-			json.dump(data, f, indent='\t')
+		self._save(f'{document_name}.json', json.dumps(data, indent='\t'))
