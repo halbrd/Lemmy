@@ -94,3 +94,12 @@ class Tests(Module):
 
 	async def cmd_print_raw(self, message, args, kwargs):
 		await self.client.send_message(message.channel, '```\n' + message.content + '\n```')
+
+	async def cmd_load_data(self, message, args, kwargs):
+		await self.client.send_message(message.channel, self.load_data('data'))
+	async def cmd_save_data(self, message, args, kwargs):
+		self.save_data('data', args[0])
+	async def cmd_load_static(self, message, args, kwargs):
+		await self.client.send_message(message.channel, self.load_data('data', static=True))
+	async def cmd_save_static(self, message, args, kwargs):
+		self.save_data('data', args[0], static=True)
