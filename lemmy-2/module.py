@@ -49,6 +49,10 @@ class Module:
 		if public_message:
 			await self.client.send_message(message.channel, public_message)
 
+	async def send_internal_error(self, message):
+		await self.client.add_reaction(message, '⚠')
+		await self.client.send_message(message.channel, '```diff\n- An internal error occurred (this isn\'t your fault) \n```')
+
 	def __init__(self, lemmy):
 		self.lemmy = lemmy
 		self.client = lemmy.client   # this line is arguably bad taste code, but the name binding removes a *lot* of typing
@@ -89,6 +93,8 @@ class Module:
 						await self.send_not_allowed(message, e.message)
 					except Module.CommandDM as e:
 						await self.send_dm(message, e.direct_message, e.public_message)
+					except Exception as e:
+						await self.send_internal_error(message)
 
 	@staticmethod
 	def deconstruct_message(message):
