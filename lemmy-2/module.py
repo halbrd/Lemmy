@@ -95,6 +95,7 @@ class Module:
 						await self.send_dm(message, e.direct_message, e.public_message)
 					except Exception as e:
 						await self.send_internal_error(message)
+						raise e
 
 	@staticmethod
 	def deconstruct_message(message):
