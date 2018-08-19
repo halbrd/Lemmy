@@ -38,6 +38,9 @@ class Tests(Module):
 		else:
 			raise Module.CommandDM(args[0], args[1])
 
+	async def cmd_internal_error(self, message, args, kwargs):
+		raise Exception
+
 	docs_dump_args = {
 		'description': 'Returns the args and kwargs parsed from the message',
 		'usage': 'dump_args <args> <kwargs>',
