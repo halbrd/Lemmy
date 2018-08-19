@@ -106,3 +106,6 @@ class Tests(Module):
 		await self.client.send_message(message.channel, self.load_data('data', static=True))
 	async def cmd_save_static(self, message, args, kwargs):
 		self.save_data('data', args[0], static=True)
+
+	async def cmd_internal_error(self, message, args, kwargs):
+		raise TypeError('this is a legitimate type error')

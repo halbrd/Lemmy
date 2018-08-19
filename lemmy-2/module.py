@@ -49,9 +49,18 @@ class Module:
 		if public_message:
 			await self.client.send_message(message.channel, public_message)
 
-	async def send_internal_error(self, message):
+	async def send_internal_error(self, message, exception):
 		await self.client.add_reaction(message, '⚠')
-		await self.client.send_message(message.channel, '```diff\n- An internal error occurred (this isn\'t your fault) \n```')
+		await self.client.send_message(message.channel, '```diff\n- An internal error occurred (this isn\'t your fault).\n```')
+		if self.lemmy.config['notify_admins_about_errors']:
+			for user_id in self.lemmy.config['admins']:
+				# ༼ つ ◕_◕ ༽つ GIVE ASSIGNMENT EXPRESSIONS ༼ つ ◕_◕ ༽つ
+				admin = message.channel.server.get_member(user_id)
+				if admin:
+					message = (f'Exception in {message.channel.server.name}#{message.channel.name}:\n'
+							   f'{message.author.name}: `{message.content[:50]}{"..." if len(message.content) > 50 else ""}`\n'
+							   f'-> {type(exception).__name__}: {str(exception)}')
+					await self.client.send_message(admin, message)
 
 	def __init__(self, lemmy):
 		self.lemmy = lemmy
@@ -79,7 +88,7 @@ class Module:
 
 			if command in self._commands:
 				# check if the user is permitted to use this command
-				if self.get_docs_attr(command, 'admin_only', default=False) and not message.author.id in self.lemmy.config['admin_users']:
+				if self.get_docs_attr(command, 'admin_only', default=False) and not message.author.id in self.lemmy.config['admins']:
 					await self.send_not_allowed(message)
 				else:
 					try:
@@ -94,7 +103,7 @@ class Module:
 					except Module.CommandDM as e:
 						await self.send_dm(message, e.direct_message, e.public_message)
 					except Exception as e:
-						await self.send_internal_error(message)
+						await self.send_internal_error(message, e)
 						raise e
 
 	@staticmethod
