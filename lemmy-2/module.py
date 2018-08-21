@@ -234,8 +234,8 @@ class Module:
 		with open(full_path, 'wb' if bytes else 'w') as f:
 			f.write(content)
 
-	def load_data(self, document_name, static=False):
-		return json.loads(self._load(f'{document_name}.json', static=static))
+	def load_data(self, document_name, static=False, default='{}'):
+		return json.loads(self._load(f'{document_name}.json', static=static, default='[]'))
 
 	def save_data(self, document_name, data, static=False):
 		self._save(f'{document_name}.json', json.dumps(data, indent='\t'), static=static)

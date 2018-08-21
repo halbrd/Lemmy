@@ -13,7 +13,7 @@ class Jebrim(Module):
 	}
 
 	def get_tweets(self):
-		return self.load_data('tweets', static=True)
+		return self.load_data('tweets', static=True, default='[]')
 
 	docs_jebrim_add = {
 		'description': 'Adds a new Jebrim screenshot to the list',
@@ -43,7 +43,11 @@ class Jebrim(Module):
 	}
 	async def cmd_jebrim(self, message, args, kwargs):
 		tweets = self.get_tweets()
-		await self.client.send_message(message.channel, random.choice(tweets))
+
+		if len(tweets) == 0:
+			await self.send_error(message, 'Jebrim database is empty')
+		else:
+			await self.client.send_message(message.channel, random.choice(tweets))
 
 	docs_is_jebrim_suspended = {
 		'description': 'Checks if Jebrim is suspended on Twitter'
