@@ -3,8 +3,10 @@ sys.path.append('..')
 from module import Module
 
 import discord
+import os
+import io
 
-WEBHOOK_NAME = 'WEBHOOK_BOT'
+WEBHOOK_NAME = 'Lemmy Emotes'
 EMOTE_PATH = '../pics/emotes'
 
 class Emotes(Module):
@@ -13,6 +15,8 @@ class Emotes(Module):
     }
 
     def __init__(self, client):
+        Module.__init__(self, client)
+
         self.media = {}
         for f in (f for f in os.listdir(EMOTE_PATH) if os.path.isfile(os.path.join(EMOTE_PATH, f))):
             emote, ext = f.split('.')
@@ -24,11 +28,24 @@ class Emotes(Module):
 
         return await channel.webhooks()[WEBHOOK_NAME]
 
-    async def on_message(self, message):
-        if message.content in self.media:
-            webhook = await self.get_webhook(message.channel)
+    # async def on_message(self, message):
+    #     if message.content in self.media:
+    #         webhook = await self.get_webhook(message.channel)
 
-            with open(f'{EMOTE_PATH}/{imagePath}', 'rb') as image:
-                file = discord.File(fp=image, filename=self.media[message.content])
-                await webhook.send(username=message.author.display_name, avatar_url=message.author.avatar_url, file=file)
-                await message.delete()
+    #         with open(f'{EMOTE_PATH}/{imagePath}', 'rb') as image:
+    #             file = discord.File(fp=image, filename=self.media[message.content])
+    #             await webhook.send(username=message.author.display_name, avatar_url=message.author.avatar_url, file=file)
+    #             await message.delete()
+
+    async def send_image(self, name, destination, type):
+        image_bytes = self.load_image(type, name)
+        webhook = await self.get_webhook(destination)
+        image_file = io.BytesIO(image_bytes)
+        discord_file = discord.File(fp=image_file, filename=name)
+        await webhook.send(username=message.author.display_name,
+                           avatar_url=message.author.avatar_url,
+                           file=discord_file)
+        await message.delete()
+
+    async def cmd_send_image(self, message, args, kwargs):
+        await self.send_image(args[0], message.channel, 'emote')

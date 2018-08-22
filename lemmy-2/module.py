@@ -201,7 +201,7 @@ class Module:
 		# convert to string and return
 		return '\n'.join(lines)
 
-	def _load(self, file_location, default='{}', static=False, bytes=False):
+	def _load(self, file_location, default=None, static=False, bytes=False):
 		storage_type = 'static' if static else 'data'
 		full_path = f'{storage_type}/{self.__class__.__name__}/{file_location}'
 		directory = '/'.join(full_path.split('/')[:-1])
@@ -212,8 +212,9 @@ class Module:
 
 		# check that file exists
 		if not os.path.isfile(full_path):
-			with open(full_path, 'w') as f:
-				f.write(default)
+			if default:
+				with open(full_path, 'w') as f:
+					f.write(default)
 
 		# get data
 		with open(full_path, 'rb' if bytes else 'r') as f:
@@ -235,7 +236,13 @@ class Module:
 			f.write(content)
 
 	def load_data(self, document_name, static=False, default='{}'):
-		return json.loads(self._load(f'{document_name}.json', static=static, default='[]'))
+		return json.loads(self._load(f'{document_name}.json', static=static, default=default))
 
 	def save_data(self, document_name, data, static=False):
 		self._save(f'{document_name}.json', json.dumps(data, indent='\t'), static=static)
+
+	def load_image(self, image_type, image_name, static=True):
+		try:
+			return self._load(f'{image_type}/{image_name}.gif', static=static, bytes=True)
+		except FileNotFoundError:
+			return self._load(f'{image_type}/{image_name}.png', static=static, bytes=True)
