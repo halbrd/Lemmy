@@ -4,6 +4,8 @@ from module import Module
 
 import emoji
 import re
+import io
+import json
 
 class CustomCommands(Module):
 	docs = {
@@ -237,3 +239,10 @@ class CustomCommands(Module):
 			await self.send_error(message, comment=str(e))
 		else:
 			await self.send_success(message)
+
+	docs_ccomm_dump = {
+		'description': 'Dumps all custom commands to a JSON file'
+	}
+	async def cmd_ccomm_dump(self, message, args, kwargs):
+		f = io.StringIO(json.dumps(self.commands, indent='\t'))
+		await self.client.send_file(message.channel, f, filename='customcommands.json')
