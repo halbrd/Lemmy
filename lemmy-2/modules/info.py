@@ -37,3 +37,25 @@ class Info(Module):
 
 		await self.client.send_message(message.channel, embed=embed)
 
+'''
+[Given]
+	name
+	icon_url
+
+[Interesting]
+	region
+	id
+	owner
+	afk_channel/timeout
+	large
+	verification_level
+	mfa_level
+	default_channel
+	member_count
+	created_at
+	features
+
+[Eh]
+	roles
+	emojis
+'''
