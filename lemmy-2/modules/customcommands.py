@@ -6,6 +6,7 @@ import emoji
 import re
 import io
 import json
+import discord
 
 class CustomCommands(Module):
 	docs = {
@@ -245,4 +246,4 @@ class CustomCommands(Module):
 	}
 	async def cmd_ccomm_dump(self, message, args, kwargs):
 		f = io.StringIO(json.dumps(self.commands, indent='\t'))
-		await message.channel.send(file=f, filename='customcommands.json')
+		await message.channel.send(file=discord.File(f, 'customcommands.json'))
