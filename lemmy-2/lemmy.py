@@ -28,8 +28,8 @@ class Lemmy:
 		# register events
 		@self.client.event
 		async def on_message(message):
-			context = message.channel.server.name if not type(message.channel) == discord.channel.PrivateChannel else None
-			recipient = '#' + message.channel.name if not type(message.channel) == discord.channel.PrivateChannel else ', '.join( list( { user.name for user in message.channel.recipients }.union({ self.client.user.name }) - { message.author.name } ) )
+			context = message.channel.guild.name if not type(message.channel) in { discord.channel.DMChannel, discord.channel.GroupChannel } else None
+			recipient = '#' + message.channel.name if not type(message.channel) in { discord.channel.DMChannel, discord.channel.GroupChannel } else ', '.join( list( { user.name for user in message.channel.recipients }.union({ self.client.user.name }) - { message.author.name } ) )
 
 			context_phrase = f'({context}) ' if context else ''
 			attachments_phrase = ' +' + '📎' * len(message.attachments) if len(message.attachments) > 0 else ''
@@ -99,7 +99,7 @@ class Lemmy:
 			self.modules[module_class_name] = class_(self)
 
 	async def load_playing_message(self):
-		await self.client.change_presence(game=discord.Game(name=self.get_config_key_or_default('playing_message')))
+		await self.client.change_presence(activity=discord.Game(name=self.get_config_key_or_default('playing_message')))
 
 	def setup_logging(self):
 		logging.basicConfig(format='%(message)s', level=logging.WARNING)
@@ -127,7 +127,7 @@ class Lemmy:
 	def resolve_symbol(self, channel):
 		default_symbol = self.config["default_symbol"]
 		try:
-			return self.get_config_key_or_default("server_config", channel.server.id, "symbol", default=default_symbol)
+			return self.get_config_key_or_default("server_config", channel.guild.id, "symbol", default=default_symbol)
 		except AttributeError:
 			return default_symbol
 

@@ -130,14 +130,14 @@ class CustomCommands(Module):
 				command = args[0]
 
 				if command in self.commands:
-					await self.client.send_message(message.channel, self.commands[command])
+					await message.channel.send(self.commands[command])
 
 	docs_ccomm_list = {
 		'description': 'Lists all custom commands'
 	}
 	async def cmd_ccomm_list(self, message, args, kwargs):
 		if len(self.commands) == 0:
-			await self.client.send_message(message.channel, '```\nNo custom commands.\n```')
+			await message.channel.send('```\nNo custom commands.\n```')
 			return
 
 		commands = sorted(self.commands.keys(), key=lambda command: (len(command), command))
@@ -145,7 +145,7 @@ class CustomCommands(Module):
 		table_chunks = self.lemmy.chunk_text(self.lemmy.make_table(commands), chunk_prefix='```\n', chunk_suffix='\n```')
 
 		for chunk in table_chunks:
-			await self.client.send_message(message.channel, chunk)
+			await message.channel.send(chunk)
 
 	docs_ccomm_search = {
 		'description': 'Lists all custom commands that contain a given string',
@@ -164,13 +164,13 @@ class CustomCommands(Module):
 		commands = [ command if command != args[0] else f'< {args[0]} >' for command in commands ]
 
 		if not commands:
-			await self.client.send_message(message.channel, f'```\nNo results.\n```')
+			await message.channel.send(f'```\nNo results.\n```')
 			return
 
 		table_chunks = self.lemmy.chunk_text(self.lemmy.make_table(commands), chunk_prefix='```md\n', chunk_suffix='\n```')
 
 		for chunk in table_chunks:
-			await self.client.send_message(message.channel, chunk)
+			await message.channel.send(chunk)
 
 	docs_ccomm_create = {
 		'description': 'Adds a new custom command',
@@ -245,4 +245,4 @@ class CustomCommands(Module):
 	}
 	async def cmd_ccomm_dump(self, message, args, kwargs):
 		f = io.StringIO(json.dumps(self.commands, indent='\t'))
-		await self.client.send_file(message.channel, f, filename='customcommands.json')
+		await message.channel.send(file=f, filename='customcommands.json')

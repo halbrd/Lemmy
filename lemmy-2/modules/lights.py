@@ -47,4 +47,4 @@ class Lights(Module):
 		if len(screenshots) == 0:
 			await self.send_error(message, 'Lights database is empty')
 		else:
-			await self.client.send_message(message.channel, random.choice(screenshots))
+			await message.channel.send(random.choice(screenshots))
