@@ -51,7 +51,7 @@ class Module:
 
 	async def send_internal_error(self, message, exception):
 		await self.client.add_reaction(message, '⚠')
-		await self.client.send_message(message.channel, '```diff\n- An internal error occurred (this isn\'t your fault).\n```')
+		await self.client.send_message(message.channel, '```diff\n- An internal error occurred (this isn\'t your fault)\n```')
 		if self.lemmy.config['notify_admins_about_errors']:
 			for user_id in self.lemmy.config['admins']:
 				# ༼ つ ◕_◕ ༽つ GIVE ASSIGNMENT EXPRESSIONS ༼ つ ◕_◕ ༽つ
