@@ -71,7 +71,7 @@ class Core(Module):
 				chunks.append(footer_message)
 
 			for chunk in chunks:
-				await self.client.send_message(message.channel, chunk)
+				await message.channel.send(chunk)
 
 		# help text pertaining to a specific topic
 		else:
@@ -91,7 +91,7 @@ class Core(Module):
 				raise Module.CommandError(f'\'{topic}\' is not a module or command')
 			else:
 				for help_text in help_texts:
-					await self.client.send_message(message.channel, help_text)
+					await message.channel.send(help_text)
 
 	docs_about = {
 		'description': 'Contains info about Lemmy'
@@ -99,4 +99,4 @@ class Core(Module):
 	async def cmd_about(self, message, args, kwargs):
 		title = '```fix\n=========================================\n=  _                                    =\n= | |    ___ _ __ ___  _ __ ___  _   _  =\n= | |   / _ \ \'_ ` _ \| \'_ ` _ \| | | | =\n= | |__|  __/ | | | | | | | | | | |_| | =\n= |_____\___|_| |_| |_|_| |_| |_|\__, | =\n=                                |___/  =\n=========================================\n Your friendly neighbourhood Discord bot\n  Created by https://github.com/halbrd\n```'
 		repo_link = '  Lemmy is free and open source software, hosted at\nhttps://github.com/halbrd/Lemmy. Bug reports and\n                       pull requests are welcome.'
-		await self.client.send_message(message.channel, title + '\n' + repo_link)
+		await message.channel.send(title + '\n' + repo_link)

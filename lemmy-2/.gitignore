@@ -1,2 +1,5 @@
 config.json
 data
+
+# local copy of discord.py rewrite library pre-PyPi
+src
