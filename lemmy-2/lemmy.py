@@ -28,10 +28,18 @@ class Lemmy:
 		# register events
 		@self.client.event
 		async def on_message(message):
-			context = message.channel.guild.name if not type(message.channel) in { discord.channel.DMChannel, discord.channel.GroupChannel } else None
-			recipient = '#' + message.channel.name if not type(message.channel) in { discord.channel.DMChannel, discord.channel.GroupChannel } else ', '.join( list( { user.name for user in message.channel.recipients }.union({ self.client.user.name }) - { message.author.name } ) )
+			channel = message.channel
 
-			context_phrase = f'({context}) ' if context else ''
+			if type(channel) == discord.channel.DMChannel:
+				context_phrase = ''
+				recipient = channel.recipient.name if message.author == channel.me else channel.me.name
+			elif type(channel) == discord.channel.GroupChannel:   # bot users can't be in these (yet)
+				context_phrase = ''
+				recipient = channel.name or ', '.join( list( { user.name for user in message.channel.recipients }.union({ self.client.user.name }) - { message.author.name } ) )
+			elif type(channel) == discord.channel.TextChannel:
+				context_phrase = f'({channel.guild}) '
+				recipient = f'#{channel.name}'
+
 			attachments_phrase = ' +' + '📎' * len(message.attachments) if len(message.attachments) > 0 else ''
 
 			self.log(f'{context_phrase}{message.author.name} => {recipient}{attachments_phrase}: {message.content}')
