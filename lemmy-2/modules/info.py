@@ -3,6 +3,7 @@ sys.path.append('..')
 from module import Module
 
 import discord
+from datetime import timezone
 
 class Info(Module):
 	docs = {
@@ -77,9 +78,19 @@ class Info(Module):
 		embed = discord.Embed()
 
 		embed.set_author(name=f'{user.name}#{user.discriminator}' + (f' ({user.nick})' if user.nick else ''), icon_url=user.default_avatar_url)   # TODO: status colors
-		embed.add_field(name=f'Joined {server.name}:', value=user.joined_at)
+		status_colors = {
+			'online': discord.Color.green(),
+			'idle': discord.Color.gold(),
+			'dnd': discord.Color.red(),
+			'offline': discord.Color.light_grey()
+		}
+		if str(user.status) in status_colors:
+			embed.color = status_colors[str(user.status)]
+		embed.add_field(name='Top role', value=user.top_role.name)
+		joined_at_aest = user.joined_at.replace(tzinfo=timezone.utc).astimezone(tz=None)
+		embed.add_field(name=f'Joined {message.guild.name}', value=f'{joined_at_aest:%B %d, %Y - %H:%M}')
 		embed.set_image(url=user.avatar_url)
-		embed.set_footer(text=f'Account created:')
+		embed.set_footer(text=f'Joined Discord:')
 		embed.timestamp = user.created_at
 
 		await message.channel.send(embed=embed)
