@@ -47,13 +47,13 @@ class Jebrim(Module):
 		if len(tweets) == 0:
 			await self.send_error(message, 'Jebrim database is empty')
 		else:
-			await self.client.send_message(message.channel, random.choice(tweets))
+			await message.channel.send(random.choice(tweets))
 
 	docs_is_jebrim_suspended = {
 		'description': 'Checks if Jebrim is suspended on Twitter'
 	}
 	async def cmd_is_jebrim_suspended(self, message, args, kwargs):
 		if 'This account has been suspended' in requests.get('https://twitter.com/jebrim').text:
-			await self.client.send_message(message.channel, 'Yes, Jebrim is suspended from Twitter.')
+			await message.channel.send('Yes, Jebrim is suspended from Twitter.')
 		else:
-			await self.client.send_message(message.channel, 'No, Jebrim is not suspended from Twitter! :tada:')
+			await message.channel.send('No, Jebrim is not suspended from Twitter! :tada:')
