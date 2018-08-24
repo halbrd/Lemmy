@@ -13,7 +13,7 @@ class Info(Module):
 		'description': 'Provides information about the current server'
 	}
 	async def cmd_serverinfo(self, message, args, kwargs):
-		server = message.channel.server
+		server = message.channel.guild
 		embed = discord.Embed()
 
 		embed.title = 'Server info: ' + server.name
@@ -38,7 +38,7 @@ class Info(Module):
 		embed.set_footer(text=f'Created by @{server.owner.name}', icon_url=server.owner.avatar_url)
 		embed.timestamp = server.created_at
 
-		await self.client.send_message(message.channel, embed=embed)
+		await message.channel.send(embed=embed)
 
 	def resolve_member(server, term):
 		try_attrs = [ 'id', 'mention', 'nick', 'name' ]
@@ -68,7 +68,7 @@ class Info(Module):
 			user = message.author
 		elif len(args) == 1:
 			search_term = args[0]
-			user = Info.resolve_user(message.server, search_term)
+			user = Info.resolve_member(message.guild, search_term)
 
 			if not user:
 				await self.send_error(message, comment=f'Couldn\'t find a user that matched \'{search_term}\'')
@@ -76,12 +76,13 @@ class Info(Module):
 
 		embed = discord.Embed()
 
-		embed.set_author(name=f'{user.name}#{user.discriminator}' + (f' ({user.nick})' if user.nick else ''), icon_url=user.default_avatar)   # TODO: status colors
+		embed.set_author(name=f'{user.name}#{user.discriminator}' + (f' ({user.nick})' if user.nick else ''), icon_url=user.default_avatar_url)   # TODO: status colors
+		embed.add_field(name=f'Joined {server.name}:', value=user.joined_at)
 		embed.set_image(url=user.avatar_url)
-		embed.set_footer(text=f'Joined {user.server}:')
+		embed.set_footer(text=f'Account created:')
 		embed.timestamp = user.created_at
 
-		await self.client.send_message(message.channel, embed=embed)
+		await message.channel.send(embed=embed)
 
 	
 
