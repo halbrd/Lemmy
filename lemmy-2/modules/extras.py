@@ -18,7 +18,7 @@ class Extras(Module):
 						"Signs point to yes.", "Reply hazy try again.", "Ask again later.", "Better not tell you now.",
 						"Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.",
 						"My sources say no.", "Outlook not so good.", "Very doubtful." ]
-		await self.client.send_message(message.channel, message.author.mention + " :8ball: " + random.choice(responses))
+		await message.channel.send(message.author.mention + " :8ball: " + random.choice(responses))
 
 	docs_choose = {
 		'description': 'Chooses between the given options',
@@ -31,9 +31,9 @@ class Extras(Module):
 		options = [ option for option in options if option != '' ]
 
 		if len(options) == 1:
-			await self.client.send_message(message.channel, message.author.mention + '   I can\'t decide!')
+			await message.channel.send(message.author.mention + '   I can\'t decide!')
 		elif len(options) > 0:
-			await self.client.send_message(message.channel, message.author.mention + f'   `{random.choice(options)}`')
+			await message.channel.send(message.author.mention + f'   `{random.choice(options)}`')
 		else:
 			await self.send_error(message)
 			return

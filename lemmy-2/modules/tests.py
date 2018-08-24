@@ -47,10 +47,10 @@ class Tests(Module):
 		'examples': [ 'dump_args a d=1 b e=2 c f=3' ]
 	}
 	async def cmd_dump_args(self, message, args, kwargs):
-		await self.client.send_message(message.channel, f'args:\n{str(args)}\nkwargs:\n{str(kwargs)}')
+		await message.channel.send(f'args:\n{str(args)}\nkwargs:\n{str(kwargs)}')
 
 	async def cmd_no_docs(self, message, args, kwargs):
-		await self.client.send_message(message.channel, 'This command has no docs to test the help text')
+		await message.channel.send('This command has no docs to test the help text')
 
 	async def cmd_embed_example(self, message, args, kwargs):
 		embed_data = {
@@ -93,17 +93,17 @@ class Tests(Module):
 		for field in embed_data['fields']:
 			embed.add_field(name=field['name'], value=field['value'], inline=field['inline'])
 
-		await self.client.send_message(message.channel, f'```json\n{json.dumps(embed_data, sort_keys=True, indent=2)}\n```', embed=embed)
+		await message.channel, f'```json\n{json.dumps(embed_data, sort_keys=True, indent=2)}\n```'.send(embed=embed)
 
 	async def cmd_print_raw(self, message, args, kwargs):
-		await self.client.send_message(message.channel, '```\n' + message.content + '\n```')
+		await message.channel.send('```\n' + message.content + '\n```')
 
 	async def cmd_load_data(self, message, args, kwargs):
-		await self.client.send_message(message.channel, self.load_data('data'))
+		await message.channel.send(self.load_data('data'))
 	async def cmd_save_data(self, message, args, kwargs):
 		self.save_data('data', args[0])
 	async def cmd_load_static(self, message, args, kwargs):
-		await self.client.send_message(message.channel, self.load_data('data', static=True))
+		await message.channel, self.load_data('data'.send(static=True))
 	async def cmd_save_static(self, message, args, kwargs):
 		self.save_data('data', args[0], static=True)
 

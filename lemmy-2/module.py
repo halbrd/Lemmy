@@ -25,42 +25,42 @@ class Module:
 			super().__init__(direct_message)
 
 	async def send_error(self, message, comment=None, comment_wrapping=True):
-		await self.client.add_reaction(message, '❌')
+		await message.add_reaction('❌')
 		if comment:
 			if comment_wrapping:
 				comment = f'```diff\n- {comment}\n```'
-			await self.client.send_message(message.channel, comment)
+			await message.channel.send(comment)
 
 	async def send_success(self, message, comment=None, comment_wrapping=True):
-		await self.client.add_reaction(message, '✅')
+		await message.add_reaction('✅')
 		if comment:
 			if comment_wrapping:
 				comment = f'```diff\n+ {comment}\n```'
-			await self.client.send_message(message.channel, comment)
+			await message.channel.send(comment)
 
 	async def send_not_allowed(self, message, comment=None):
-		await self.client.add_reaction(message, '🔒')
+		await message.add_reaction('🔒')
 		if comment:
-			await self.client.send_message(message.channel, comment)
+			await message.channel.send(comment)
 
 	async def send_dm(self, message, direct_message, public_message=None):
-		await self.client.add_reaction(message, '📨')
-		await self.client.send_message(message.author, direct_message)
+		await message.add_reaction('📨')
+		await message.author.send(direct_message)
 		if public_message:
-			await self.client.send_message(message.channel, public_message)
+			await message.channel.send(public_message)
 
 	async def send_internal_error(self, message, exception):
-		await self.client.add_reaction(message, '⚠')
-		await self.client.send_message(message.channel, '```diff\n- An internal error occurred (this isn\'t your fault)\n```')
+		await message.add_reaction('⚠')
+		await message.channel.send('```diff\n- An internal error occurred (this isn\'t your fault)\n```')
 		if self.lemmy.config['notify_admins_about_errors']:
 			for user_id in self.lemmy.config['admins']:
 				# ༼ つ ◕_◕ ༽つ GIVE ASSIGNMENT EXPRESSIONS ༼ つ ◕_◕ ༽つ
-				admin = message.channel.server.get_member(user_id)
+				admin = message.channel.guild.get_member(user_id)
 				if admin:
-					message = (f'Exception in {message.channel.server.name}#{message.channel.name}:\n'
+					message = (f'Exception in {message.channel.guild.name}#{message.channel.name}:\n'
 							   f'{message.author.name}: `{message.content[:50]}{"..." if len(message.content) > 50 else ""}`\n'
 							   f'-> {type(exception).__name__}: {str(exception)}')
-					await self.client.send_message(admin, message)
+					await admin.send(message)
 
 	def __init__(self, lemmy):
 		self.lemmy = lemmy
