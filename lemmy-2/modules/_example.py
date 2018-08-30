@@ -32,9 +32,9 @@ class Example(Module):
 		# try to do stuff
 		# when a problem is discovered, raise CommandError
 		if len(args) == 0:
-			await self.client.send_message(message.channel, 'Default message!')
+			await message.channel.send('Default message!')
 		elif len(args) == 1:
-			await self.client.send_message(message.channel, 'You gave the argument: ' + args[0])
+			await message.channel.send('You gave the argument: ' + args[0])
 		else:
 			raise Module.CommandError
 
