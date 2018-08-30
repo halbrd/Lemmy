@@ -53,7 +53,14 @@ class Jebrim(Module):
 		'description': 'Checks if Jebrim is suspended on Twitter'
 	}
 	async def cmd_is_jebrim_suspended(self, message, args, kwargs):
-		if 'This account has been suspended' in requests.get('https://twitter.com/jebrim').text:
-			await message.channel.send('Yes, Jebrim is suspended from Twitter.')
+		jebrim_suspended = 'This account has been suspended' in requests.get('https://twitter.com/jebrim').text
+		the1jebrim_suspended = 'This account has been suspended' in requests.get('https://twitter.com/the1jebrim').text
+
+		if jebrim_suspended and the1jebrim_suspended:
+			await message.channel.send('Yes, @Jebrim and @The1Jebrim are both suspended.')
+		elif jebrim_suspended and not the1jebrim_suspended:
+			await message.channel.send('@Jebrim is suspended from Twitter, but @The1Jebrim is not.')
+		elif not jebrim_suspended and the1jebrim_suspended:
+			await message.channel.send('@The1Jebrim is suspended from Twitter, but @Jebrim is not.')
 		else:
 			await message.channel.send('No, Jebrim is not suspended from Twitter! :tada:')
