@@ -7,9 +7,7 @@ import os
 import io
 
 WEBHOOK_NAME = 'Lemmy Emotes'
-EMOTE_PATH = '../pics/emotes'
-
-# TODO: extract static to config level
+USE_STATIC_STORAGE = True   # this might be better as a member variable so it can be changed at runtime
 
 class Emotes(Module):
     docs = {
@@ -19,11 +17,11 @@ class Emotes(Module):
     def __init__(self, client):
         Module.__init__(self, client)
 
-        self.load_all()
-
+        self.load_emotes()
+        self.load_stickers()
 
     def _load_images(self, type):
-        files = self.list_files(type, static=True)
+        files = self.list_files(type, static=USE_STATIC_STORAGE)
         images = filter(lambda file_name: file_name.endswith('.gif') or file_name.endswith('.png'), files)
         trimmed_images = map(lambda file_name: '.'.join(file_name.split('.')[:-1]), images)
         return set(trimmed_images)
@@ -34,14 +32,10 @@ class Emotes(Module):
     def load_stickers(self):
         self.stickers = self._load_images('sticker')
 
-    def load_all(self):
-        self.load_emotes()
-        self.load_stickers()
-
     def _get_image_filename(self, type, emote_name):
-        if self.data_exists(f'{type}/{emote_name}.gif', static=True):
+        if self.data_exists(f'{type}/{emote_name}.gif', static=USE_STATIC_STORAGE):
             return f'{emote_name}.gif'
-        elif self.data_exists(f'{type}/{emote_name}.png', static=True):
+        elif self.data_exists(f'{type}/{emote_name}.png', static=USE_STATIC_STORAGE):
             return f'{emote_name}.png'
         return None
 
