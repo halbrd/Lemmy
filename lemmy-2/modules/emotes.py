@@ -60,7 +60,7 @@ class Emotes(Module):
     #             await webhook.send(username=message.author.display_name, avatar_url=message.author.avatar_url, file=file)
     #             await message.delete()
 
-    async def send_image(self, name, destination, type, vanity_username=None, vanity_avatar_url=None):
+    async def send_image(self, name, type, destination, vanity_username=None, vanity_avatar_url=None):
         image_file_name = self.get_image_filename(name)
         image_file = self.get_image_as_discord_file(image_file_name, type)
         webhook = await self.get_webhook(destination, WEBHOOK_NAME)
