@@ -242,13 +242,12 @@ class Module:
 		self._save(f'{document_name}.json', json.dumps(data, indent='\t'), static=static)
 
 	def load_image(self, image_type, image_name, static=True):
-		try:
-			return {
-				'bytes': self._load(f'{image_type}/{image_name}.gif', static=static, bytes=True),
-				'extension': 'gif'
-			}
-		except FileNotFoundError:
-			return {
-				'bytes': self._load(f'{image_type}/{image_name}.png', static=static, bytes=True),
-				'extension': 'png'
-			}
+		return self._load(f'{image_type}/{image_name}', static=static, bytes=True)
+
+	def list_files(self, path, static=False):
+		storage_type = 'static' if static else 'data'
+		return os.listdir(f'{storage_type}/{self.__class__.__name__}/{path}')
+
+	def data_exists(self, path, static=False):
+		storage_type = 'static' if static else 'data'
+		return os.path.exists(f'{storage_type}/{self.__class__.__name__}/{path}')
