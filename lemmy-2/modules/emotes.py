@@ -22,11 +22,8 @@ class Emotes(Module):
             emote, ext = f.split('.')
             self.media[emote] = f
 
-    async def get_webhook(self, channel):
-        if not WEBHOOK_NAME in await channel.webhooks():
-            await channel.create_webhook(name=WEBHOOK_NAME)
-
-        return await channel.webhooks()[WEBHOOK_NAME]
+    async def get_webhook(self, channel, webhook_name):
+        return discord.utils.find(lambda x: x.name == webhook_name, await channel.webhooks()) or await channel.create_webhook(name=webhook_name)
 
     # async def on_message(self, message):
     #     if message.content in self.media:
@@ -37,15 +34,17 @@ class Emotes(Module):
     #             await webhook.send(username=message.author.display_name, avatar_url=message.author.avatar_url, file=file)
     #             await message.delete()
 
-    async def send_image(self, name, destination, type):
-        image_bytes = self.load_image(type, name)
-        webhook = await self.get_webhook(destination)
-        image_file = io.BytesIO(image_bytes)
-        discord_file = discord.File(fp=image_file, filename=name)
-        await webhook.send(username=message.author.display_name,
-                           avatar_url=message.author.avatar_url,
-                           file=discord_file)
-        await message.delete()
+    async def send_image(self, name, destination, type, vanity_username=None, vanity_avatar_url=None):
+        image_data = self.load_image(type, name)
+        webhook = await self.get_webhook(destination, WEBHOOK_NAME)
+
+        image_file = io.BytesIO(image_data['bytes'])
+        discord_file = discord.File(fp=image_file, filename=f'{name}.{image_data["extension"]}')
+
+        await webhook.send(username=vanity_username,
+                            avatar_url=vanity_avatar_url,
+                            file=discord_file)
 
     async def cmd_send_image(self, message, args, kwargs):
-        await self.send_image(args[0], message.channel, 'emote')
+        await self.send_image(args[0], message.channel, 'emote', vanity_username=message.author.name, vanity_avatar_url=message.author.avatar_url)
+        await message.delete()

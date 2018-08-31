@@ -243,6 +243,12 @@ class Module:
 
 	def load_image(self, image_type, image_name, static=True):
 		try:
-			return self._load(f'{image_type}/{image_name}.gif', static=static, bytes=True)
+			return {
+				'bytes': self._load(f'{image_type}/{image_name}.gif', static=static, bytes=True),
+				'extension': 'gif'
+			}
 		except FileNotFoundError:
-			return self._load(f'{image_type}/{image_name}.png', static=static, bytes=True)
+			return {
+				'bytes': self._load(f'{image_type}/{image_name}.png', static=static, bytes=True),
+				'extension': 'png'
+			}
