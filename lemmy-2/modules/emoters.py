@@ -77,3 +77,75 @@ class Emoters(Module):
     async def cmd_emoter_list(self, message, args, kwargs):
         await message.channel.send('Emotes: ' + str(self.emotes))
         await message.channel.send('Stickers: ' + str(self.stickers))
+
+    # def normalize_png(self, png_bytes):
+    #     output_size = 64, 64
+        
+    #     # load image
+    #     image_file = io.BytesIO(png_bytes)
+    #     image = Image.open(image_file)
+        
+    #     # resize
+    #     image.thumbnail(output_size, Image.ANTIALIAS)
+
+    #     # pad
+    #     horizontal_padding = output_size[0] - image.size[0]
+    #     vertical_padding = output_size[1] - image.size[1]
+
+    #     # center image
+    #     square_image = Image.new(image.mode, output_size)
+    #     square_image.putalpha(0)
+    #     square_image.paste(image, (horizontal_padding // 2, vertical_padding // 2))
+    #     image = square_image
+
+    #     # return bytes
+    #     output_file = io.BytesIO()
+    #     image.save(output_file, 'PNG')
+
+    #     return output_file.getvalue()
+
+    # def normalize_gif(self, gif_bytes, channel):
+    #     output_size = 32, 32
+
+    #     # load image
+    #     image_file = io.BytesIO(gif_bytes)
+    #     image = Image.open(image_file)
+    #     frames = list(ImageSequence.Iterator(image))
+        
+    #     for i, frame in enumerate(frames):
+    #         frame.thumbnail(output_size, Image.ANTIALIAS)
+
+    #         # pixels = frame.load()
+
+    #         # for y in range(frame.size[1]):
+    #         #     for x in range(frame.size[0]):
+    #         #         # if pixels[x, y] == 6:
+    #         #         #     pixels[x, y] = 0
+    #         #         print(pixels[x, y], end='|')
+
+    #         # frame.save(f'frame{i}.gif')
+    #         # break
+
+
+
+    #     #     # resize
+    #     #     frames[i].thumbnail(output_size, Image.ANTIALIAS)
+
+    #     #     # pad
+    #     #     horizontal_padding = output_size[0] - frame.size[0]
+    #     #     vertical_padding = output_size[1] - frame.size[1]
+
+    #     #     # center image
+    #     #     square_image = Image.new(frame.mode, output_size)
+    #     #     square_image.putalpha(0)
+    #     #     square_image.paste(frame, (horizontal_padding // 2, vertical_padding // 2))
+    #     #     square_image = square_image.rotate(90)
+    #     #     frames[i] = square_image
+        
+    #     # return bytes
+    #     output_file = io.BytesIO()
+    #     initial_frame = frames[0]
+    #     initial_frame.save(output_file, 'GIF', save_all=True, append_images=list(frames[1:]))
+
+    #     return output_file.getvalue()
+
