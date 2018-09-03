@@ -81,7 +81,7 @@ class Emoters(Module):
         await message.channel.send('Emotes: ' + str(self.emotes))
         await message.channel.send('Stickers: ' + str(self.stickers))
 
-    def normalize_png(self, png_bytes, target_size):
+    def normalize_png_pillow(self, png_bytes, target_size):
         # load bytes into PIL Image
         image_file = io.BytesIO(png_bytes)
         im = Image.open(image_file)
