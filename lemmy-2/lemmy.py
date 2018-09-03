@@ -31,18 +31,16 @@ class Lemmy:
 			channel = message.channel
 
 			if type(channel) == discord.channel.DMChannel:
-				context_phrase = ''
 				recipient = channel.recipient.name if message.author == channel.me else channel.me.name
 			elif type(channel) == discord.channel.GroupChannel:   # bot users can't be in these (yet)
-				context_phrase = ''
 				recipient = channel.name or ', '.join( list( { user.name for user in message.channel.recipients }.union({ self.client.user.name }) - { message.author.name } ) )
 			elif type(channel) == discord.channel.TextChannel:
-				context_phrase = f'({channel.guild}) '
-				recipient = f'#{channel.name}'
+				recipient = f'{channel.guild}#{channel.name}'
 
-			attachments_phrase = ' +' + '📎' * len(message.attachments) if len(message.attachments) > 0 else ''
+			extras_phrase = '📎' * len(message.attachments) + '📊' * len(message.embeds)
+			extras_phrase = f' +{extras_phrase}' if extras_phrase else ''
 
-			self.log(f'{context_phrase}{message.author.name} => {recipient}{attachments_phrase}: {message.content}')
+			self.log(f'{message.author.name} => {recipient}{extras_phrase}: {message.content}')
 
 			# pass the event to the modules
 			for _, module in self.modules.items():
