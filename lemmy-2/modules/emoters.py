@@ -7,6 +7,8 @@ import os
 import io
 
 WEBHOOK_NAME = 'Lemmy Emotes'
+EMOTE_MAX_SIZE = 64, 64
+STICKER_MAX_SIZE = 128, 128
 
 class Emoters(Module):
     docs = {
@@ -61,6 +63,7 @@ class Emoters(Module):
     def load_stickers(self):
         self.stickers = self._load_emoters('sticker')
 
+    # TODO: refactor into filename -> bytes, bytes -> discordfile
     def get_image_as_discord_file(self, file_name, emoter_type):
         image_bytes = self.load_image(f'{emoter_type}/{file_name}', static=True)
         image_file = io.BytesIO(image_bytes)
@@ -77,6 +80,29 @@ class Emoters(Module):
     async def cmd_emoter_list(self, message, args, kwargs):
         await message.channel.send('Emotes: ' + str(self.emotes))
         await message.channel.send('Stickers: ' + str(self.stickers))
+
+    def normalize_png(self, png_bytes, target_size):
+        # load bytes into PIL Image
+        image_file = io.BytesIO(png_bytes)
+        im = Image.open(image_file)
+
+        # resize image, maintaining aspect ratio
+        im.thumbnail(target_size, Image.ANTIALIAS)
+
+        # pad image out to a square
+        horizontal_padding = target_size[0] - image.size[0]
+        vertical_padding = target_size[1] - image.size[1]
+
+        square_image = Image.new(im.mode, target_size)
+        square_image.putalpha(0)   # fill image with transparent
+        square_image.paste(im, (horizontal_padding // 2, vertical_padding // 2))   # paste emote in center
+        image = square_image
+
+        # return bytes
+        output_file = io.BytesIO()
+        im.save(output_file, 'PNG')
+        return output_file.getvalue()
+
 
     # def normalize_png(self, png_bytes):
     #     output_size = 64, 64
