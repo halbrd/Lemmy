@@ -241,7 +241,7 @@ class Module:
 	def save_data(self, document_name, data, static=False):
 		self._save(f'{document_name}.json', json.dumps(data, indent='\t'), static=static)
 
-	def load_image(self, file_location, static=True):
+	def load_image(self, file_location, static=False):
 		return self._load(file_location, static=static, bytes=True)
 
 	def list_files(self, path, static=False):
