@@ -241,13 +241,26 @@ class Module:
 	def save_data(self, document_name, data, static=False):
 		self._save(f'{document_name}.json', json.dumps(data, indent='\t'), static=static)
 
-	def load_image(self, image_type, image_name, static=True):
-		return self._load(f'{image_type}/{image_name}', static=static, bytes=True)
+	def load_image(self, file_location, static=True):
+		return self._load(file_location, static=static, bytes=True)
 
 	def list_files(self, path, static=False):
 		storage_type = 'static' if static else 'data'
-		return os.listdir(f'{storage_type}/{self.__class__.__name__}/{path}')
+		directory = f'{storage_type}/{self.__class__.__name__}/{path}'
 
-	def data_exists(self, path, static=False):
+		# check that directory exists
+		if not os.path.isdir(directory):
+			os.makedirs(directory)
+
+		return os.listdir(directory)
+
+	def data_exists(self, file_location, static=False):
 		storage_type = 'static' if static else 'data'
-		return os.path.exists(f'{storage_type}/{self.__class__.__name__}/{path}')
+		full_path = f'{storage_type}/{self.__class__.__name__}/{file_location}'
+		directory = '/'.join(full_path.split('/')[:-1])
+
+		# check that directory exists
+		if not os.path.isdir(directory):
+			os.makedirs(directory)
+
+		return os.path.exists(full_path)
