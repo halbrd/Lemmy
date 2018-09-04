@@ -30,6 +30,8 @@ class Memes(Module):
 		'description': 'Posts a random tweet from @commentiquette to @tedcruz'
 	}
 	async def cmd_tedcruz(self, message, args, kwargs):
+		await message.add_reaction('⏳')
+
 		tweets = set()
 
 		# this uses an ancient, non-Javascript mobile version of Twitter
@@ -48,3 +50,4 @@ class Memes(Module):
 				page = None
 
 		await message.channel.send(random.choice(list(tweets)))
+		await message.remove_reaction('⏳', message.guild.me)
