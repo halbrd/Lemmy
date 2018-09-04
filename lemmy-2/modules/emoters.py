@@ -102,3 +102,22 @@ class Emoters(Module):
         output_file = io.BytesIO()
         im.save(output_file, 'PNG')
         return output_file.getvalue()
+
+### Much Ado About Images ###
+# Problem: PIL can't render gifs with transparency
+# Issues this causes:
+# - Can't automatically resize gifs
+# - Can't combine gifs with other images
+# Potential solutions:
+# - Drop PIL for ImageMagick
+#   Advantages:
+#   - Actually solves the problem
+#   Disadvantages:
+#   - Creates platform dependency, increasing deployment complexity, probably necessitating Docker
+#   - Not certain that ImageMagick will have all benefits of PIL, eg. in-memory handling, padding
+# - Don't support gif manipulation
+#   Advantages:
+#   - Low complexity, little effort
+#   Disadvantages:
+#   - Increases user effort and proficiency requirement
+#   - Lack of features
