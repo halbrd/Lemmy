@@ -7,8 +7,8 @@ class Example(Module):
 		'description': 'Explains how to write a module for Lemmy'
 	}
 
-	def __init__(self, client):
-		Module.__init__(self, client)
+	def __init__(self, lemmy):
+		Module.__init__(self, lemmy)
 		# put setup code to run at bot startup here
 		# if you don't have anything in particular you can not define __init__ and it'll use the inherited version
 
