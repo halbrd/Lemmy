@@ -212,8 +212,9 @@ class Module:
 
 		# check that file exists
 		if not os.path.isfile(full_path):
-			with open(full_path, 'w') as f:
-				f.write(default)
+			if default is not None:
+				with open(full_path, 'w') as f:
+					f.write(default)
 
 		# get data
 		with open(full_path, 'rb' if bytes else 'r') as f:
@@ -235,7 +236,7 @@ class Module:
 			f.write(content)
 
 	def load_data(self, document_name, static=False, default='{}'):
-		return json.loads(self._load(f'{document_name}.json', static=static, default='[]'))
+		return json.loads(self._load(f'{document_name}.json', static=static, default=default))
 
 	def save_data(self, document_name, data, static=False):
 		self._save(f'{document_name}.json', json.dumps(data, indent='\t'), static=static)
