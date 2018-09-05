@@ -129,3 +129,11 @@ class Emoters(Module):
 #   Disadvantages:
 #   - Increases user effort and proficiency requirement
 #   - Lack of features
+
+# ImageMagick capabilities
+# Can do:
+# - Rotate, resize PNGs, maintain transparency, aspect ratio
+#   `convert -background transparent -rotate 30 -resize 64x64 in.png out.png`
+# - Rotate, resize GIFs, maintain transparency, aspect ratio (places image frame-by-frame?????)
+#   `convert -background none -rotate 30 -resize 64x64 in.gif out.gif`
+# Can't do:
