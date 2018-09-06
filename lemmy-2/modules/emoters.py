@@ -136,4 +136,11 @@ class Emoters(Module):
 #   `convert -background transparent -rotate 30 -resize 64x64 in.png out.png`
 # - Rotate, resize GIFs, maintain transparency, aspect ratio (places image frame-by-frame?????)
 #   `convert -background none -rotate 30 -resize 64x64 in.gif out.gif`
+# - Connect PNGs horizontally, auto spaced and laid out
+#   `montage -background transparent -geometry +0+0 in1.png in2.png out.png`
+# - Connect PNGs and the first frame of a gif
+#   `montage -background transparent -geometry +0+0 in1.png 'in2.gif[0]' out.png`
+# - Rotate or flip images, then connect
+#   ``
+# Okay you know what I'm pretty sure it can do everything needed
 # Can't do:
