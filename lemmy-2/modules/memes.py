@@ -30,24 +30,23 @@ class Memes(Module):
 		'description': 'Posts a random tweet from @commentiquette to @tedcruz'
 	}
 	async def cmd_tedcruz(self, message, args, kwargs):
-		await message.add_reaction('⏳')
-
-		tweets = set()
+		tweets = set(self.load_data('tedcruz', default='[]'))
 
 		# this uses an ancient, non-Javascript mobile version of Twitter
 		page = requests.get('https://mobile.twitter.com/search?q=ted%20OR%20cruz%20OR%20tedcruz%20from%3Acommentiquette').text
 
 		while page:
 			links = { 'https://twitter.com' + link for link in re.findall('/commentiquette/status/\d+', page) }
+			found_existing_link = any([ link in tweets for link in links ])
 			tweets = tweets.union(links)
 
 			next_link_match = re.search('<a href="(.+)"> Load older Tweets </a>', page)
 
-			if next_link_match:
+			if next_link_match and not found_existing_link:
 				next_link = 'https://mobile.twitter.com' + next_link_match.group(1)
 				page = requests.get(next_link).text
 			else:
 				page = None
 
 		await message.channel.send(random.choice(list(tweets)))
-		await message.remove_reaction('⏳', message.guild.me)
+		self.save_data('tedcruz', list(tweets))
