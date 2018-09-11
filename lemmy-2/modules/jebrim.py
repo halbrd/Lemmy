@@ -56,11 +56,10 @@ class Jebrim(Module):
 		jebrim_suspended = 'This account has been suspended' in requests.get('https://twitter.com/jebrim').text
 		the1jebrim_suspended = 'This account has been suspended' in requests.get('https://twitter.com/the1jebrim').text
 
-		if jebrim_suspended and the1jebrim_suspended:
-			await message.channel.send('Yes, @Jebrim and @The1Jebrim are both suspended.')
-		elif jebrim_suspended and not the1jebrim_suspended:
-			await message.channel.send('@Jebrim is suspended from Twitter, but @The1Jebrim is not.')
-		elif not jebrim_suspended and the1jebrim_suspended:
-			await message.channel.send('@The1Jebrim is suspended from Twitter, but @Jebrim is not.')
-		else:
-			await message.channel.send('No, Jebrim is not suspended from Twitter! :tada:')
+		banned_symbol = '💔'
+		unbanned_symbol = '💚'
+		jebrim_indicator = banned_symbol if jebrim_suspended else unbanned_symbol
+		the1jebrim_indicator = banned_symbol if the1jebrim_suspended else unbanned_symbol
+
+		await message.channel.send(f'{jebrim_indicator} @Jebrim\n{the1jebrim_indicator} @The1Jebrim')
+
