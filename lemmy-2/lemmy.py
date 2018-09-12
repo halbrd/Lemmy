@@ -203,6 +203,9 @@ class Lemmy:
 		self.log('Received SIGTERM.')
 		await self.shutdown()
 
+	# async def send_text_file(self, body, file_name='text.txt'):
+
+
 
 
 if __name__ == '__main__':
