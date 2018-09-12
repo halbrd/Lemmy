@@ -50,9 +50,3 @@ class Memes(Module):
 
 		await message.channel.send(random.choice(list(tweets)))
 		self.save_data('tedcruz', list(tweets))
-
-	# docs_jebrim_dump = {
-	# 	'description': 'Sends a file with all Jebrim links'
-	# }
-	# async def cmd_jebrim__dump(self, message, args, kwargs):
-

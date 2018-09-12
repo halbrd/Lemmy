@@ -67,3 +67,8 @@ class Jebrim(Module):
 		embed.description = '\n'.join(account_lines)
 		await message.channel.send(embed=embed)
 
+	docs_jebrim_dump = {
+		'description': 'Sends a file containing the entire Jebrim database'
+	}
+	async def cmd_jebrim_dump(self, message, args, kwargs):
+		await self.lemmy.send_text_file('\n'.join(self.get_tweets()), message.channel, file_name='jebrim-tweets.txt')

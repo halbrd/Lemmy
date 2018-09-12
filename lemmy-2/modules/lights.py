@@ -48,3 +48,9 @@ class Lights(Module):
 			await self.send_error(message, 'Lights database is empty')
 		else:
 			await message.channel.send(random.choice(screenshots))
+
+	docs_lights_dump = {
+		'description': 'Sends a file containing the entire Lights database'
+	}
+	async def cmd_lights_dump(self, message, args, kwargs):
+		await self.lemmy.send_text_file('\n'.join(self.get_screenshots()), message.channel, file_name='lights-screenshots.txt')
