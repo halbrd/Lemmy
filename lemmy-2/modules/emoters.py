@@ -123,6 +123,20 @@ class Emoters(Module):
         im.save(output_file, 'PNG')
         return output_file.getvalue()
 
+    def normalize_image(image, dimensions):
+        # TODO
+
+    def rotate_image(image, degrees):
+        image.rotate(degrees)
+        return image
+
+    def flip_image(image, flipv=False, fliph=False):
+        if flipv: image.flip()
+        if fliph: image.flop()
+
+        return image
+
+
 ### Much Ado About Images ###
 # Problem: PIL can't render gifs with transparency
 # Issues this causes:

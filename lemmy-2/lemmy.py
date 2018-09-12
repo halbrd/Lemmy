@@ -216,7 +216,6 @@ class Lemmy:
 
 
 
-
 if __name__ == '__main__':
 	if not os.path.isfile('config.json'):
 		raise Lemmy.NoConfigException
