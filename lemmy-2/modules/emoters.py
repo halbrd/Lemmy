@@ -28,20 +28,15 @@ class Emoters(Module):
 
         delete_message = False
         for arg in args:
-            discord_file = None
+            emoter_details = self.get_emoter_details_by_name(arg)
 
-            if arg in self.instance_emotes:
-                discord_file = self.get_image_as_discord_file(self.instance_emotes[arg], 'emote', static=False)
-            elif arg in self.instance_stickers:
-                discord_file = self.get_image_as_discord_file(self.instance_stickers[arg], 'sticker', static=False)
-            elif arg in self.static_emotes:
-                discord_file = self.get_image_as_discord_file(self.static_emotes[arg], 'emote', static=True)
-            elif arg in self.static_stickers:
-                discord_file = self.get_image_as_discord_file(self.static_stickers[arg], 'sticker', static=True)
-
-            if discord_file:
+            if emoter_details:
+                image_bytes = self.get_image_bytes(emoter_details['file_name'],
+                                                   emoter_details['type'],
+                                                   emoter_details['static'])
+                discord_file = self.lemmy.to_discord_file(image_bytes, emoter_details['file_name'])
                 await self.send_image(discord_file, message.channel, vanity_username=message.author.name,
-                vanity_avatar_url=message.author.avatar_url)
+                  vanity_avatar_url=message.author.avatar_url)
                 delete_message = True
 
         if delete_message:
@@ -69,12 +64,29 @@ class Emoters(Module):
         self.static_stickers = self._load_emoters('sticker', static=True)
         self.instance_stickers = self._load_emoters('sticker', static=False)
 
-    # TODO: refactor into filename -> bytes, bytes -> discordfile
-    def get_image_as_discord_file(self, file_name, emoter_type, static):
-        image_bytes = self.load_image(f'{emoter_type}/{file_name}', static=static)
-        image_file = io.BytesIO(image_bytes)
-        discord_file = discord.File(fp=image_file, filename=file_name)
-        return discord_file
+    def get_image_bytes(self, file_name, emoter_type, static):
+        return self.load_image(f'{emoter_type}/{file_name}', static=static)
+
+    def get_emoter_details_by_name(self, name):
+        emoter_details = None
+
+        if name in self.instance_emotes:
+            emoter_details = (self.instance_emotes[name], 'emote', False)
+        elif name in self.instance_stickers:
+            emoter_details = (self.instance_stickers[name], 'sticker', False)
+        elif name in self.static_emotes:
+            emoter_details = (self.static_emotes[name], 'emote', True)
+        elif name in self.static_stickers:
+            emoter_details = (self.static_stickers[name], 'sticker', True)
+
+        if emoter_details is None:
+            return None
+        else:
+            return {
+                'file_name': emoter_details[0],
+                'type': emoter_details[1],
+                'static': emoter_details[2]
+            }
 
     async def get_webhook(self, channel, webhook_name):
         return discord.utils.find(lambda x: x.name == webhook_name, await channel.webhooks()) or await channel.create_webhook(name=webhook_name)

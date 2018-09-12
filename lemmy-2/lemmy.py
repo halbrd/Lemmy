@@ -10,6 +10,7 @@ import re
 from itertools import zip_longest
 import logging
 import signal
+import io
 
 sys.path.append('modules')
 
@@ -204,6 +205,15 @@ class Lemmy:
 	async def handle_sigterm(self):
 		self.log('Received SIGTERM.')
 		await self.shutdown()
+
+	def to_discord_file(self, contents, file_name):
+		if type(contents) == bytes:
+			contents = io.BytesIO(contents)
+		elif type(contents) == str:
+			contents = io.StringIO(contents)
+
+		return discord.File(fp=contents, filename=file_name)
+
 
 
 
