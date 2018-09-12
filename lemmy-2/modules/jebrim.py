@@ -54,15 +54,16 @@ class Jebrim(Module):
 		'description': 'Checks if Jebrim is suspended on Twitter'
 	}
 	async def cmd_is_jebrim_suspended(self, message, args, kwargs):
-		jebrim_suspended = 'This account has been suspended' in requests.get('https://twitter.com/jebrim').text
-		the1jebrim_suspended = 'This account has been suspended' in requests.get('https://twitter.com/the1jebrim').text
+		accounts = ['Jebrim', 'The1Jebrim']
+		account_lines = []
 
-		banned_symbol = '💔'
-		unbanned_symbol = '💚'
-		jebrim_indicator = banned_symbol if jebrim_suspended else unbanned_symbol
-		the1jebrim_indicator = banned_symbol if the1jebrim_suspended else unbanned_symbol
+		for account in accounts:
+			suspended = 'This account has been suspended' in requests.get('https://twitter.com/' + account).text
+			indicator = '💔' if suspended else '💚'
+			line = f'{indicator} [@{account}](https://twitter.com/{account})'
+			account_lines.append(line)
 
 		embed = discord.Embed()
-		embed.description = f'{jebrim_indicator} [@Jebrim](https://twitter.com/Jebrim)\n{the1jebrim_indicator} [@The1Jebrim](https://twitter.com/The1Jebrim)'
+		embed.description = '\n'.join(account_lines)
 		await message.channel.send(embed=embed)
 
