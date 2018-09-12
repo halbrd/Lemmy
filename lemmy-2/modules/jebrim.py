@@ -6,6 +6,7 @@ import json
 import random
 import re
 import requests
+import discord
 
 class Jebrim(Module):
 	docs = {
@@ -61,5 +62,7 @@ class Jebrim(Module):
 		jebrim_indicator = banned_symbol if jebrim_suspended else unbanned_symbol
 		the1jebrim_indicator = banned_symbol if the1jebrim_suspended else unbanned_symbol
 
-		await message.channel.send(f'{jebrim_indicator} @Jebrim\n{the1jebrim_indicator} @The1Jebrim')
+		embed = discord.Embed()
+		embed.description = f'{jebrim_indicator} [@Jebrim](https://twitter.com/Jebrim)\n{the1jebrim_indicator} [@The1Jebrim](https://twitter.com/The1Jebrim)'
+		await message.channel.send(embed=embed)
 
