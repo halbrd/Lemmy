@@ -5,10 +5,11 @@ from module import Module
 import discord
 import os
 import io
+from wand.image import Image, Color
 
 WEBHOOK_NAME = 'Lemmy Emotes'
-EMOTE_MAX_SIZE = 64, 64
-STICKER_MAX_SIZE = 128, 128
+EMOTE_MAX_SIZE = 64
+STICKER_MAX_SIZE = 128
 
 class Emoters(Module):
     docs = {
@@ -123,18 +124,44 @@ class Emoters(Module):
         im.save(output_file, 'PNG')
         return output_file.getvalue()
 
-    def normalize_image(image, dimensions):
-        # TODO
+    def normalize_image(self, image, side_length=None, pad=True):
+        # resize image, maintaining aspect ratio
+        if side_length:
+            image.transform(resize=f'x{side_length}')
 
-    def rotate_image(image, degrees):
+        # pad image with transparency so that it's square
+        if pad:
+            target_side_length = max(image.size)
+            pad_left = target_side_length - image.size[0]
+            pad_top = target_side_length - image.size[1]
+
+            new_image = Image(width=target_side_length, height=target_side_length, background=Color('transparent'))
+            new_image.format = image.format.lower()
+            new_image.composite(image, left=pad_left // 2, top=pad_top // 2)
+            image = new_image
+
+        return image
+
+    def rotate_image(self, image, degrees):
         image.rotate(degrees)
         return image
 
-    def flip_image(image, flipv=False, fliph=False):
+    def flip_image(self, image, flipv=False, fliph=False):
         if flipv: image.flip()
         if fliph: image.flop()
 
         return image
+
+    async def cmd_test_wand(self, message, args, kwargs):
+        img_bytes = self.get_image_bytes('DOSCassidy.png', 'emote', True)
+        image = Image(blob=img_bytes)
+
+        image = self.normalize_image(image, EMOTE_MAX_SIZE)
+
+        img_bytes = image.make_blob()
+        discord_file = self.lemmy.to_discord_file(img_bytes, 'DOSCassidy.png')
+        await self.send_image(discord_file, message.channel, vanity_username=message.author.name,
+          vanity_avatar_url=message.author.avatar_url)
 
 
 ### Much Ado About Images ###
