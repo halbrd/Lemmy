@@ -27,21 +27,39 @@ class Emoters(Module):
 
         args = Module.deconstruct_message(message)['args']
 
-        delete_message = False
-        for arg in args:
-            emoter_details = self.get_emoter_details_by_name(arg)
+        if all(self.get_emoter_details_by_name(arg.split(':')[0]) for arg in args):
+            print('all terms are emotes')
 
-            if emoter_details:
-                image_bytes = self.get_image_bytes(emoter_details['file_name'],
-                                                   emoter_details['type'],
-                                                   emoter_details['static'])
-                discord_file = self.lemmy.to_discord_file(image_bytes, emoter_details['file_name'])
-                await self.send_image(discord_file, message.channel, vanity_username=message.author.name,
-                  vanity_avatar_url=message.author.avatar_url)
-                delete_message = True
+            images = []
+            for arg in args:
+                terms = arg.split(':')
+                emoter_name = terms[0]
+                emoter_details = self.get_emoter_details_by_name(emoter_name)
 
-        if delete_message:
-            await message.delete()
+                steps = []
+                for term in terms[1:]:
+                    if term.startswith('flip'):
+                        steps.append(('flip', term[4:]))
+                    elif term.startswith('rotate'):
+                        steps.append(('rotate', int(term[7:-1])))
+                    else:
+                        raise ValueError(f"'{term}' is not a valid image operation")
+
+                image_bytes = self.get_image_bytes(emoter_details['file_name'], emoter_details['type'], emoter_details['static'])
+
+                images.append(self.process_image(image_bytes, steps))
+
+            base_image = Image(width=sum(image.size[0] for image in images), height=max(image.size[1] for image in images))
+            base_image.format = images[1].format.lower()
+            x_cursor = 0
+
+            for image in images:
+                base_image.composite(image, left=x_cursor, top=(base_image.size[1] - image.size[1]) // 2)
+                x_cursor += image.size[0]
+
+            discord_file = self.lemmy.to_discord_file(base_image.make_blob(), emoter_details['file_name'])
+            await self.send_image(discord_file, message.channel, vanity_username=message.author.name,
+              vanity_avatar_url=message.author.avatar_url)
 
     def _load_emoters(self, emoter_type, static):
         # list all files in emoter directory
@@ -142,13 +160,26 @@ class Emoters(Module):
 
         return image
 
-    def rotate_image(self, image, degrees):
-        image.rotate(degrees)
-        return image
+    def process_image(self, image_bytes, steps):
+        image = Image(blob=image_bytes)
 
-    def flip_image(self, image, flipv=False, fliph=False):
-        if flipv: image.flip()
-        if fliph: image.flop()
+        image = self.normalize_image(image, EMOTE_MAX_SIZE)
+
+        for step in steps:
+
+            if step[0] == 'flip':
+                if step[1] == 'v':
+                    image.flip()
+                elif step[1] == 'h':
+                    image.flop()
+                else:
+                    raise ValueError("image flip parameter must be 'v' or 'h'")
+
+            elif step[0] == 'rotate':
+                image.rotate(step[1])
+
+            else:
+                raise ValueError(f"'{step[0]}' is not a valid image operation")
 
         return image
 
