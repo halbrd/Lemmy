@@ -6,6 +6,7 @@ import discord
 import os
 import io
 from wand.image import Image, Color
+import re
 
 WEBHOOK_NAME = 'Lemmy Emotes'
 EMOTE_MAX_SIZE = 64
@@ -26,36 +27,48 @@ class Emoters(Module):
         await self.call_functions(message)
 
         args = Module.deconstruct_message(message)['args']
+        details = list(map(lambda arg: self.get_emoter_details_by_name(arg.split(':')[0]), args))
 
-        if all(self.get_emoter_details_by_name(arg.split(':')[0]) for arg in args):
-            print('all terms are emotes')
+        if all(details):
+            # every arg is a valid emote
 
+            # assemble list of processed Wand images
             images = []
-            for arg in args:
+            for arg, emoter_details in zip(args, details):
                 terms = arg.split(':')
                 emoter_name = terms[0]
-                emoter_details = self.get_emoter_details_by_name(emoter_name)
+                suffixes = terms[1:]
 
+                # validate suffixes
+                for suffix in suffixes:
+                    if not (suffix in { 'fliph', 'flipv' } or re.match('rotate\(-?\d+\)')):
+                        await self.send_error(message.channel, f"'{suffix}' is not a valid emote operation")
+                        return
+
+                # parse suffixes into steps
                 steps = []
-                for term in terms[1:]:
-                    if term.startswith('flip'):
-                        steps.append(('flip', term[4:]))
-                    elif term.startswith('rotate'):
-                        steps.append(('rotate', int(term[7:-1])))
+                for suffix in suffixes:
+                    if suffix.startswith('flip'):
+                        steps.append(('flip', suffix[4:]))
+                    elif suffix.startswith('rotate'):
+                        steps.append(('rotate', int(suffix[7:-1])))
                     else:
-                        raise ValueError(f"'{term}' is not a valid image operation")
+                        raise ValueError(f"'{suffix}' is not a valid image operation")
 
                 image_bytes = self.get_image_bytes(emoter_details['file_name'], emoter_details['type'], emoter_details['static'])
 
                 images.append(self.process_image(image_bytes, steps))
 
-            base_image = Image(width=sum(image.size[0] for image in images), height=max(image.size[1] for image in images))
-            base_image.format = images[1].format.lower()
-            x_cursor = 0
+            if len(images) == 1:   # skip compositing if there's only 1 image, mainly to allow GIFs to remain animated
+                base_image = images[0]
+            else:
+                base_image = Image(width=sum(image.size[0] for image in images), height=max(image.size[1] for image in images))
+                base_image.format = images[0].format.lower()
+                x_cursor = 0
 
-            for image in images:
-                base_image.composite(image, left=x_cursor, top=(base_image.size[1] - image.size[1]) // 2)
-                x_cursor += image.size[0]
+                for image in images:
+                    base_image.composite(image, left=x_cursor, top=(base_image.size[1] - image.size[1]) // 2)
+                    x_cursor += image.size[0]
 
             discord_file = self.lemmy.to_discord_file(base_image.make_blob(), emoter_details['file_name'])
             await self.send_image(discord_file, message.channel, vanity_username=message.author.name,
