@@ -30,7 +30,6 @@ class Emoters(Module):
 
         args = Module.deconstruct_message(message)['args']
         args = list(map(lambda arg: arg.split(OPERATION_DELIMITER), args))
-        print(args)
 
         if len(args) > 0 and all([self.is_emoter(arg[0]) for arg in args]):   # every arg is a valid emote
             # collect details and parse operations into convenient dictionary
@@ -59,7 +58,6 @@ class Emoters(Module):
             if len(images) == 1:   # skip compositing if there's only 1 image, mainly to allow GIFs to remain animated
                 base_image = images[0]
             else:
-                print(images)
                 base_image = Image(width=sum(image.size[0] for image in images), height=max(image.size[1] for image in images))
                 base_image.format = images[0].format.lower()
                 x_cursor = 0
