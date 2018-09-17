@@ -11,6 +11,8 @@ import re
 WEBHOOK_NAME = 'Lemmy Emotes'
 EMOTE_MAX_SIZE = 64
 STICKER_MAX_SIZE = 128
+OPERATION_DELIMITER = '/'
+OPERATION_PARAM_DELIMITER = ':'
 
 class Emoters(Module):
     docs = {
@@ -27,41 +29,37 @@ class Emoters(Module):
         await self.call_functions(message)
 
         args = Module.deconstruct_message(message)['args']
-        details = list(map(lambda arg: self.get_emoter_details_by_name(arg.split(':')[0]), args))
+        args = list(map(lambda arg: arg.split(OPERATION_DELIMITER), args))
+        print(args)
 
-        if all(details):
-            # every arg is a valid emote
+        if len(args) > 0 and all([self.is_emoter(arg[0]) for arg in args]):   # every arg is a valid emote
+            # collect details and parse operations into convenient dictionary
+            emoters = []
+            for emoter_phrase in args:
+                emoter = self.get_emoter_details_by_name(emoter_phrase[0])
+                emoter['name'] = emoter_phrase[0]
+                emoter['steps'] = []
 
-            # assemble list of processed Wand images
+                for step in emoter_phrase[1:]:
+                    assert len(step.split(OPERATION_PARAM_DELIMITER)) == 2
+                    emoter['steps'].append((step.split(OPERATION_PARAM_DELIMITER)[0], step.split(OPERATION_PARAM_DELIMITER)[1]))
+
+                emoters.append(emoter)
+
+            # assemble list of processed emotes as Wand images
             images = []
-            for arg, emoter_details in zip(args, details):
-                terms = arg.split(':')
-                emoter_name = terms[0]
-                suffixes = terms[1:]
-
+            for emoter in emoters:
                 # validate suffixes
-                for suffix in suffixes:
-                    if not (suffix in { 'fliph', 'flipv' } or re.match('rotate\(-?\d+\)')):
-                        await self.send_error(message.channel, f"'{suffix}' is not a valid emote operation")
-                        return
+                # skipping for now to reduce complexity in development
 
-                # parse suffixes into steps
-                steps = []
-                for suffix in suffixes:
-                    if suffix.startswith('flip'):
-                        steps.append(('flip', suffix[4:]))
-                    elif suffix.startswith('rotate'):
-                        steps.append(('rotate', int(suffix[7:-1])))
-                    else:
-                        raise ValueError(f"'{suffix}' is not a valid image operation")
+                image_bytes = self.get_image_bytes(emoter['file_name'], emoter['type'], emoter['static'])
 
-                image_bytes = self.get_image_bytes(emoter_details['file_name'], emoter_details['type'], emoter_details['static'])
-
-                images.append(self.process_image(image_bytes, steps))
+                images.append(self.process_image(image_bytes, emoter['steps']))
 
             if len(images) == 1:   # skip compositing if there's only 1 image, mainly to allow GIFs to remain animated
                 base_image = images[0]
             else:
+                print(images)
                 base_image = Image(width=sum(image.size[0] for image in images), height=max(image.size[1] for image in images))
                 base_image.format = images[0].format.lower()
                 x_cursor = 0
@@ -70,7 +68,7 @@ class Emoters(Module):
                     base_image.composite(image, left=x_cursor, top=(base_image.size[1] - image.size[1]) // 2)
                     x_cursor += image.size[0]
 
-            discord_file = self.lemmy.to_discord_file(base_image.make_blob(), emoter_details['file_name'])
+            discord_file = self.lemmy.to_discord_file(base_image.make_blob(), emoter['file_name'])
             await self.send_image(discord_file, message.channel, vanity_username=message.author.name,
               vanity_avatar_url=message.author.avatar_url)
 
@@ -98,6 +96,9 @@ class Emoters(Module):
 
     def get_image_bytes(self, file_name, emoter_type, static):
         return self.load_image(f'{emoter_type}/{file_name}', static=static)
+
+    def is_emoter(self, name):
+        return name in self.static_emotes or name in self.static_stickers or name in self.instance_emotes or name in self.instance_stickers
 
     def get_emoter_details_by_name(self, name):
         emoter_details = None
@@ -155,23 +156,26 @@ class Emoters(Module):
         im.save(output_file, 'PNG')
         return output_file.getvalue()
 
-    def normalize_image(self, image, side_length=None, pad=True):
-        # resize image, maintaining aspect ratio
-        if side_length:
-            image.transform(resize=f'x{side_length}')
+    def normalize_image(self, image_seq, side_length=None, pad=True):
+        for i, image in enumerate(image_seq.sequence):
+            # resize image, maintaining aspect ratio
+            if side_length:
+                image.transform(resize=f'x{side_length}')
 
-        # pad image with transparency so that it's square
-        if pad:
-            target_side_length = max(image.size)
-            pad_left = target_side_length - image.size[0]
-            pad_top = target_side_length - image.size[1]
+            # pad image with transparency so that it's square
+            if pad:
+                target_side_length = max(image.size)
+                pad_left = target_side_length - image.size[0]
+                pad_top = target_side_length - image.size[1]
 
-            new_image = Image(width=target_side_length, height=target_side_length, background=Color('transparent'))
-            new_image.format = image.format.lower()
-            new_image.composite(image, left=pad_left // 2, top=pad_top // 2)
-            image = new_image
+                new_image = Image(width=target_side_length, height=target_side_length, background=Color('transparent'))
+                new_image.format = image_seq.format.lower()
+                new_image.composite(image, left=pad_left // 2, top=pad_top // 2)
+                image = new_image
 
-        return image
+            image_seq.sequence[i] = image
+
+        return image_seq
 
     def process_image(self, image_bytes, steps):
         image = Image(blob=image_bytes)
@@ -189,7 +193,7 @@ class Emoters(Module):
                     raise ValueError("image flip parameter must be 'v' or 'h'")
 
             elif step[0] == 'rotate':
-                image.rotate(step[1])
+                image.rotate(int(step[1]))
 
             else:
                 raise ValueError(f"'{step[0]}' is not a valid image operation")
@@ -197,13 +201,14 @@ class Emoters(Module):
         return image
 
     async def cmd_test_wand(self, message, args, kwargs):
-        img_bytes = self.get_image_bytes('DOSCassidy.png', 'emote', True)
+        img_bytes = self.get_image_bytes('Konga.gif', 'emote', True)
         image = Image(blob=img_bytes)
+        await message.channel.send(f'frames: {len(image.sequence)}')
 
         image = self.normalize_image(image, EMOTE_MAX_SIZE)
 
         img_bytes = image.make_blob()
-        discord_file = self.lemmy.to_discord_file(img_bytes, 'DOSCassidy.png')
+        discord_file = self.lemmy.to_discord_file(img_bytes, 'Konga.gif')
         await self.send_image(discord_file, message.channel, vanity_username=message.author.name,
           vanity_avatar_url=message.author.avatar_url)
 
