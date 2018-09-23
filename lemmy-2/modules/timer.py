@@ -37,24 +37,32 @@ timers = [
         CHECK_INTERVAL = 1
 
         while True:
-            try:
-                for timer in self.timers:
-                    if datetime.datetime.now() > timer['expiration']:
-                        message = f'{timer["creator"].mention} Your timer for {timer["duration"]} is up.'
-                        if timer['message']:
-                            message += '\n' + timer['message']
-                        await timer['destination'].send(message)
+            # try:
+            for timer in self.timers:
+                if datetime.datetime.now() > timer['expiration']:
+                    message = f'{timer["creator"].mention} Your timer for {timer["duration"]} is up.'
+                    if timer['message']:
+                        message += '\n' + timer['message']
+                    await timer['destination'].send(message)
 
-                await asyncio.sleep(CHECK_INTERVAL)
+            await asyncio.sleep(CHECK_INTERVAL)
             # except Exception as e:   # prevent an exception from killing the job
             #     logging.error(f'Exception in check_timers job: {type(exception).__name__}: {str(exception)}')
             #     continue
 
 
 	docs_timer = {
-		'description': 'Creates a new countdown timer',
-		'usage': 'timer <duration or end datetime>',
-		'examples': [ 'timer 3s', 'timer 1d2h3m4s', 'timer 2018-09-17', 'timer 2018-09-17 16:20:27', 'timer 7:45' ]
+		'description': 'Starts a countdown timer',
+		'usage': 'timer <duration> <message>',
+		'examples': [ 'timer 3s', 'timer 1d2h3m4s', 'timer 7:45' ]
 	}
 	async def cmd_timer(self, message, args, kwargs):
 		pass
+
+    docs_remindme = {
+        'description': 'Reminds the user of something at the specified time',
+        'usage': 'remindme <activation date time> <message>',
+        'examples': [ 'remindme 2020-09-24 "September 24th, 2020!"', 'remindme 2020-05-13/13:22:57 "1:22:57pm, May 13th, 2020!"' ]
+    }
+    async def cmd_remindme(self, message, args, kwargs):
+        pass
