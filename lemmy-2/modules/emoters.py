@@ -154,26 +154,26 @@ class Emoters(Module):
         im.save(output_file, 'PNG')
         return output_file.getvalue()
 
-    def normalize_image(self, image_seq, side_length=None, pad=True):
-        for i, image in enumerate(image_seq.sequence):
-            # resize image, maintaining aspect ratio
+    def normalize_image(self, image, side_length=None, pad=True):
+        for i, frame in enumerate(image.sequence):
+            # resize frame, maintaining aspect ratio
             if side_length:
-                image.transform(resize=f'x{side_length}')
+                frame.transform(resize=f'x{side_length}')
 
-            # pad image with transparency so that it's square
+            # pad frame with transparency so that it's square
             if pad:
-                target_side_length = max(image.size)
-                pad_left = target_side_length - image.size[0]
-                pad_top = target_side_length - image.size[1]
+                target_side_length = max(frame.size)
+                pad_left = target_side_length - frame.size[0]
+                pad_top = target_side_length - frame.size[1]
 
-                new_image = Image(width=target_side_length, height=target_side_length, background=Color('transparent'))
-                new_image.format = image_seq.format.lower()
-                new_image.composite(image, left=pad_left // 2, top=pad_top // 2)
-                image = new_image
+                new_frame = Image(width=target_side_length, height=target_side_length, background=Color('transparent'))
+                new_frame.format = image.format.lower()
+                new_frame.composite(frame, left=pad_left // 2, top=pad_top // 2)
+                frame = new_frame
 
-            image_seq.sequence[i] = image
+            image.sequence[i] = frame
 
-        return image_seq
+        return image
 
     def process_image(self, image_bytes, steps):
         image = Image(blob=image_bytes)
