@@ -52,6 +52,10 @@ class Lemmy:
 			# perform asynchronous setup
 			await self.load_all_async()
 
+			# pass the event to the modules
+			for _, module in self.modules.items():
+				await module.on_ready()
+
 			self.log('Logged in.')
 
 		# log in

@@ -72,6 +72,9 @@ class Module:
 		if message.author != self.client.user:
 			await self.call_functions(message)
 
+	async def on_ready(self):
+		pass
+
 	async def call_functions(self, message):
 		# get parsed message
 		terms = Module.deconstruct_message(message)
