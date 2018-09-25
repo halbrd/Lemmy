@@ -154,31 +154,42 @@ class Emoters(Module):
         im.save(output_file, 'PNG')
         return output_file.getvalue()
 
+    #def _scale(self, image)
     def normalize_image(self, image, side_length=None, pad=True):
-        for i, frame in enumerate(image.sequence):
-            # resize frame, maintaining aspect ratio
-            if side_length:
-                frame.transform(resize=f'x{side_length}')
+        # resize frame, maintaining aspect ratio
+        if side_length:
+            for i, frame in enumerate(image.sequence):
+                print(f'frame pre resize size: {frame.size}')
+                frame.transform(resize=f'{side_length}x{side_length}')
 
-            # pad frame with transparency so that it's square
-            if pad:
+                image.sequence[i] = frame
+                print(f'frame post resize size: {frame.size}')
+
+        # pad frame with transparency so that it's square
+        if pad:
+            for i, frame in enumerate(image.sequence):
+                print(f'frame pre pad size: {frame.size}')
                 target_side_length = max(frame.size)
                 pad_left = target_side_length - frame.size[0]
                 pad_top = target_side_length - frame.size[1]
 
-                new_frame = Image(width=target_side_length, height=target_side_length, background=Color('transparent'))
-                new_frame.format = image.format.lower()
-                new_frame.composite(frame, left=pad_left // 2, top=pad_top // 2)
-                frame = new_frame
+                frame_copy = frame.copy()
+                frame.resize(target_side_length, target_side_length)
+                frame.transparentize(1)
+                frame.composite(frame_copy, left=pad_left // 2, top=pad_top // 2)
 
-            image.sequence[i] = frame
+                # print(f'pad left mod 2: {pad_left % 2}, pad top mod 2: {pad_top % 2}')
+                
+
+                image.sequence[i] = frame
+                print(f'frame post pad size: {frame.size}')
 
         return image
 
     def process_image(self, image_bytes, steps):
         image = Image(blob=image_bytes)
 
-        image = self.normalize_image(image, EMOTE_MAX_SIZE)
+        image = self.normalize_image(image, side_length=EMOTE_MAX_SIZE, pad=True)
 
         for step in steps:
 
@@ -209,6 +220,14 @@ class Emoters(Module):
         discord_file = self.lemmy.to_discord_file(img_bytes, 'Konga.gif')
         await self.send_image(discord_file, message.channel, vanity_username=message.author.name,
           vanity_avatar_url=message.author.avatar_url)
+
+    async def cmd_frame_dimensions(self, message, args, kwargs):
+        deets = self.get_emoter_details_by_name(args[0])
+        img_bytes = self.get_image_bytes(deets['file_name'], deets['type'], deets['static'])
+        image = Image(blob=img_bytes)
+        print(f'{type(image)}: {image.size}')
+        for frame in image.sequence:
+            print(f'{type(frame)}: {frame.size}')
 
 
 ### Much Ado About Images ###
