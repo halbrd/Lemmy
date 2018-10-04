@@ -154,52 +154,58 @@ class Emoters(Module):
         im.save(output_file, 'PNG')
         return output_file.getvalue()
 
+    def _scale_frame(self, frame, side_length, preserve_aspect_ratio):
+        if preserve_aspect_ratio:
+            frame.transform(resize=f'{side_length}x{side_length}')
+        else:
+            frame.resize(side_length, side_length)
+        return frame
+
+    def scale_image(self, image, side_length, preserve_aspect_ratio=True):
+        """ Scales a Wand image such that its longest side equals side_length """
+        new_image = Image()
+
+        for frame in image.sequence:
+            new_image.sequence.append(self._scale_frame(frame, side_length, preserve_aspect_ratio))
+
+        return new_image
+
+    def _pad_frame(self, frame):
+        # get a new empty SingleImage of the desired size
+        new_frame = frame.clone()
+        new_frame.transparentize(transparency=1)
+        target_side_length = max(frame.size)
+        new_frame.resize(width=target_side_length, height=target_side_length)
+
+        # paste the frame in the middle
+        pad_left = (target_side_length - frame.size[0]) // 2
+        pad_top = (target_side_length - frame.size[1]) // 2
+        new_frame.composite(frame, left=pad_left, top=pad_top)
+
+        return new_frame
+
+    def pad_image(self, image):
+        """ Pads a Wand image with transparency such that its shortest side becomes equal to its longest side """
+        new_image = Image()
+
+        for frame in image.sequence:
+            new_image.sequence.append(self._pad_frame(frame))
+
+        return new_image
+
     def normalize_image(self, image, side_length=None, pad=True):
-        for i, frame in enumerate(image.sequence):
-            for row in image.sequence[i]:
-                for col in row:
-                    print(int(col.alpha), end='')
-                print()
+        if side_length:
+            image = self.scale_image(image, side_length)
 
-            # resize frame, maintaining aspect ratio
-            if side_length:
-                print(f'frame pre resize size: {frame.size}')
-                frame.transform(resize=f'{side_length}x{side_length}')
-
-                image.sequence[i] = frame
-                print(f'frame post resize size: {frame.size}')
-
-        # pad frame with transparency so that it's square
         if pad:
-            print(f'frame pre pad size: {frame.size}')
-            # find out how much extra space needs to be added to make the frame square
-            target_side_length = max(frame.size)
-            pad_left = target_side_length - frame.size[0]
-            pad_top = target_side_length - frame.size[1]
-
-            # find the coordinates of the top left corner of the frame relative to the whole image
-            # TODO
-            frame_offset_left = 0
-            frame_offset_top = 0
-
-            # paste the frame onto a transparent square image of the right dimensions
-            new_frame = Image(width=target_side_length, height=target_side_length, background=Color('transparent'))
-            new_frame.format = image.format.lower()
-            new_frame.composite(frame, left=(pad_left // 2) + frame_offset_left, top=(pad_top // 2) + frame_offset_top)
-            frame = new_frame
-
-            print(f'pad left mod 2: {pad_left % 2}, pad top mod 2: {pad_top % 2}')
-
-
-            image.sequence[i] = frame
-            print(f'frame post pad size: {frame.size}')
+            image = self.pad_image(image)
 
         return image
 
     def process_image(self, image_bytes, steps):
         image = Image(blob=image_bytes)
 
-        image = self.normalize_image(image, side_length=EMOTE_MAX_SIZE, pad=True)
+        image = self.normalize_image(image, side_length=EMOTE_MAX_SIZE * 2, pad=True)
 
         for step in steps:
 
