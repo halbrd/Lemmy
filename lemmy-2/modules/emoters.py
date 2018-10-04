@@ -47,7 +47,7 @@ class Emoters(Module):
                     step_chunks = full_step.split(OPERATION_PARAM_DELIMITER)   # break up (step, parameter)
 
                     if len(step_chunks) != 2:   # more or less than the required (step, parameter) provided
-                        await self.send_error(message)
+                        await self.send_error(message, 'image modifiers should be formatted like `Kappa/rotate:45`')
                         return
 
                     emoter_details['steps'].append(
@@ -79,7 +79,7 @@ class Emoters(Module):
                 x_cursor = 0
 
                 for image in images:
-                    base_image.composite(image, left=x_cursor, top=(base_image.size[1] - image.size[1]) // 2)
+                    base_image.composite(image.sequence[0], left=x_cursor, top=(base_image.size[1] - image.size[1]) // 2)
                     x_cursor += image.size[0]
 
             # send image
@@ -236,7 +236,12 @@ class Emoters(Module):
                     raise ValueError("image flip parameter must be 'v' or 'h'")
 
             elif step[0] == 'rotate':
-                image.rotate(int(step[1]))
+                try:
+                    degrees = int(step[1])
+                except ValueError:
+                    raise ValueError(f"'{step[1]}' is not a valid integer")
+                else:
+                    image.rotate(degrees)
 
             else:
                 raise ValueError(f"'{step[0]}' is not a valid image operation")
