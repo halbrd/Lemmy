@@ -29,44 +29,62 @@ class Emoters(Module):
         await self.call_functions(message)
 
         args = Module.deconstruct_message(message)['args']
-        args = list(map(lambda arg: arg.split(OPERATION_DELIMITER), args))
+        args = [ arg.split(OPERATION_DELIMITER) for arg in args ]   # split emoter name and rules out
 
-        if len(args) > 0 and all([self.is_emoter(arg[0]) for arg in args]):   # every arg is a valid emote
+        # check if every arg is a valid emote
+        if len(args) > 0 and all([self.is_emoter(arg[0]) for arg in args]):
+
             # collect details and parse operations into convenient dictionary
             emoters = []
             for emoter_phrase in args:
-                emoter = self.get_emoter_details_by_name(emoter_phrase[0])
-                emoter['name'] = emoter_phrase[0]
-                emoter['steps'] = []
+                # record name, type, static
+                emoter_details = self.get_emoter_details_by_name(emoter_phrase[0])
+                emoter_details['name'] = emoter_phrase[0]
 
-                for step in emoter_phrase[1:]:
-                    assert len(step.split(OPERATION_PARAM_DELIMITER)) == 2
-                    emoter['steps'].append((step.split(OPERATION_PARAM_DELIMITER)[0], step.split(OPERATION_PARAM_DELIMITER)[1]))
+                # record steps
+                emoter_details['steps'] = []
+                for full_step in emoter_phrase[1:]:
+                    step_chunks = full_step.split(OPERATION_PARAM_DELIMITER)   # break up (step, parameter)
 
-                emoters.append(emoter)
+                    if len(step_chunks) != 2:   # more or less than the required (step, parameter) provided
+                        await self.send_error(message)
+                        return
+
+                    emoter_details['steps'].append(
+                        (step_chunks[0], step_chunks[1])
+                    )
+
+                emoters.append(emoter_details)
 
             # assemble list of processed emotes as Wand images
             images = []
             for emoter in emoters:
-                # validate suffixes
+                # TODO: validate suffixes
                 # skipping for now to reduce complexity in development
 
                 image_bytes = self.get_image_bytes(emoter['file_name'], emoter['type'], emoter['static'])
 
-                images.append(self.process_image(image_bytes, emoter['steps']))
+                try:
+                    images.append(self.process_image(image_bytes, emoter['steps']))
+                except ValueError as e:
+                    await self.send_error(message, comment=str(e))
+                    return
 
+            # assemble all images into single image to send
             if len(images) == 1:   # skip compositing if there's only 1 image, mainly to allow GIFs to remain animated
                 base_image = images[0]
             else:
                 base_image = Image(width=sum(image.size[0] for image in images), height=max(image.size[1] for image in images))
-                base_image.format = images[0].format.lower()
+                base_image.format = 'png'
                 x_cursor = 0
 
                 for image in images:
                     base_image.composite(image, left=x_cursor, top=(base_image.size[1] - image.size[1]) // 2)
                     x_cursor += image.size[0]
 
-            discord_file = self.lemmy.to_discord_file(base_image.make_blob(), emoter['file_name'])
+            # send image
+            file_name = ''.join([ emoter['name'] for emoter in emoters ]) + '.png'
+            discord_file = self.lemmy.to_discord_file(base_image.make_blob(), file_name)
             await self.send_image(discord_file, message.channel, vanity_username=message.author.name,
               vanity_avatar_url=message.author.avatar_url)
 
