@@ -154,11 +154,15 @@ class Emoters(Module):
         im.save(output_file, 'PNG')
         return output_file.getvalue()
 
-    #def _scale(self, image)
     def normalize_image(self, image, side_length=None, pad=True):
-        # resize frame, maintaining aspect ratio
-        if side_length:
-            for i, frame in enumerate(image.sequence):
+        for i, frame in enumerate(image.sequence):
+            for row in image.sequence[i]:
+                for col in row:
+                    print(int(col.alpha), end='')
+                print()
+
+            # resize frame, maintaining aspect ratio
+            if side_length:
                 print(f'frame pre resize size: {frame.size}')
                 frame.transform(resize=f'{side_length}x{side_length}')
 
@@ -167,22 +171,28 @@ class Emoters(Module):
 
         # pad frame with transparency so that it's square
         if pad:
-            for i, frame in enumerate(image.sequence):
-                print(f'frame pre pad size: {frame.size}')
-                target_side_length = max(frame.size)
-                pad_left = target_side_length - frame.size[0]
-                pad_top = target_side_length - frame.size[1]
+            print(f'frame pre pad size: {frame.size}')
+            # find out how much extra space needs to be added to make the frame square
+            target_side_length = max(frame.size)
+            pad_left = target_side_length - frame.size[0]
+            pad_top = target_side_length - frame.size[1]
 
-                frame_copy = frame.copy()
-                frame.resize(target_side_length, target_side_length)
-                frame.transparentize(1)
-                frame.composite(frame_copy, left=pad_left // 2, top=pad_top // 2)
+            # find the coordinates of the top left corner of the frame relative to the whole image
+            # TODO
+            frame_offset_left = 0
+            frame_offset_top = 0
 
-                # print(f'pad left mod 2: {pad_left % 2}, pad top mod 2: {pad_top % 2}')
-                
+            # paste the frame onto a transparent square image of the right dimensions
+            new_frame = Image(width=target_side_length, height=target_side_length, background=Color('transparent'))
+            new_frame.format = image.format.lower()
+            new_frame.composite(frame, left=(pad_left // 2) + frame_offset_left, top=(pad_top // 2) + frame_offset_top)
+            frame = new_frame
 
-                image.sequence[i] = frame
-                print(f'frame post pad size: {frame.size}')
+            print(f'pad left mod 2: {pad_left % 2}, pad top mod 2: {pad_top % 2}')
+
+
+            image.sequence[i] = frame
+            print(f'frame post pad size: {frame.size}')
 
         return image
 
