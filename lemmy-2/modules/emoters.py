@@ -157,34 +157,6 @@ class Emoters(Module):
         webhook = await self.get_webhook(destination, WEBHOOK_NAME)
         await webhook.send(username=vanity_username, avatar_url=vanity_avatar_url, file=discord_file)
 
-    async def cmd_emoter_list(self, message, args, kwargs):
-        await message.channel.send('Static emotes: ' + str(self.static_emotes))
-        await message.channel.send('Instance emotes: ' + str(self.instance_emotes))
-        await message.channel.send('Static stickers: ' + str(self.static_stickers))
-        await message.channel.send('Instance stickers: ' + str(self.instance_stickers))
-
-    def normalize_png_pillow(self, png_bytes, target_size):
-        # load bytes into PIL Image
-        image_file = io.BytesIO(png_bytes)
-        im = Image.open(image_file)
-
-        # resize image, maintaining aspect ratio
-        im.thumbnail(target_size, Image.ANTIALIAS)
-
-        # pad image out to a square
-        horizontal_padding = target_size[0] - image.size[0]
-        vertical_padding = target_size[1] - image.size[1]
-
-        square_image = Image.new(im.mode, target_size)
-        square_image.putalpha(0)   # fill image with transparent
-        square_image.paste(im, (horizontal_padding // 2, vertical_padding // 2))   # paste emote in center
-        image = square_image
-
-        # return bytes
-        output_file = io.BytesIO()
-        im.save(output_file, 'PNG')
-        return output_file.getvalue()
-
     def _scale_frame(self, frame, side_length, preserve_aspect_ratio):
         if preserve_aspect_ratio:
             frame.transform(resize=f'{side_length}x{side_length}')
@@ -260,6 +232,40 @@ class Emoters(Module):
                 raise ValueError(f"'{step[0]}' is not a valid image operation")
 
         return image
+
+#################
+### TO DELETE ###
+#################
+
+
+    def normalize_png_pillow(self, png_bytes, target_size):
+        # load bytes into PIL Image
+        image_file = io.BytesIO(png_bytes)
+        im = Image.open(image_file)
+
+        # resize image, maintaining aspect ratio
+        im.thumbnail(target_size, Image.ANTIALIAS)
+
+        # pad image out to a square
+        horizontal_padding = target_size[0] - image.size[0]
+        vertical_padding = target_size[1] - image.size[1]
+
+        square_image = Image.new(im.mode, target_size)
+        square_image.putalpha(0)   # fill image with transparent
+        square_image.paste(im, (horizontal_padding // 2, vertical_padding // 2))   # paste emote in center
+        image = square_image
+
+        # return bytes
+        output_file = io.BytesIO()
+        im.save(output_file, 'PNG')
+        return output_file.getvalue()
+
+
+    async def cmd_emoter_list(self, message, args, kwargs):
+        await message.channel.send('Static emotes: ' + str(self.static_emotes))
+        await message.channel.send('Instance emotes: ' + str(self.instance_emotes))
+        await message.channel.send('Static stickers: ' + str(self.static_stickers))
+        await message.channel.send('Instance stickers: ' + str(self.instance_stickers))
 
     async def cmd_test_wand(self, message, args, kwargs):
         img_bytes = self.get_image_bytes('Konga.gif', 'emote', True)
