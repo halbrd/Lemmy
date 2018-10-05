@@ -14,6 +14,12 @@ STICKER_MAX_SIZE = 128
 OPERATION_DELIMITER = '/'
 OPERATION_PARAM_DELIMITER = ':'
 
+# TODO: delete code
+# TODO: clean up and comment
+# TODO: standardize nomenclature (eg. step -> modifier)
+# TODO: user-facing documentation
+# TODO: make relevant functions static
+
 class Emoters(Module):
     docs = {
         'description': 'Handles emotes and stickers'
@@ -59,16 +65,12 @@ class Emoters(Module):
             # assemble list of processed emotes as Wand images
             images = []
             for emoter in emoters:
-                # TODO: validate suffixes
-                # skipping for now to reduce complexity in development
+                # validate modifiers
+                # TODO
 
                 image_bytes = self.get_image_bytes(emoter['file_name'], emoter['type'], emoter['static'])
 
-                try:
-                    images.append(self.process_image(image_bytes, emoter['steps']))
-                except ValueError as e:
-                    await self.send_error(message, comment=str(e))
-                    return
+                images.append(self.process_image(image_bytes, emoter['steps']))
 
             # assemble all images into single image to send
             if len(images) == 1:   # skip compositing if there's only 1 image, mainly to allow GIFs to remain animated
@@ -87,6 +89,17 @@ class Emoters(Module):
             discord_file = self.lemmy.to_discord_file(base_image.make_blob(), file_name)
             await self.send_image(discord_file, message.channel, vanity_username=message.author.name,
               vanity_avatar_url=message.author.avatar_url)
+
+    # this is how emoter moifiers are validated
+    # for a modifier to be valid, it must be a key in here, and its 1 parameter must fullmatch the corresponding pattern
+    modifier_validation = {
+        'rotate': '-?\d+',
+        'flip': '[vh]'
+    }
+
+    def _validate_modifier(self, modifier, parameter):
+        return modifier in Emoters.modifier_validation.keys
+          and re.fullmatch(Emoters.modifier_validation[modifier], parameter)
 
     def _load_emoters(self, emoter_type, static):
         # list all files in emoter directory
