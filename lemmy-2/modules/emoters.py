@@ -15,14 +15,25 @@ OPERATION_DELIMITER = '/'
 OPERATION_PARAM_DELIMITER = ':'
 
 # TODO: delete code
-# TODO: clean up and comment
-# TODO: standardize nomenclature (eg. step -> modifier)
 # TODO: user-facing documentation
 # TODO: make relevant functions static
 
 class Emoters(Module):
     docs = {
         'description': 'Handles emotes and stickers'
+    }
+
+    MODIFIERS = {
+        'rotate': {
+            'validate': lambda x: bool(re.fullmatch('-?\d+', x)),
+            'transform': lambda x: int(x),
+            'apply': lambda image, x: image.rotate(x)
+        },
+        'flip': {
+            'validate': lambda x: bool(re.fullmatch('[vh]', x)),
+            'transform': lambda x: x,
+            'apply': lambda image, x: image.flip() if x == 'v' else image.flop()
+        }
     }
 
     def __init__(self, client):
@@ -34,72 +45,94 @@ class Emoters(Module):
     async def on_message(self, message):
         await self.call_functions(message)
 
+        # transform message into arguments, and pre-emptively split emoter name and rules
+        # e.g. DOSCassidy/rotate:45/flip:h
+        #   -> ['DOSCassidy', 'rotate:45', 'flip:h']
         args = Module.deconstruct_message(message)['args']
-        args = [ arg.split(OPERATION_DELIMITER) for arg in args ]   # split emoter name and rules out
+        args = [ arg.split(OPERATION_DELIMITER) for arg in args ]
 
-        # check if every arg is a valid emote
-        if len(args) > 0 and all([self.is_emoter(arg[0]) for arg in args]):
+        # check if every arg is a valid emote, and stop here if this is not the case
+        everything_is_an_emoter = len(args) > 0 and all([self.is_emoter(arg[0]) for arg in args])
+        if not everything_is_an_emoter:
+            return
 
-            # collect details and parse operations into convenient dictionary
-            emoters = []
-            for emoter_phrase in args:
-                # record name, type, static
-                emoter_details = self.get_emoter_details_by_name(emoter_phrase[0])
-                emoter_details['name'] = emoter_phrase[0]
+        # transform emoter name and modifiers into a dictionary
+        # example:
+        # {
+        #   'name': 'DOSCassidy',
+        #   'type': 'emote',
+        #   'static': True,
+        #   'modifications': [ ('rotate', 45), ('flip', 'h') ]
+        # }
+        emoters = []
+        for emoter_phrase in args:
+            # initialise emoter_details with attributes: name, type, static
+            emoter_details = self.get_emoter_details_by_name(emoter_phrase[0])
+            # add in emoter name
+            emoter_details['name'] = emoter_phrase[0]
+            # add in modifications
+            try:
+                emoter_details['modifications'] = Emoters._split_raw_modifiers(emoter_phrase[1:])
+            except ValueError:
+                await self.send_error(message)
+                return
 
-                # record steps
-                emoter_details['steps'] = []
-                for full_step in emoter_phrase[1:]:
-                    step_chunks = full_step.split(OPERATION_PARAM_DELIMITER)   # break up (step, parameter)
+            emoters.append(emoter_details)
 
-                    if len(step_chunks) != 2:   # more or less than the required (step, parameter) provided
-                        await self.send_error(message, 'image modifiers should be formatted like `Kappa/rotate:45`')
-                        return
+        # transform emoter details into list of processed (with modifiers applied) Wand images
+        images = []
+        for emoter in emoters:
+            image_bytes = self.get_image_bytes(emoter['file_name'], emoter['type'], emoter['static'])
 
-                    emoter_details['steps'].append(
-                        (step_chunks[0], step_chunks[1])
-                    )
+            images.append(self.process_image(image_bytes, emoter['modifications']))
 
-                emoters.append(emoter_details)
+        # assemble all images into single image to send
+        if len(images) == 1:   # skip compositing if there's only 1 image, mainly to allow GIFs to remain animated
+            base_image = images[0]
+        else:
+            base_image = Image(width=sum(image.size[0] for image in images), height=max(image.size[1] for image in images))
+            base_image.format = 'png'
+            x_cursor = 0
 
-            # assemble list of processed emotes as Wand images
-            images = []
-            for emoter in emoters:
-                # validate modifiers
-                # TODO
+            for image in images:
+                base_image.composite(image.sequence[0], left=x_cursor, top=(base_image.size[1] - image.size[1]) // 2)
+                x_cursor += image.size[0]
 
-                image_bytes = self.get_image_bytes(emoter['file_name'], emoter['type'], emoter['static'])
+        # send image
+        file_name = ''.join([ emoter['name'] for emoter in emoters ]) + ('.gif' if base_image.format.lower() == 'gif' else '.png')
+        discord_file = self.lemmy.to_discord_file(base_image.make_blob(), file_name)
+        await self.send_image(discord_file, message.channel, vanity_username=message.author.name,
+            vanity_avatar_url=message.author.avatar_url)
 
-                images.append(self.process_image(image_bytes, emoter['steps']))
+    def _split_raw_modifiers(raw_modifiers):
+        # e.g. ['rotate:45', 'flip:h']
+        #   -> [ ('rotate', '45'), ('flip', 'h') ]
 
-            # assemble all images into single image to send
-            if len(images) == 1:   # skip compositing if there's only 1 image, mainly to allow GIFs to remain animated
-                base_image = images[0]
-            else:
-                base_image = Image(width=sum(image.size[0] for image in images), height=max(image.size[1] for image in images))
-                base_image.format = 'png'
-                x_cursor = 0
+        modifiers = []
 
-                for image in images:
-                    base_image.composite(image.sequence[0], left=x_cursor, top=(base_image.size[1] - image.size[1]) // 2)
-                    x_cursor += image.size[0]
+        for raw_modifier in raw_modifiers:
+            # split the modifier string
+            modifier_terms = tuple(raw_modifier.split(OPERATION_PARAM_DELIMITER))
 
-            # send image
-            file_name = ''.join([ emoter['name'] for emoter in emoters ]) + '.png'
-            discord_file = self.lemmy.to_discord_file(base_image.make_blob(), file_name)
-            await self.send_image(discord_file, message.channel, vanity_username=message.author.name,
-              vanity_avatar_url=message.author.avatar_url)
+            # check that there's exactly 1 parameter
+            if len(modifier_terms) != 2:
+                raise ValueError('modifiers must have exactly 1 parameter')
 
-    # this is how emoter moifiers are validated
-    # for a modifier to be valid, it must be a key in here, and its 1 parameter must fullmatch the corresponding pattern
-    modifier_validation = {
-        'rotate': '-?\d+',
-        'flip': '[vh]'
-    }
+            # there are two modifier terms - we can assign them names for clarity
+            modifier, parameter = modifier_terms
 
-    def _validate_modifier(self, modifier, parameter):
-        return modifier in Emoters.modifier_validation.keys
-          and re.fullmatch(Emoters.modifier_validation[modifier], parameter)
+            # validate modifier name and parameter
+            if not Emoters.MODIFIERS[modifier]['validate'](parameter):
+                raise ValueError(f'\'{modifier}: {parameter}\' is not a valid modifier')
+
+            # transform parameter
+            parameter = Emoters.MODIFIERS[modifier]['transform'](parameter)
+
+            # add our processed modifier to the list
+            modifiers.append((modifier, parameter))
+
+        return modifiers
+
 
     def _load_emoters(self, emoter_type, static):
         # list all files in emoter directory
@@ -127,7 +160,10 @@ class Emoters(Module):
         return self.load_image(f'{emoter_type}/{file_name}', static=static)
 
     def is_emoter(self, name):
-        return name in self.static_emotes or name in self.static_stickers or name in self.instance_emotes or name in self.instance_stickers
+        return name in self.static_emotes \
+          or name in self.static_stickers \
+          or name in self.instance_emotes \
+          or name in self.instance_stickers
 
     def get_emoter_details_by_name(self, name):
         emoter_details = None
@@ -205,31 +241,16 @@ class Emoters(Module):
 
         return image
 
-    def process_image(self, image_bytes, steps):
+    def process_image(self, image_bytes, modifications):
+        # turn image bytes into Wand image
         image = Image(blob=image_bytes)
 
-        image = self.normalize_image(image, side_length=EMOTE_MAX_SIZE * 2, pad=True)
+        # normalize image (scale to correct size, pad with transparency to make square)
+        image = self.normalize_image(image, side_length=EMOTE_MAX_SIZE, pad=True)
 
-        for step in steps:
-
-            if step[0] == 'flip':
-                if step[1] == 'v':
-                    image.flip()
-                elif step[1] == 'h':
-                    image.flop()
-                else:
-                    raise ValueError("image flip parameter must be 'v' or 'h'")
-
-            elif step[0] == 'rotate':
-                try:
-                    degrees = int(step[1])
-                except ValueError:
-                    raise ValueError(f"'{step[1]}' is not a valid integer")
-                else:
-                    image.rotate(degrees)
-
-            else:
-                raise ValueError(f"'{step[0]}' is not a valid image operation")
+        # apply modifiers
+        for modifier, parameter in modifications:
+            Emoters.MODIFIERS[modifier]['apply'](image, parameter)
 
         return image
 
