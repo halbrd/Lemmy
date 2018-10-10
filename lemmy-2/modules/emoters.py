@@ -84,7 +84,7 @@ class Emoters(Module):
         for emoter in emoters:
             image_bytes = self.get_image_bytes(emoter['file_name'], emoter['type'], emoter['static'])
 
-            images.append(self.process_image(image_bytes, emoter['modifications']))
+            images.append(Emoters.process_image(image_bytes, emoter['modifications']))
 
         # assemble all images into single image to send
         if len(images) == 1:   # skip compositing if there's only 1 image, mainly to allow GIFs to remain animated
@@ -193,23 +193,23 @@ class Emoters(Module):
         webhook = await self.get_webhook(destination, WEBHOOK_NAME)
         await webhook.send(username=vanity_username, avatar_url=vanity_avatar_url, file=discord_file)
 
-    def _scale_frame(self, frame, side_length, preserve_aspect_ratio):
+    def _scale_frame(frame, side_length, preserve_aspect_ratio):
         if preserve_aspect_ratio:
             frame.transform(resize=f'{side_length}x{side_length}')
         else:
             frame.resize(side_length, side_length)
         return frame
 
-    def scale_image(self, image, side_length, preserve_aspect_ratio=True):
+    def scale_image(image, side_length, preserve_aspect_ratio=True):
         """ Scales a Wand image such that its longest side equals side_length """
         new_image = Image()
 
         for frame in image.sequence:
-            new_image.sequence.append(self._scale_frame(frame, side_length, preserve_aspect_ratio))
+            new_image.sequence.append(Emoters._scale_frame(frame, side_length, preserve_aspect_ratio))
 
         return new_image
 
-    def _pad_frame(self, frame):
+    def _pad_frame(frame):
         # get a new empty SingleImage of the desired size
         new_frame = frame.clone()
         new_frame.transparentize(transparency=1)
@@ -223,30 +223,30 @@ class Emoters(Module):
 
         return new_frame
 
-    def pad_image(self, image):
+    def pad_image(image):
         """ Pads a Wand image with transparency such that its shortest side becomes equal to its longest side """
         new_image = Image()
 
         for frame in image.sequence:
-            new_image.sequence.append(self._pad_frame(frame))
+            new_image.sequence.append(Emoters._pad_frame(frame))
 
         return new_image
 
-    def normalize_image(self, image, side_length=None, pad=True):
+    def normalize_image(image, side_length=None, pad=True):
         if side_length:
-            image = self.scale_image(image, side_length)
+            image = Emoters.scale_image(image, side_length)
 
         if pad:
-            image = self.pad_image(image)
+            image = Emoters.pad_image(image)
 
         return image
 
-    def process_image(self, image_bytes, modifications):
+    def process_image(image_bytes, modifications):
         # turn image bytes into Wand image
         image = Image(blob=image_bytes)
 
         # normalize image (scale to correct size, pad with transparency to make square)
-        image = self.normalize_image(image, side_length=EMOTE_MAX_SIZE, pad=True)
+        image = Emoters.normalize_image(image, side_length=EMOTE_MAX_SIZE, pad=True)
 
         # apply modifiers
         for modifier, parameter in modifications:
