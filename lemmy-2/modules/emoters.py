@@ -17,6 +17,7 @@ OPERATION_PARAM_DELIMITER = ':'
 # TODO: delete code
 # TODO: user-facing documentation
 # TODO: make relevant functions static
+# TODO: scale modifiers
 
 class Emoters(Module):
     docs = {
@@ -253,6 +254,10 @@ class Emoters(Module):
             Emoters.MODIFIERS[modifier]['apply'](image, parameter)
 
         return image
+
+    async def cmd_emoter_search(self, message, args, kwargs):
+        pass   # TODO
+
 
 #################
 ### TO DELETE ###
