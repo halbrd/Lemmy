@@ -123,3 +123,77 @@ class Info(Module):
 		embed.timestamp = user.created_at
 
 		await message.channel.send(embed=embed)
+
+	def resolve_channel(server, term):
+		try_attrs = [ 'id', 'mention', 'name' ]
+
+		for attr in try_attrs:
+			channel = discord.utils.find(lambda channel: str(getattr(channel, attr)).lower() == term.lower(), server.channels)
+			if channel:
+				return channel
+
+		return None
+
+	docs_channelinfo = {
+		'description': 'Provides information about a channel',
+		'usage': 'channelinfo <id, name, or mention>',
+		'examples': [
+			'channelinfo 77041788564545536',
+			'channelinfo everything',
+			'channelinfo #everything'
+		]
+	}
+	async def cmd_channel_info(self, message, args, kwargs):
+		if len(args) != 1:
+			await self.send_error(message)
+			return
+
+		search_term = args[0]
+		channel = Info.resolve_channel(message.guild, search_term)
+
+		if not channel:
+			await self.send_error(message, comment=f'Couldn\'t find a channel that matched \'{search_term}\'')
+			return
+
+		embed = discord.Embed()
+
+		if type(channel) == discord.TextChannel:
+			# name, icon
+			embed.set_author(name='#' + channel.name, icon_url='https://i.imgur.com/zcaLaDF.png')
+			# slow mode delay
+			embed.add_field(name='Slow mode delay', value=f'{channel.slowmode_delay} seconds', inline=True)
+			# recent messages
+			messages_in_last_month = 0
+			messages_in_last_day = 0
+			hourglass_added = False
+
+			async for _message in channel.history(limit=None, after=datetime.datetime.now() - datetime.timedelta(days=28)):
+				messages_in_last_month += 1
+
+				if _message.created_at > datetime.datetime.now() - datetime.timedelta(days=1):
+					messages_in_last_day += 1
+
+				if messages_in_last_month > 100 and not hourglass_added:
+					await message.add_reaction('⏳')
+					hourglass_added = True
+
+			embed.add_field(name=f'{messages_in_last_day} messages in the past day', value=f'{messages_in_last_month} messages in the past month')
+		elif type(channel) == discord.VoiceChannel:
+			# name, icon
+			embed.set_author(name=channel.name, icon_url='https://i.imgur.com/htsk1oy.png')
+			# bitrate
+			embed.add_field(name='Bitrate', value=f'{channel.bitrate / 1000} kbps')
+			# user limit
+			embed.add_field(name='Capacity', value=f'{channel.user_limit} users' if channel.user_limit > 0 else 'unlimited')
+			# connected users
+			if len(channel.members) > 0:
+				embed.description = 'Currently talking:\n' + '\n'.join(f'* {member.nick or member.name}' for member in channel.members)
+		elif type(channel) == discord.CategoryChannel:
+			# name
+			embed.set_author(name='› ' + channel.name)
+		# created at
+		embed.set_footer(text=f'Created at:')
+		embed.timestamp = channel.created_at
+
+		await message.remove_reaction('⏳', message.guild.me)
+		await message.channel.send(embed=embed)
