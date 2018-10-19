@@ -5,6 +5,8 @@ from module import Module
 import discord
 from datetime import timezone
 
+# TODO: lookup external entities by ID
+
 class Info(Module):
 	docs = {
 		'description': 'Provides information about a Discord entity'
@@ -17,26 +19,49 @@ class Info(Module):
 		server = message.channel.guild
 		embed = discord.Embed()
 
-		embed.title = 'Server info: ' + server.name
+		# name
+		embed.title = server.name
+		# splash url
 		if server.splash_url:
 			embed.url = server.splash_url
-		embed.add_field(name=f'{server.member_count} members', value='Large server' if server.large else 'Standard server', inline=True)
-		embed.add_field(name='Region', value=server.region, inline=True)
+		# member count and server size
+		embed.add_field(name=f'{server.member_count} members', value='Large-sized server' if server.large else 'Standard-sized server', inline=True)
+		# id
 		embed.add_field(name='Unique ID', value=server.id, inline=True)
-		embed.add_field(name='AFK voice channel', value=f'{server.afk_channel.name} ({server.afk_timeout // 60} mins)', inline=True)
-		embed.add_field(name='Default channel', value='#' + server.default_channel.name, inline=True)
-		embed.add_field(name=f'Verification level: {server.verification_level}', value=f'MFA level: {server.mfa_level}', inline=True)
-		embed.add_field(name='Special Features', value=server.features if server.features else 'None', inline=True)
+		# roles
 		role_counts = {}
 		for member in server.members:
 			for role in member.roles:
 				role_counts[role.name] = role_counts.get(role.name, 0) + 1
 		sorted_roles = sorted(role_counts, key=role_counts.get, reverse=True)
-		embed.add_field(name=f'{len(server.roles)} roles', value=f'Top roles: {", ".join(sorted_roles[1:4])}', inline=True)
+		embed.add_field(name=f'{len(server.roles)} roles', value=f'Top roles: {", ".join(sorted_roles[1:min([4, len(sorted_roles)])])}', inline=True)
+		# emojis
 		embed.add_field(name=f'{len(server.emojis)} emojis',
-		  value=f'{len(list(filter(lambda emoji: emoji.animated, server.emojis)))} animated')
+		  value=f'{len(list(filter(lambda emoji: not emoji.animated, server.emojis)))} static, {len(list(filter(lambda emoji: emoji.animated, server.emojis)))} animated', inline=True)
+		# afk voice channel
+		embed.add_field(name='AFK voice channel', value=f'{server.afk_channel.name} ({server.afk_timeout // 60} mins)', inline=True)
+		# system channel
+		embed.add_field(name='System channel', value='#' + server.system_channel.name, inline=True)
+		# region
+		embed.add_field(name='Voice region', value=server.region, inline=True)
+		# verification/mfa level
+		# note: the __str__ call on the following line is NOT redundant, due to how the enum resolves
+		embed.add_field(name=f'Verification level: {str(server.verification_level)}', value=f'MFA {"not " if server.mfa_level == 0 else ""}required', inline=True)
+		# content filter
+		embed.add_field(name=f'Content filter', value=server.explicit_content_filter, inline=True)
+		# owner
+		embed.add_field(name=f'Current owner', value=f'@{server.owner.nick or server.owner.name}', inline=True)
+		# splash
+		if server.splash:
+			embed.add_field(name=f'Splash', value=server.splash, inline=True)
+		# special features
+		if server.features:
+			embed.add_field(name='Special Features', value=server.features, inline=True)
+		# server icon
 		embed.set_image(url=server.icon_url)
-		embed.set_footer(text=f'Created by @{server.owner.name}', icon_url=server.owner.avatar_url)
+		# creator
+		embed.set_footer(text=f'Created by @{server.owner.nick or server.owner.name}', icon_url=server.owner.avatar_url)
+		# created at
 		embed.timestamp = server.created_at
 
 		await message.channel.send(embed=embed)
