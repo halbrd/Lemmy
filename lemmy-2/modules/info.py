@@ -17,11 +17,8 @@ class Info(Module):
 		server = message.channel.guild
 		embed = discord.Embed()
 
-		# name
-		embed.title = server.name
-		# splash url
-		if server.splash_url:
-			embed.url = server.splash_url
+		# name, icon
+		embed.set_author(name=server.name, icon_url=server.splash_url)
 		# member count and server size
 		embed.add_field(name=f'{server.member_count} members', value='Large-sized server' if server.large else 'Standard-sized server', inline=True)
 		# roles
@@ -37,9 +34,11 @@ class Info(Module):
 		# region
 		embed.add_field(name='Voice region', value=server.region, inline=True)
 		# afk voice channel
-		embed.add_field(name='AFK voice channel', value=f'{server.afk_channel.name} ({server.afk_timeout // 60} mins)', inline=True)
+		if server.afk_channel:
+			embed.add_field(name='AFK voice channel', value=f'{server.afk_channel.name} ({server.afk_timeout // 60} mins)', inline=True)
 		# system channel
-		embed.add_field(name='System channel', value='#' + server.system_channel.name, inline=True)
+		if server.system_channel:
+			embed.add_field(name='System channel', value='#' + server.system_channel.name, inline=True)
 		# verification/mfa level
 		# note: the __str__ call on the following line is NOT redundant, due to how the enum resolves
 		embed.add_field(name=f'Verification level: {str(server.verification_level)}', value=f'MFA {"not " if server.mfa_level == 0 else ""}required', inline=True)
