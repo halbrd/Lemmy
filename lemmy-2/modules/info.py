@@ -3,7 +3,7 @@ sys.path.append('..')
 from module import Module
 
 import discord
-from datetime import timezone
+import datetime
 
 # TODO: lookup external entities by ID
 
@@ -15,7 +15,7 @@ class Info(Module):
 	docs_serverinfo = {
 		'description': 'Provides information about the current server'
 	}
-	async def cmd_serverinfo(self, message, args, kwargs):
+	async def cmd_server_info(self, message, args, kwargs):
 		server = message.channel.guild
 		embed = discord.Embed()
 
@@ -26,8 +26,6 @@ class Info(Module):
 			embed.url = server.splash_url
 		# member count and server size
 		embed.add_field(name=f'{server.member_count} members', value='Large-sized server' if server.large else 'Standard-sized server', inline=True)
-		# id
-		embed.add_field(name='Unique ID', value=server.id, inline=True)
 		# roles
 		role_counts = {}
 		for member in server.members:
@@ -38,12 +36,12 @@ class Info(Module):
 		# emojis
 		embed.add_field(name=f'{len(server.emojis)} emojis',
 		  value=f'{len(list(filter(lambda emoji: not emoji.animated, server.emojis)))} static, {len(list(filter(lambda emoji: emoji.animated, server.emojis)))} animated', inline=True)
+		# region
+		embed.add_field(name='Voice region', value=server.region, inline=True)
 		# afk voice channel
 		embed.add_field(name='AFK voice channel', value=f'{server.afk_channel.name} ({server.afk_timeout // 60} mins)', inline=True)
 		# system channel
 		embed.add_field(name='System channel', value='#' + server.system_channel.name, inline=True)
-		# region
-		embed.add_field(name='Voice region', value=server.region, inline=True)
 		# verification/mfa level
 		# note: the __str__ call on the following line is NOT redundant, due to how the enum resolves
 		embed.add_field(name=f'Verification level: {str(server.verification_level)}', value=f'MFA {"not " if server.mfa_level == 0 else ""}required', inline=True)
@@ -70,7 +68,7 @@ class Info(Module):
 		try_attrs = [ 'id', 'mention', 'nick', 'name' ]
 
 		for attr in try_attrs:
-			user = discord.utils.find(lambda user: getattr(user, attr) == term, server.members)
+			user = discord.utils.find(lambda user: str(getattr(user, attr)).lower() == term.lower(), server.members)
 			if user:
 				return user
 
@@ -85,7 +83,7 @@ class Info(Module):
 			'userinfo @Lemmy'
 		]
 	}
-	async def cmd_userinfo(self, message, args, kwargs):
+	async def cmd_user_info(self, message, args, kwargs):
 		if len(args) > 1:
 			await self.send_error(message)
 			return
@@ -116,7 +114,7 @@ class Info(Module):
 		# top role
 		embed.add_field(name='Top role', value=user.top_role.name)
 		# joined server at
-		joined_at_aest = user.joined_at.replace(tzinfo=timezone.utc).astimezone(tz=None)
+		joined_at_aest = user.joined_at.replace(tzinfo=datetime.timezone.utc).astimezone(tz=None)
 		embed.add_field(name=f'Joined {message.guild.name}', value=f'{joined_at_aest:%B %d, %Y - %H:%M}')
 		# avatar
 		embed.set_image(url=user.avatar_url)
@@ -125,61 +123,3 @@ class Info(Module):
 		embed.timestamp = user.created_at
 
 		await message.channel.send(embed=embed)
-
-
-
-'''
-User
-
-[Given]
-	- name
-	- avatar_url (handle null)
-[Interesting]
-	- id
-	- discriminator
-	- created_at
-[Eh]
-	- default_avatar
-	- permissions_in
-	- bot
-
-Member
-[Interesting]
-	- voice
-	- joined_at
-	- status
-	- game
-	- nick
-	- colour
-	- top_role
-[Eh]
-	- server_permissions
-'''
-
-
-
-'''
-
-Server
-
-[Given]
-	name
-	icon_url
-
-[Interesting]
-	region
-	id
-	owner
-	afk_channel/timeout
-	large
-	verification_level
-	mfa_level
-	default_channel
-	member_count
-	created_at
-	features
-
-[Eh]
-	roles
-	emojis
-'''
