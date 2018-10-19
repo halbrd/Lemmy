@@ -7,7 +7,7 @@ import datetime
 
 class Info(Module):
 	docs = {
-		'description': 'Provides information about a Discord entity'
+		'description': 'Provides information about Discord entities'
 	}
 
 	docs_server_info = {
