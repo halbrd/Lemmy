@@ -12,7 +12,7 @@ class Info(Module):
 		'description': 'Provides information about a Discord entity'
 	}
 
-	docs_serverinfo = {
+	docs_server_info = {
 		'description': 'Provides information about the current server'
 	}
 	async def cmd_server_info(self, message, args, kwargs):
@@ -74,13 +74,13 @@ class Info(Module):
 
 		return None
 
-	docs_userinfo = {
+	docs_user_info = {
 		'description': 'Provides information about a user',
-		'usage': 'userinfo <id, username, or mention>',
+		'usage': 'user_info <id, username, or mention>',
 		'examples': [
-			'userinfo 174046218190716929',
-			'userinfo Lemmy',
-			'userinfo @Lemmy'
+			'user_info 174046218190716929',
+			'user_info Lemmy',
+			'user_info @Lemmy'
 		]
 	}
 	async def cmd_user_info(self, message, args, kwargs):
@@ -153,13 +153,13 @@ class Info(Module):
 
 		return None
 
-	docs_channelinfo = {
+	docs_channel_info = {
 		'description': 'Provides information about a channel',
-		'usage': 'channelinfo <id, name, or mention>',
+		'usage': 'channel_info <id, name, or mention>',
 		'examples': [
-			'channelinfo 77041788564545536',
-			'channelinfo everything',
-			'channelinfo #everything'
+			'channel_info 110624691177177088',
+			'channel_info tech',
+			'channel_info #tech'
 		]
 	}
 	async def cmd_channel_info(self, message, args, kwargs):
