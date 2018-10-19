@@ -33,8 +33,8 @@ class Info(Module):
 				role_counts[role.name] = role_counts.get(role.name, 0) + 1
 		sorted_roles = sorted(role_counts, key=role_counts.get, reverse=True)
 		embed.add_field(name=f'{len(server.roles)} roles', value=f'Top roles: {", ".join(sorted_roles[1:4])}', inline=True)
-		# embed.add_field(name=f'{len(server.emojis)} emojis',   TODO: blocked by 1.0 migration
-		#   value=f'{len(list(filter(lambda emoji: emoji.animated, server.emojis)))} animated')
+		embed.add_field(name=f'{len(server.emojis)} emojis',
+		  value=f'{len(list(filter(lambda emoji: emoji.animated, server.emojis)))} animated')
 		embed.set_image(url=server.icon_url)
 		embed.set_footer(text=f'Created by @{server.owner.name}', icon_url=server.owner.avatar_url)
 		embed.timestamp = server.created_at
@@ -77,7 +77,9 @@ class Info(Module):
 
 		embed = discord.Embed()
 
-		embed.set_author(name=f'{user.name}#{user.discriminator}' + (f' ({user.nick})' if user.nick else ''), icon_url=user.default_avatar_url)   # TODO: status colors
+		# username, discriminator, nickname, default avatar
+		embed.set_author(name=f'{user.name}#{user.discriminator}' + (f' ({user.nick})' if user.nick else '') + (' [🤖]' if user.bot else ''), icon_url=user.default_avatar_url)
+		# online status
 		status_colors = {
 			'online': discord.Color.green(),
 			'idle': discord.Color.gold(),
@@ -86,16 +88,20 @@ class Info(Module):
 		}
 		if str(user.status) in status_colors:
 			embed.color = status_colors[str(user.status)]
+		# top role
 		embed.add_field(name='Top role', value=user.top_role.name)
+		# joined server at
 		joined_at_aest = user.joined_at.replace(tzinfo=timezone.utc).astimezone(tz=None)
 		embed.add_field(name=f'Joined {message.guild.name}', value=f'{joined_at_aest:%B %d, %Y - %H:%M}')
+		# avatar
 		embed.set_image(url=user.avatar_url)
+		# joined Discord at
 		embed.set_footer(text=f'Joined Discord:')
 		embed.timestamp = user.created_at
 
 		await message.channel.send(embed=embed)
 
-	
+
 
 '''
 User
