@@ -57,7 +57,7 @@ class LemmyConfig:
 			},
 			"userinfo": {
 				"function": Lcmds.userinfo,
-				"enabled": True,
+				"enabled": False,
 				"moderator": False,
 				"description": "Get info about a user"
 			},
@@ -87,7 +87,7 @@ class LemmyConfig:
 			},
 			"serverinfo": {
 				"function": Lcmds.serverinfo,
-				"enabled": True,
+				"enabled": False,
 				"moderator": False,
 				"description": "Get info about the current server"
 			},
