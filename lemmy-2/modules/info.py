@@ -5,8 +5,6 @@ from module import Module
 import discord
 import datetime
 
-# TODO: lookup external entities by ID
-
 class Info(Module):
 	docs = {
 		'description': 'Provides information about a Discord entity'
