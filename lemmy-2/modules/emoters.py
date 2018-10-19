@@ -18,6 +18,8 @@ OPERATION_PARAM_DELIMITER = ':'
 # TODO: user-facing documentation
 # TODO: make relevant functions static
 # TODO: scale modifiers
+# TODO: make sure images are garbage collected
+# TODO: optimise and/or cache image processing
 
 class Emoters(Module):
     docs = {
@@ -294,13 +296,15 @@ class Emoters(Module):
         await message.channel.send('Instance stickers: ' + str(self.instance_stickers))
 
     async def cmd_test_wand(self, message, args, kwargs):
-        img_bytes = self.get_image_bytes('Konga.gif', 'emote', True)
-        image = Image(blob=img_bytes)
-        await message.channel.send(f'frames: {len(image.sequence)}')
+        deets = self.get_emoter_details_by_name(args[0])
+        img_bytes = self.get_image_bytes(deets['file_name'], deets['type'], deets['static'])
+        with Image(blob=img_bytes) as source:
+            with Image() as dest:
+                for frame in source.sequence:
+                    frame.flip()
+                    dest.sequence.append(frame)
 
-        image = self.normalize_image(image, EMOTE_MAX_SIZE)
-
-        img_bytes = image.make_blob()
+                img_bytes = dest.make_blob()
         discord_file = self.lemmy.to_discord_file(img_bytes, 'Konga.gif')
         await self.send_image(discord_file, message.channel, vanity_username=message.author.name,
           vanity_avatar_url=message.author.avatar_url)
