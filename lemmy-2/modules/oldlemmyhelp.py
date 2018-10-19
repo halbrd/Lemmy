@@ -76,3 +76,12 @@ class OldLemmyHelp(Module):
 	}
 	async def cmd_userinfo(self, message, args, kwargs):
 		pass
+
+	docs_fusion = {
+		'description': 'Fuses Pokemon together',
+		'usage': 'fusion <first Pokemon> <second Pokemon>',
+		'examples': [ 'fusion shellder voltorb' ]
+	}
+	async def cmd_fusion(self, message, args, kwargs):
+		pass
+

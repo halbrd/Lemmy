@@ -10,6 +10,7 @@ import re
 from itertools import zip_longest
 import logging
 import signal
+import io
 
 sys.path.append('modules')
 
@@ -31,18 +32,16 @@ class Lemmy:
 			channel = message.channel
 
 			if type(channel) == discord.channel.DMChannel:
-				context_phrase = ''
 				recipient = channel.recipient.name if message.author == channel.me else channel.me.name
 			elif type(channel) == discord.channel.GroupChannel:   # bot users can't be in these (yet)
-				context_phrase = ''
 				recipient = channel.name or ', '.join( list( { user.name for user in message.channel.recipients }.union({ self.client.user.name }) - { message.author.name } ) )
 			elif type(channel) == discord.channel.TextChannel:
-				context_phrase = f'({channel.guild}) '
-				recipient = f'#{channel.name}'
+				recipient = f'{channel.guild}#{channel.name}'
 
-			attachments_phrase = ' +' + '📎' * len(message.attachments) if len(message.attachments) > 0 else ''
+			extras_phrase = '📎' * len(message.attachments) + '📊' * len(message.embeds)
+			extras_phrase = f' +{extras_phrase}' if extras_phrase else ''
 
-			self.log(f'{context_phrase}{message.author.name} => {recipient}{attachments_phrase}: {message.content}')
+			self.log(f'{message.author.name} => {recipient}{extras_phrase}: {message.content}')
 
 			# pass the event to the modules
 			for _, module in self.modules.items():
@@ -204,6 +203,18 @@ class Lemmy:
 	async def handle_sigterm(self):
 		self.log('Received SIGTERM.')
 		await self.shutdown()
+
+	def to_discord_file(self, contents, file_name):
+		if type(contents) == bytes:
+			contents = io.BytesIO(contents)
+		elif type(contents) == str:
+			contents = io.StringIO(contents)
+
+		return discord.File(fp=contents, filename=file_name)
+
+	async def send_text_file(self, body, destination, file_name='text.txt', comment=None):
+		file = self.to_discord_file(body, file_name)
+		await destination.send(comment, file=file)
 
 
 

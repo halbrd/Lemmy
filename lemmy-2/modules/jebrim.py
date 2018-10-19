@@ -6,6 +6,7 @@ import json
 import random
 import re
 import requests
+import discord
 
 class Jebrim(Module):
 	docs = {
@@ -53,7 +54,21 @@ class Jebrim(Module):
 		'description': 'Checks if Jebrim is suspended on Twitter'
 	}
 	async def cmd_is_jebrim_suspended(self, message, args, kwargs):
-		if 'This account has been suspended' in requests.get('https://twitter.com/jebrim').text:
-			await message.channel.send('Yes, Jebrim is suspended from Twitter.')
-		else:
-			await message.channel.send('No, Jebrim is not suspended from Twitter! :tada:')
+		accounts = ['Jebrim', 'The1Jebrim']
+		account_lines = []
+
+		for account in accounts:
+			suspended = 'This account has been suspended' in requests.get('https://twitter.com/' + account).text
+			indicator = '💔' if suspended else '💚'
+			line = f'{indicator} [@{account}](https://twitter.com/{account})'
+			account_lines.append(line)
+
+		embed = discord.Embed()
+		embed.description = '\n'.join(account_lines)
+		await message.channel.send(embed=embed)
+
+	docs_jebrim_dump = {
+		'description': 'Sends a file containing the entire Jebrim database'
+	}
+	async def cmd_jebrim_dump(self, message, args, kwargs):
+		await self.lemmy.send_text_file('\n'.join(self.get_tweets()), message.channel, file_name='jebrim-tweets.txt')
