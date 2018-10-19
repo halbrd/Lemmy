@@ -49,6 +49,12 @@ class OldLemmyHelp(Module):
 	async def cmd_restart(self, message, args, kwargs):
 		pass
 
+	docs_serverinfo = {
+		'description': 'Returns information about the server'
+	}
+	async def cmd_serverinfo(self, message, args, kwargs):
+		pass
+
 	docs_skypeemotes = {
 		'description': 'Returns a list of available Skype emotes'
 	}
@@ -61,6 +67,14 @@ class OldLemmyHelp(Module):
 		'examples': [ 'tilt KappaG', 'tilt Jebaited 180' ]
 	}
 	async def cmd_tilt(self, message, args, kwargs):
+		pass
+
+	docs_userinfo = {
+		'description': 'Returns information about a user',
+		'usage': 'userinfo <username>',
+		'examples': [ 'userinfo Lemmy' ]
+	}
+	async def cmd_userinfo(self, message, args, kwargs):
 		pass
 
 	docs_fusion = {
