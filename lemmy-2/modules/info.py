@@ -116,6 +116,25 @@ class Info(Module):
 		# joined server at
 		joined_at_aest = user.joined_at.replace(tzinfo=datetime.timezone.utc).astimezone(tz=None)
 		embed.add_field(name=f'Joined {message.guild.name}', value=f'{joined_at_aest:%B %d, %Y - %H:%M}')
+
+		# voice state
+		if user.voice:
+			state = ''
+			# the order of these is semi-important
+			if user.voice.self_mute:
+				state = 'self muted'
+			if user.voice.self_deaf:
+				state = 'self deafened'
+			if user.voice.mute:
+				state = 'server muted'
+			if user.voice.deaf:
+				state = 'server deafened'
+			if user.voice.afk:
+				state = 'afk'
+			if state == '':
+				state = 'talking'
+			embed.add_field(name=f'Currently {state}', value=user.voice.channel.name, inline=True)
+
 		# avatar
 		embed.set_image(url=user.avatar_url)
 		# joined Discord at
