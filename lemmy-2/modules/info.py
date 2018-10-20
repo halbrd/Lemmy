@@ -160,16 +160,19 @@ class Info(Module):
 		]
 	}
 	async def cmd_channel_info(self, message, args, kwargs):
-		if len(args) != 1:
+		if len(args) > 1:
 			await self.send_error(message)
 			return
 
-		search_term = args[0]
-		channel = Info.resolve_channel(message.guild, search_term)
+		if len(args) == 0:
+			channel = message.channel
+		elif len(args) == 1:
+			search_term = args[0]
+			channel = Info.resolve_channel(message.guild, search_term)
 
-		if not channel:
-			await self.send_error(message, comment=f'Couldn\'t find a channel that matched \'{search_term}\'')
-			return
+			if not channel:
+				await self.send_error(message, comment=f'Couldn\'t find a channel that matched \'{search_term}\'')
+				return
 
 		embed = discord.Embed()
 
@@ -211,5 +214,5 @@ class Info(Module):
 		embed.set_footer(text=f'Created at:')
 		embed.timestamp = channel.created_at
 
-		await message.remove_reaction('⏳', message.guild.me)
 		await message.channel.send(embed=embed)
+		await message.remove_reaction('⏳', message.guild.me)
