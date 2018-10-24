@@ -14,7 +14,6 @@ STICKER_MAX_SIZE = 128
 OPERATION_DELIMITER = '/'
 OPERATION_PARAM_DELIMITER = ':'
 
-# TODO: delete code
 # TODO: user-facing documentation
 # TODO: make relevant functions static
 # TODO: scale modifiers
@@ -106,6 +105,8 @@ class Emoters(Module):
         discord_file = self.lemmy.to_discord_file(base_image.make_blob(), file_name)
         await self.send_image(discord_file, message.channel, vanity_username=message.author.name,
             vanity_avatar_url=message.author.avatar_url)
+
+        await message.delete()
 
     def _split_raw_modifiers(raw_modifiers):
         # e.g. ['rotate:45', 'flip:h']
@@ -260,94 +261,3 @@ class Emoters(Module):
     async def cmd_emoter_search(self, message, args, kwargs):
         pass   # TODO
 
-
-#################
-### TO DELETE ###
-#################
-
-
-    def normalize_png_pillow(self, png_bytes, target_size):
-        # load bytes into PIL Image
-        image_file = io.BytesIO(png_bytes)
-        im = Image.open(image_file)
-
-        # resize image, maintaining aspect ratio
-        im.thumbnail(target_size, Image.ANTIALIAS)
-
-        # pad image out to a square
-        horizontal_padding = target_size[0] - image.size[0]
-        vertical_padding = target_size[1] - image.size[1]
-
-        square_image = Image.new(im.mode, target_size)
-        square_image.putalpha(0)   # fill image with transparent
-        square_image.paste(im, (horizontal_padding // 2, vertical_padding // 2))   # paste emote in center
-        image = square_image
-
-        # return bytes
-        output_file = io.BytesIO()
-        im.save(output_file, 'PNG')
-        return output_file.getvalue()
-
-
-    async def cmd_emoter_list(self, message, args, kwargs):
-        await message.channel.send('Static emotes: ' + str(self.static_emotes))
-        await message.channel.send('Instance emotes: ' + str(self.instance_emotes))
-        await message.channel.send('Static stickers: ' + str(self.static_stickers))
-        await message.channel.send('Instance stickers: ' + str(self.instance_stickers))
-
-    async def cmd_test_wand(self, message, args, kwargs):
-        deets = self.get_emoter_details_by_name(args[0])
-        img_bytes = self.get_image_bytes(deets['file_name'], deets['type'], deets['static'])
-        with Image(blob=img_bytes) as source:
-            with Image() as dest:
-                for frame in source.sequence:
-                    frame.flip()
-                    dest.sequence.append(frame)
-
-                img_bytes = dest.make_blob()
-        discord_file = self.lemmy.to_discord_file(img_bytes, 'Konga.gif')
-        await self.send_image(discord_file, message.channel, vanity_username=message.author.name,
-          vanity_avatar_url=message.author.avatar_url)
-
-    async def cmd_frame_dimensions(self, message, args, kwargs):
-        deets = self.get_emoter_details_by_name(args[0])
-        img_bytes = self.get_image_bytes(deets['file_name'], deets['type'], deets['static'])
-        image = Image(blob=img_bytes)
-        print(f'{type(image)}: {image.size}')
-        for frame in image.sequence:
-            print(f'{type(frame)}: {frame.size}')
-
-
-### Much Ado About Images ###
-# Problem: PIL can't render gifs with transparency
-# Issues this causes:
-# - Can't automatically resize gifs
-# - Can't combine gifs with other images
-# Potential solutions:
-# - Drop PIL for ImageMagick
-#   Advantages:
-#   - Actually solves the problem
-#   Disadvantages:
-#   - Creates platform dependency, increasing deployment complexity, probably necessitating Docker
-#   - Not certain that ImageMagick will have all benefits of PIL, eg. in-memory handling, padding
-# - Don't support gif manipulation
-#   Advantages:
-#   - Low complexity, little effort
-#   Disadvantages:
-#   - Increases user effort and proficiency requirement
-#   - Lack of features
-
-# ImageMagick capabilities
-# Can do:
-# - Rotate, resize PNGs, maintain transparency, aspect ratio
-#   `convert -background transparent -rotate 30 -resize 64x64 in.png out.png`
-# - Rotate, resize GIFs, maintain transparency, aspect ratio (places image frame-by-frame?????)
-#   `convert -background none -rotate 30 -resize 64x64 in.gif out.gif`
-# - Connect PNGs horizontally, auto spaced and laid out
-#   `montage -background transparent -geometry +0+0 in1.png in2.png out.png`
-# - Connect PNGs and the first frame of a gif
-#   `montage -background transparent -geometry +0+0 in1.png 'in2.gif[0]' out.png`
-# - Rotate or flip images, then connect
-#   ``
-# Okay you know what I'm pretty sure it can do everything needed
-# Can't do:
