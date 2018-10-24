@@ -19,6 +19,7 @@ OPERATION_PARAM_DELIMITER = ':'
 # TODO: scale modifiers
 # TODO: make sure images are garbage collected
 # TODO: optimise and/or cache image processing
+# TODO: switch out original-resolution emoters
 
 class Emoters(Module):
     docs = {
@@ -86,7 +87,7 @@ class Emoters(Module):
         for emoter in emoters:
             image_bytes = self.get_image_bytes(emoter['file_name'], emoter['type'], emoter['static'])
 
-            images.append(Emoters.process_image(image_bytes, emoter['modifications']))
+            images.append(Emoters.process_image(image_bytes, emoter['modifications'], emoter['type']))
 
         # assemble all images into single image to send
         if len(images) == 1:   # skip compositing if there's only 1 image, mainly to allow GIFs to remain animated
@@ -245,12 +246,18 @@ class Emoters(Module):
 
         return image
 
-    def process_image(image_bytes, modifications):
+    def process_image(image_bytes, modifications, emoter_type):
         # turn image bytes into Wand image
         image = Image(blob=image_bytes)
 
         # normalize image (scale to correct size, pad with transparency to make square)
-        image = Emoters.normalize_image(image, side_length=EMOTE_MAX_SIZE, pad=True)
+        if emoter_type == 'emote':
+            side_length = EMOTE_MAX_SIZE
+        elif emoter_type == 'sticker':
+            side_length = STICKER_MAX_SIZE
+        else:
+            raise ValueError('emoter_type must be \'emote\' or \'sticker\'')
+        image = Emoters.normalize_image(image, side_length=side_length, pad=emoter_type == 'emote')
 
         # apply modifiers
         for modifier, parameter in modifications:
