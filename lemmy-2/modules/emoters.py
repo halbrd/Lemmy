@@ -20,6 +20,8 @@ OPERATION_PARAM_DELIMITER = ':'
 # TODO: make sure images are garbage collected
 # TODO: optimise and/or cache image processing
 # TODO: switch out original-resolution emoters
+# TODO: replace control strings with constants (eg. emoter_type = 'emote' or 'sticker')
+# TODO: freeze wand version
 
 class Emoters(Module):
     docs = {
