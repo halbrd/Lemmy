@@ -6,13 +6,12 @@ import datetime
 import asyncio
 import re
 from decimal import Decimal   # BEGONE FLOAT
+import dateparser
 
 class Timer(Module):
 	docs = {
 		'description': 'Posts an alert after a specified time period'
 	}
-
-	DURATION_PATTERN = '((?:\d+\.)?\d+) *(s|m|h|d|w|y)'
 
 	TO_SECONDS = {   # the number to multiply a unit by to convert them into seconds
 		's': 1,
@@ -130,14 +129,7 @@ class Timer(Module):
 			await self.send_error(message)
 			return
 
-		# interpret time interval
-		duration_ms = 0
-
-		for amount, unit in [ (match.group(1), match.group(2)) for match in re.finditer(Timer.DURATION_PATTERN, args[0]) ]:
-			duration_ms += Decimal(amount) * Timer.TO_SECONDS[unit] * 1000
-
-		duration_ms = int(duration_ms)   # precision is to the nearest millisecond while we get the expiry
-		expiry = datetime.datetime.now() + datetime.timedelta(milliseconds=duration_ms)
+		# TODO: delete this command
 
 		self.add_timer({
 			'creator': message.author,
@@ -152,7 +144,27 @@ class Timer(Module):
 	docs_remindme = {
 		'description': 'Reminds the user of something at the specified time',
 		'usage': 'remindme <activation date time> <message>',
-		'examples': [ 'remindme 2020-09-24 "September 24th, 2020!"', 'remindme 2020-05-13/13:22:57 "1:22:57pm, May 13th, 2020!"' ]
+		'examples': [
+			'remindme "in 6 days, 7 hours" "to do something"',
+			'remindme "2156-01-07" "Nic Cage turns 192"',
+			'remindme "tomorrow at 10am"'
+			'remindme "5pm"'
+		]
 	}
 	async def cmd_remindme(self, message, args, kwargs):
-		pass
+		expiry = dateparser.parse(args[0], settings={'PREFER_DATES_FROM': 'future'})
+
+		if expiry is None:
+			await self.send_error(message, comment=f'couldn\'t understand your date or duration (\'{args[0]}\')')
+			return
+
+		duration = expiry - datetime.datetime.now()
+
+		if duration < datetime.timedelta(0):
+			await self.send_error(message, comment=f'can\'t set timer for {expiry} (datetime is in the past)')
+			return
+
+		await message.channel.send(f'<timer for {expiry}>')
+
+	async def cmd_parse_date(self, message, args, kwargs):
+		await message.channel.send(dateparser.parse(" ".join(args)) or "<:EnemyMissing:434620725891039242>")
