@@ -54,7 +54,7 @@ class Jebrim(Module):
 		'description': 'Checks if Jebrim is suspended on Twitter'
 	}
 	async def cmd_is_jebrim_suspended(self, message, args, kwargs):
-		accounts = ['Jebrim', 'The1Jebrim']
+		accounts = ['Jebrim', 'The1Jebrim', 'mirbeJ']
 		account_lines = []
 
 		for account in accounts:
