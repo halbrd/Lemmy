@@ -23,6 +23,7 @@ OPERATION_PARAM_DELIMITER = ':'
 # TODO: replace control strings with constants (eg. emoter_type = 'emote' or 'sticker')
 # TODO: freeze wand version
 # TODO: comment this file more -_-
+# TODO: tilt command
 
 class Emoters(Module):
     docs = {
