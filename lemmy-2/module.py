@@ -51,7 +51,7 @@ class Module:
 
 	async def send_internal_error(self, message, exception):
 		await message.add_reaction('⚠')
-		await message.channel.send('```diff\n- An internal error occurred (this isn\'t your fault).\n```')
+		await message.channel.send('```diff\n- An internal error occurred (this isn\'t your fault)\n```')
 		if self.lemmy.config['notify_admins_about_errors']:
 			for user_id in self.lemmy.config['admins']:
 				# ༼ つ ◕_◕ ༽つ GIVE ASSIGNMENT EXPRESSIONS ༼ つ ◕_◕ ༽つ
@@ -212,7 +212,7 @@ class Module:
 
 		# check that file exists
 		if not os.path.isfile(full_path):
-			if default:
+			if default is not None:
 				with open(full_path, 'w') as f:
 					f.write(default)
 

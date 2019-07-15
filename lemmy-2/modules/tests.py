@@ -93,7 +93,7 @@ class Tests(Module):
 		for field in embed_data['fields']:
 			embed.add_field(name=field['name'], value=field['value'], inline=field['inline'])
 
-		await message.channel, f'```json\n{json.dumps(embed_data, sort_keys=True, indent=2)}\n```'.send(embed=embed)
+		await message.channel.send(f'```json\n{json.dumps(embed_data, sort_keys=True, indent=2)}\n```', embed=embed)
 
 	async def cmd_print_raw(self, message, args, kwargs):
 		await message.channel.send('```\n' + message.content + '\n```')
