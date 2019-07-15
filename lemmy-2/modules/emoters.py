@@ -22,6 +22,7 @@ OPERATION_PARAM_DELIMITER = ':'
 # TODO: switch out original-resolution emoters
 # TODO: replace control strings with constants (eg. emoter_type = 'emote' or 'sticker')
 # TODO: freeze wand version
+# TODO: comment this file more -_-
 
 class Emoters(Module):
     docs = {
