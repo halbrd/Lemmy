@@ -1,9 +1,10 @@
 FROM python:3-alpine
 
-RUN apk add imagemagick
-RUN apk add git
-RUN apk add gcc
-RUN apk add musl-dev
+RUN apk add --no-cache imagemagick
+RUN apk add --no-cache imagemagick-dev
+RUN apk add --no-cache git
+RUN apk add --no-cache gcc
+RUN apk add --no-cache musl-dev
 
 WORKDIR /app
 COPY . .
