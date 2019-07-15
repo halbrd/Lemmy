@@ -1,4 +1,4 @@
--e git://github.com/Rapptz/discord.py@rewrite#egg=discord.py
+discord.py
 googletrans
 emoji
 Wand
