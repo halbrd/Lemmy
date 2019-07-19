@@ -1,3 +1,5 @@
 discord.py
 Pillow
 fuzzywuzzy
+requests
+
