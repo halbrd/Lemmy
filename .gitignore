@@ -1,10 +1,12 @@
+# Misc. clutter files
 .gitattributes
-credentials.txt
 .DS_Store
 venv
+.vscode
 
-# 'normal' log location
-log.txt
+# Lemmy-related stuff
+log.txt # 'normal' log location
+credentials.txt
 
 
 

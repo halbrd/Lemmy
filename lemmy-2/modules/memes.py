@@ -2,13 +2,10 @@ import sys
 sys.path.append('..')
 from module import Module
 
-import os
 import random
-import discord
-import json
 import requests
-from bs4 import BeautifulSoup
-from itertools import zip_longest
+import re
+import random
 
 class Memes(Module):
 	docs = {
@@ -19,23 +16,37 @@ class Memes(Module):
 		'description': 'Posts a random ruseman'
 	}
 	async def cmd_ruseman(self, message, args, kwargs):
-		image_location = 'data/Memes/rusemans/'
-		await self.client.send_file(message.channel, image_location + random.choice(os.listdir(image_location)))
+		rusemans = self.load_data('ruseman', static=True)['links']
+		await message.channel.send(random.choice(rusemans))
 
 	docs_genjimain = {
 		'description': 'Posts a random Genji main'
 	}
 	async def cmd_genjimain(self, message, args, kwargs):
-		genji_mains = self.load_data('genjimain')['links']
-		await self.client.send_message(message.channel, random.choice(genji_mains))
+		genji_mains = self.load_data('genjimain', static=True)['links']
+		await message.channel.send(random.choice(genji_mains))
 
-	docs_8ball = {
-		'description': 'Gives a certified correct answer to your question'
+	docs_tedcruz = {
+		'description': 'Posts a random tweet from @commentiquette to @tedcruz'
 	}
-	async def cmd_8ball(self, message, args, kwargs):
-		responses = [ "It is certain.", "It is decidedly so.", "Without a doubt.", "Yes, definitely.",
-						"You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Yes.",
-						"Signs point to yes.", "Reply hazy try again.", "Ask again later.", "Better not tell you now.",
-						"Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.",
-						"My sources say no.", "Outlook not so good.", "Very doubtful." ]
-		await self.client.send_message(message.channel, message.author.mention + " :8ball: " + random.choice(responses))
+	async def cmd_tedcruz(self, message, args, kwargs):
+		tweets = set(self.load_data('tedcruz', default='[]'))
+
+		# this uses an ancient, non-Javascript mobile version of Twitter
+		page = requests.get('https://mobile.twitter.com/search?q=ted%20OR%20cruz%20OR%20tedcruz%20from%3Acommentiquette').text
+
+		while page:
+			links = { 'https://twitter.com' + link for link in re.findall('/commentiquette/status/\d+', page) }
+			found_existing_link = any([ link in tweets for link in links ])
+			tweets = tweets.union(links)
+
+			next_link_match = re.search('<a href="(.+)"> Load older Tweets </a>', page)
+
+			if next_link_match and not found_existing_link:
+				next_link = 'https://mobile.twitter.com' + next_link_match.group(1)
+				page = requests.get(next_link).text
+			else:
+				page = None
+
+		await message.channel.send(random.choice(list(tweets)))
+		self.save_data('tedcruz', list(tweets))

@@ -3,3 +3,4 @@ Pillow
 fuzzywuzzy
 requests
 beautifulsoup4
+

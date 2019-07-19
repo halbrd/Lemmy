@@ -25,29 +25,42 @@ class Module:
 			super().__init__(direct_message)
 
 	async def send_error(self, message, comment=None, comment_wrapping=True):
-		await self.client.add_reaction(message, '❌')
+		await message.add_reaction('❌')
 		if comment:
 			if comment_wrapping:
 				comment = f'```diff\n- {comment}\n```'
-			await self.client.send_message(message.channel, comment)
+			await message.channel.send(comment)
 
 	async def send_success(self, message, comment=None, comment_wrapping=True):
-		await self.client.add_reaction(message, '✅')
+		await message.add_reaction('✅')
 		if comment:
 			if comment_wrapping:
 				comment = f'```diff\n+ {comment}\n```'
-			await self.client.send_message(message.channel, comment)
+			await message.channel.send(comment)
 
 	async def send_not_allowed(self, message, comment=None):
-		await self.client.add_reaction(message, '🔒')
+		await message.add_reaction('🔒')
 		if comment:
-			await self.client.send_message(message.channel, comment)
+			await message.channel.send(comment)
 
 	async def send_dm(self, message, direct_message, public_message=None):
-		await self.client.add_reaction(message, '📨')
-		await self.client.send_message(message.author, direct_message)
+		await message.add_reaction('📨')
+		await message.author.send(direct_message)
 		if public_message:
-			await self.client.send_message(message.channel, public_message)
+			await message.channel.send(public_message)
+
+	async def send_internal_error(self, message, exception):
+		await message.add_reaction('⚠')
+		await message.channel.send('```diff\n- An internal error occurred (this isn\'t your fault)\n```')
+		if self.lemmy.config['notify_admins_about_errors']:
+			for user_id in self.lemmy.config['admins']:
+				# ༼ つ ◕_◕ ༽つ GIVE ASSIGNMENT EXPRESSIONS ༼ つ ◕_◕ ༽つ
+				admin = message.channel.guild.get_member(user_id)
+				if admin:
+					message = (f'Exception in {message.channel.guild.name}#{message.channel.name}:\n'
+							   f'{message.author.name}: `{message.content[:50]}{"..." if len(message.content) > 50 else ""}`\n'
+							   f'-> {type(exception).__name__}: {str(exception)}')
+					await admin.send(message)
 
 	def __init__(self, lemmy):
 		self.lemmy = lemmy
@@ -75,7 +88,7 @@ class Module:
 
 			if command in self._commands:
 				# check if the user is permitted to use this command
-				if self.get_docs_attr(command, 'admin_only', default=False) and not message.author.id in self.lemmy.config['admin_users']:
+				if self.get_docs_attr(command, 'admin_only', default=False) and not message.author.id in self.lemmy.config['admins']:
 					await self.send_not_allowed(message)
 				else:
 					try:
@@ -89,6 +102,9 @@ class Module:
 						await self.send_not_allowed(message, e.message)
 					except Module.CommandDM as e:
 						await self.send_dm(message, e.direct_message, e.public_message)
+					except Exception as e:
+						await self.send_internal_error(message, e)
+						raise e
 
 	@staticmethod
 	def deconstruct_message(message):
@@ -161,7 +177,7 @@ class Module:
 			# examples
 			examples = self.get_docs_attr(command, 'examples')
 			if examples:
-				lines.append('Examples: ' + ('\n  ' if len(examples) > 1 else '') + '\n  '.join(f'`{symbol}{example}`' for example in examples))
+				lines.append('Examples:\n  ' + '\n  '.join(f'`{symbol}{example}`' for example in examples))
 
 		# asking about the module generally
 		# the resultant text should be wrapped in a diff code block by whatever calls for it
@@ -185,23 +201,66 @@ class Module:
 		# convert to string and return
 		return '\n'.join(lines)
 
-	def load_data(self, document_name):
-		target_directory = f'data/{self.__class__.__name__}/'
-		target_file = target_directory + f'{document_name}.json'
+	def _load(self, file_location, default=None, static=False, bytes=False):
+		storage_type = 'static' if static else 'data'
+		full_path = f'{storage_type}/{self.__class__.__name__}/{file_location}'
+		directory = '/'.join(full_path.split('/')[:-1])
 
 		# check that directory exists
-		if not os.path.isdir(target_directory):
-			os.makedirs(target_directory)
+		if not os.path.isdir(directory):
+			os.makedirs(directory)
 
 		# check that file exists
-		if not os.path.isfile(target_file):
-			with open(target_file, 'w') as f:
-				f.write('{}')
+		if not os.path.isfile(full_path):
+			if default is not None:
+				with open(full_path, 'w') as f:
+					f.write(default)
 
 		# get data
-		with open(target_file, 'r') as f:
-			return json.load(f)
+		with open(full_path, 'rb' if bytes else 'r') as f:
+			return f.read()
 
-	def save_data(self, document_name, data):
-		with open(f'data/{self.__class__.__name__}/{document_name}.json', 'w') as f:
-			json.dump(data, f, indent='\t')
+	def _save(self, file_location, content, static=False, bytes=False):
+		storage_type = 'static' if static else 'data'
+		full_path = f'{storage_type}/{self.__class__.__name__}/{file_location}'
+		directory = '/'.join(full_path.split('/')[:-1])
+
+		# check that directory exists
+		if not os.path.isdir(directory):
+			os.makedirs(directory)
+
+		# no need to check that file exists
+
+		# save data
+		with open(full_path, 'wb' if bytes else 'w') as f:
+			f.write(content)
+
+	def load_data(self, document_name, static=False, default='{}'):
+		return json.loads(self._load(f'{document_name}.json', static=static, default=default))
+
+	def save_data(self, document_name, data, static=False):
+		self._save(f'{document_name}.json', json.dumps(data, indent='\t'), static=static)
+
+	def load_image(self, file_location, static=False):
+		return self._load(file_location, static=static, bytes=True)
+
+	def list_files(self, path, static=False):
+		storage_type = 'static' if static else 'data'
+		directory = f'{storage_type}/{self.__class__.__name__}/{path}'
+
+		# check that directory exists
+		if not os.path.isdir(directory):
+			os.makedirs(directory)
+
+		return os.listdir(directory)
+
+	def data_exists(self, file_location, static=False):
+		storage_type = 'static' if static else 'data'
+		full_path = f'{storage_type}/{self.__class__.__name__}/{file_location}'
+		directory = '/'.join(full_path.split('/')[:-1])
+
+		# check that directory exists
+		if not os.path.isdir(directory):
+			os.makedirs(directory)
+
+		return os.path.exists(full_path)

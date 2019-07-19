@@ -7,8 +7,8 @@ class Example(Module):
 		'description': 'Explains how to write a module for Lemmy'
 	}
 
-	def __init__(self, client):
-		Module.__init__(self, client)
+	def __init__(self, lemmy):
+		Module.__init__(self, lemmy)
 		# put setup code to run at bot startup here
 		# if you don't have anything in particular you can not define __init__ and it'll use the inherited version
 
@@ -32,10 +32,10 @@ class Example(Module):
 		# try to do stuff
 		# when a problem is discovered, raise CommandError
 		if len(args) == 0:
-			await self.client.send_message(message.channel, 'Default message!')
+			await message.channel.send('Default message!')
 		elif len(args) == 1:
-			await self.client.send_message(message.channel, 'You gave the argument: ' + args[0])
+			await message.channel.send('You gave the argument: ' + args[0])
 		else:
 			raise Module.CommandError
 
-# remember to add your module to manifest.json
+# remember to add your module to config.json

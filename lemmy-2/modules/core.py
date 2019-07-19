@@ -14,9 +14,8 @@ class Core(Module):
 		'admin_only': True
 	}
 	async def cmd_shutdown(self, message, args, kwargs):
-		self.lemmy.log('Shutting down...')
 		await self.send_success(message)
-		await self.client.logout()
+		await self.lemmy.shutdown()
 
 	docs_reload = {
 		'description': 'Reloads modules from disk',
@@ -72,11 +71,11 @@ class Core(Module):
 				chunks.append(footer_message)
 
 			for chunk in chunks:
-				await self.client.send_message(message.channel, chunk)
+				await message.channel.send(chunk)
 
 		# help text pertaining to a specific topic
 		else:
-			topic = args[0]
+			topic = args[0].replace('-', '_')
 			help_texts = []
 
 			# check if user is asking about a module
@@ -92,12 +91,12 @@ class Core(Module):
 				raise Module.CommandError(f'\'{topic}\' is not a module or command')
 			else:
 				for help_text in help_texts:
-					await self.client.send_message(message.channel, help_text)
+					await message.channel.send(help_text)
 
 	docs_about = {
 		'description': 'Contains info about Lemmy'
 	}
 	async def cmd_about(self, message, args, kwargs):
 		title = '```fix\n=========================================\n=  _                                    =\n= | |    ___ _ __ ___  _ __ ___  _   _  =\n= | |   / _ \ \'_ ` _ \| \'_ ` _ \| | | | =\n= | |__|  __/ | | | | | | | | | | |_| | =\n= |_____\___|_| |_| |_|_| |_| |_|\__, | =\n=                                |___/  =\n=========================================\n Your friendly neighbourhood Discord bot\n  Created by https://github.com/halbrd\n```'
-		repo_link = '  Lemmy is free and open source software, hosted at\nhttps://github.com/halbrd/Lemmy. Bug reports and\n                       pull requests are welcome.'
-		await self.client.send_message(message.channel, title + '\n' + repo_link)
+		repo_link = '     Lemmy is free and open source software, hosted\n at <https://github.com/halbrd/Lemmy>. Development\nprogress is tracked at <https://trello.com/b/x2QGb0jk>.\n    Bug reports, feature suggestions, and pull requests \n                                    are welcome.'
+		await message.channel.send(title + '\n' + repo_link)

@@ -37,10 +37,10 @@ class Translate(Module):
 			translation = translator.translate(expression, dest=destination)
 		else:
 			translation = translator.translate(expression, src=source, dest=destination)
-		await self.client.send_message(message.channel, f'{translation.origin} `[{googletrans.LANGUAGES[translation.src.lower()].title()}] => [{googletrans.LANGUAGES[translation.dest.lower()].title()}]` {translation.text}')
+		await message.channel.send(f'{translation.origin} `[{googletrans.LANGUAGES[translation.src.lower()].title()}] => [{googletrans.LANGUAGES[translation.dest.lower()].title()}]` {translation.text}')
 
 	docs_translate_languages = {
 		'description': 'Lists available languages and codes'
 	}
 	async def cmd_translate_languages(self, message, args, kwargs):
-		await self.client.send_message(message.channel, ', '.join([ f'{v.title()} `[{k}]`' for k, v in googletrans.LANGUAGES.items() ]))
+		await message.channel.send(', '.join([ f'{v.title()} `[{k}]`' for k, v in googletrans.LANGUAGES.items() ]))

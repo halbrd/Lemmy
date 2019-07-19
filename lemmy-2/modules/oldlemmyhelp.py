@@ -8,14 +8,6 @@ class OldLemmyHelp(Module):
 		'description': 'Provides help documentation for Old Lemmy commands'
 	}
 
-	docs_choose = {
-		'description': 'Chooses between the given options',
-		'usage': 'choose <option> or <option> or ...',
-		'examples': [ 'choose go left or go right or stay still' ]
-	}
-	async def cmd_choose(self, message, args, kwargs):
-		pass
-
 	docs_refresh = {
 		'description': 'Checks for new emotes and stickers'
 	}
@@ -57,12 +49,6 @@ class OldLemmyHelp(Module):
 	async def cmd_restart(self, message, args, kwargs):
 		pass
 
-	docs_serverinfo = {
-		'description': 'Returns information about the server'
-	}
-	async def cmd_serverinfo(self, message, args, kwargs):
-		pass
-
 	docs_skypeemotes = {
 		'description': 'Returns a list of available Skype emotes'
 	}
@@ -77,10 +63,11 @@ class OldLemmyHelp(Module):
 	async def cmd_tilt(self, message, args, kwargs):
 		pass
 
-	docs_userinfo = {
-		'description': 'Returns information about a user',
-		'usage': 'userinfo <username>',
-		'examples': [ 'userinfo Lemmy' ]
+	docs_fusion = {
+		'description': 'Fuses Pokemon together',
+		'usage': 'fusion <first Pokemon> <second Pokemon>',
+		'examples': [ 'fusion shellder voltorb' ]
 	}
-	async def cmd_userinfo(self, message, args, kwargs):
+	async def cmd_fusion(self, message, args, kwargs):
 		pass
+
