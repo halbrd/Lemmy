@@ -39,13 +39,13 @@ class LemmyConfig:
 			},
 			"refresh": {
 				"function": Lcmds.refresh,
-				"enabled": True,
+				"enabled": False,
 				"moderator": False,
 				"description": "Check for new stickers and emotes"
 			},
 			"f5": {
 				"function": Lcmds.refresh,
-				"enabled": True,
+				"enabled": False,
 				"moderator": False,
 				"description": "Check for new stickers and emotes"
 			},
@@ -57,7 +57,7 @@ class LemmyConfig:
 			},
 			"userinfo": {
 				"function": Lcmds.userinfo,
-				"enabled": True,
+				"enabled": False,
 				"moderator": False,
 				"description": "Get info about a user"
 			},
@@ -87,25 +87,25 @@ class LemmyConfig:
 			},
 			"serverinfo": {
 				"function": Lcmds.serverinfo,
-				"enabled": True,
+				"enabled": False,
 				"moderator": False,
 				"description": "Get info about the current server"
 			},
 			"choose": {
 				"function": Lcmds.choose,
-				"enabled": True,
+				"enabled": False,
 				"moderator": False,
 				"description": "Choose between the given options"
 			},
 			"tilt": {
 				"function": Lcmds.tilt,
-				"enabled": True,
+				"enabled": False,
 				"moderator": False,
 				"description": "Get a rotated emote"
 			},
 			"skypeemotes": {
 				"function": Lcmds.skypeemotes,
-				"enabled": True,
+				"enabled": False,
 				"moderator": False,
 				"description": "Get a list of Skype emotes"
 			},

@@ -72,47 +72,47 @@ class LemmyBot:
 
 
 			# Message is an emote
-			elif msg.content in self.res.emotes and msg.author != self.client.user:
-				await Lutils.SendEmote(self.client, msg)
-				Lutils.LogEmoteUse(self.res, msg.author, msg.content)
+			#elif msg.content in self.res.emotes and msg.author != self.client.user:
+			#	await Lutils.SendEmote(self.client, msg)
+			#	Lutils.LogEmoteUse(self.res, msg.author, msg.content)
 
 			# Message is a sticker
-			elif msg.content in self.res.stickers and msg.author != self.client.user:
-				await Lutils.SendSticker(self.client, msg)
-				Lutils.LogEmoteUse(self.res, msg.author, msg.content)
+			#elif msg.content in self.res.stickers and msg.author != self.client.user:
+			#	await Lutils.SendSticker(self.client, msg)
+			#	Lutils.LogEmoteUse(self.res, msg.author, msg.content)
 
 			# Message is a Skype emote
-			elif re.match("\(" + self.res.skype.emoteMatch + "\)", msg.content):
-				await Lutils.SendSkypeEmote(self.client, msg)
-				Lutils.LogEmoteUse(self.res, msg.author, msg.content[1:-1])
+			#elif re.match("\(" + self.res.skype.emoteMatch + "\)", msg.content):
+			#	await Lutils.SendSkypeEmote(self.client, msg)
+			#	Lutils.LogEmoteUse(self.res, msg.author, msg.content[1:-1])
 
 			# Message is a Skype flag
-			elif re.match("\(flag:" + self.res.skype.flagMatch + "\)", msg.content):
-				await Lutils.SendSkypeFlag(self.client, msg)
-				Lutils.LogEmoteUse(self.res, msg.author, msg.content[1:-1])
+			#elif re.match("\(flag:" + self.res.skype.flagMatch + "\)", msg.content):
+			#	await Lutils.SendSkypeFlag(self.client, msg)
+			#	Lutils.LogEmoteUse(self.res, msg.author, msg.content[1:-1])
 
-			else:
-				imageMatch = "(" + "|".join(self.res.emotes) + "|" + "|".join(self.res.stickers) + ")"
+			#else:
+			#	imageMatch = "(" + "|".join(self.res.emotes) + "|" + "|".join(self.res.stickers) + ")"
 
-				# Message is a hybrid emote
-				if re.match(imageMatch + "( +" + imageMatch + ")+", msg.content):
-					imageTerms = msg.content.split()
-					images = []
-					for imageTerm in imageTerms:
-						if imageTerm in self.res.emotes:
-							images.append(Image.open("pics/emotes/" + imageTerm + ".png"))
-						elif imageTerm in self.res.stickers:
-							images.append(Image.open("pics/stickers/" + imageTerm + ".png"))
-						else:
-							images.append(Image.new("RGBA", (64,64)))
+			#	# Message is a hybrid emote
+			#	if re.match(imageMatch + "( +" + imageMatch + ")+", msg.content):
+			#		imageTerms = msg.content.split()
+			#		images = []
+			#		for imageTerm in imageTerms:
+			#			if imageTerm in self.res.emotes:
+			#				images.append(Image.open("pics/emotes/" + imageTerm + ".png"))
+			#			elif imageTerm in self.res.stickers:
+			#				images.append(Image.open("pics/stickers/" + imageTerm + ".png"))
+			#			else:
+			#				images.append(Image.new("RGBA", (64,64)))
 
-					# This saves the combined image as pics/temp.png
-					Lutils.CombineImages(images)
+			#		# This saves the combined image as pics/temp.png
+			#		Lutils.CombineImages(images)
 
-					await Lutils.SendTemp(self.client, msg)
+			#		await Lutils.SendTemp(self.client, msg)
 
-					for image in imageTerms:
-						Lutils.LogEmoteUse(self.res, msg.author, image)
+			#		for image in imageTerms:
+			#			Lutils.LogEmoteUse(self.res, msg.author, image)
 
 		@self.client.event
 		async def on_ready():
