@@ -1,6 +1,7 @@
 .gitattributes
 credentials.txt
 .DS_Store
+venv
 
 # 'normal' log location
 log.txt
