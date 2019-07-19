@@ -201,7 +201,7 @@ class Module:
 		# convert to string and return
 		return '\n'.join(lines)
 
-	def _load(self, file_location, default='{}', static=False, bytes=False):
+	def _load(self, file_location, default=None, static=False, bytes=False):
 		storage_type = 'static' if static else 'data'
 		full_path = f'{storage_type}/{self.__class__.__name__}/{file_location}'
 		directory = '/'.join(full_path.split('/')[:-1])
@@ -240,3 +240,27 @@ class Module:
 
 	def save_data(self, document_name, data, static=False):
 		self._save(f'{document_name}.json', json.dumps(data, indent='\t'), static=static)
+
+	def load_image(self, file_location, static=False):
+		return self._load(file_location, static=static, bytes=True)
+
+	def list_files(self, path, static=False):
+		storage_type = 'static' if static else 'data'
+		directory = f'{storage_type}/{self.__class__.__name__}/{path}'
+
+		# check that directory exists
+		if not os.path.isdir(directory):
+			os.makedirs(directory)
+
+		return os.listdir(directory)
+
+	def data_exists(self, file_location, static=False):
+		storage_type = 'static' if static else 'data'
+		full_path = f'{storage_type}/{self.__class__.__name__}/{file_location}'
+		directory = '/'.join(full_path.split('/')[:-1])
+
+		# check that directory exists
+		if not os.path.isdir(directory):
+			os.makedirs(directory)
+
+		return os.path.exists(full_path)
