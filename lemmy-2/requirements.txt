@@ -1,4 +1,0 @@
-discord.py
-googletrans
-emoji
-Wand
