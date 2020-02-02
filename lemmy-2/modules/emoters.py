@@ -269,6 +269,6 @@ class Emoters(Module):
 
         return image
 
-    async def cmd_emoter_search(self, message, args, kwargs):
-        pass   # TODO
-
+    # TODO
+    # async def cmd_emoter_search(self, message, args, kwargs):
+        # pass
