@@ -98,5 +98,5 @@ class Core(Module):
 	}
 	async def cmd_about(self, message, args, kwargs):
 		title = '```fix\n=========================================\n=  _                                    =\n= | |    ___ _ __ ___  _ __ ___  _   _  =\n= | |   / _ \ \'_ ` _ \| \'_ ` _ \| | | | =\n= | |__|  __/ | | | | | | | | | | |_| | =\n= |_____\___|_| |_| |_|_| |_| |_|\__, | =\n=                                |___/  =\n=========================================\n Your friendly neighbourhood Discord bot\n  Created by https://github.com/halbrd\n```'
-		repo_link = '     Lemmy is free and open source software, hosted\n at <https://github.com/halbrd/Lemmy>. Development\nprogress is tracked at <https://trello.com/b/x2QGb0jk>.\n    Bug reports, feature suggestions, and pull requests \n                                    are welcome.'
+		repo_link = '    Lemmy is free and open source software, hosted\n   at <https://github.com/halbrd/Lemmy>. Reference\ndocumentation is located at <https://lynq.me/lemmy>.\n  Bug reports, feature suggestions, and pull requests \n                                 are welcome.'
 		await message.channel.send(title + '\n' + repo_link)
