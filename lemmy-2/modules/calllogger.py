@@ -23,6 +23,9 @@ class CallLogger(Module):
 		self.channel_map = self.load_data('channelmap')
 		self.calls = {}
 
+	async def on_ready(self):
+		await self.handle_voice_state_update()
+
 	def get_channel_populations(self):
 		voice_channels = [
 			channel
@@ -50,6 +53,9 @@ class CallLogger(Module):
 
 
 	async def on_voice_state_update(self, member, before, after):
+		await self.handle_voice_state_update()
+
+	async def handle_voice_state_update(self):
 		channel_populations = self.get_channel_populations()
 		responses = []
 
