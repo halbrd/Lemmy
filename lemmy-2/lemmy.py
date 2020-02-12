@@ -48,6 +48,11 @@ class Lemmy:
 				await module.on_message(message)
 
 		@self.client.event
+		async def on_voice_state_update(member, before, after):
+			for _, module in self.modules.items():
+				await module.on_voice_state_update(member, before, after)
+
+		@self.client.event
 		async def on_ready():
 			# perform asynchronous setup
 			await self.load_all_async()
