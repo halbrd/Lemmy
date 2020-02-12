@@ -68,6 +68,9 @@ class Module:
 
 		self._commands = { function[4:]: getattr(self, function) for function in dir(self) if function.startswith('cmd_') }
 
+	async def on_ready(self):
+		pass
+
 	async def on_message(self, message):
 		if message.author != self.client.user:
 			await self.call_functions(message)
