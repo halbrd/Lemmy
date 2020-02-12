@@ -50,8 +50,6 @@ class CallLogger(Module):
 
 
 	async def on_voice_state_update(self, member, before, after):
-		# spam = discord.utils.find(lambda channel: channel.id == 166125798611353600, self.client.get_all_channels())
-
 		channel_populations = self.get_channel_populations()
 		responses = []
 
