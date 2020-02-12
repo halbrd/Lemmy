@@ -68,11 +68,13 @@ class CallLogger(Module):
 			if not was_call and is_call:
 				self.calls[voice_id] = datetime.datetime.now()
 			elif was_call and not is_call:
-				responses.append((
-					voice_id,
-					datetime.datetime.now() - self.calls[voice_id],
-				))
+				# always clear the call from the store
 				self.calls[voice_id] = None
+
+				# only log the call if it was at least a minute
+				duration = datetime.datetime.now() - self.calls[voice_id]
+				if duration.seconds >= 60:
+					responses.append((voice_id, duration))
 
 		# send responses
 		for voice_id, duration in responses:
