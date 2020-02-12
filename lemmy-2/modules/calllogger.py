@@ -15,7 +15,7 @@ class CallLogger(Module):
 
 	def format_duration(timedelta):
 		seconds = timedelta.seconds
-		return '{:02}:{:02}:{:02}'.format(seconds // 3600, seconds % 3600 // 60, seconds % 60)
+		return '{}:{:02}:{:02}'.format(seconds // 3600, seconds % 3600 // 60, seconds % 60)
 
 	def __init__(self, lemmy):
 		Module.__init__(self, lemmy)
