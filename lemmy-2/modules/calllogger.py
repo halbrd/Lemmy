@@ -79,7 +79,7 @@ class CallLogger(Module):
 		# send responses
 		for voice_id, duration in responses:
 			# ignore if there isn't a text channel associated with the voice channel
-			if not voice_id in self.channel_map[].keys():
+			if not voice_id in self.channel_map.keys():
 				continue
 
 			voice_channel = self.get_channel_by_id(voice_id)
