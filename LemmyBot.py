@@ -222,7 +222,7 @@ class LemmyBot:
 				for channel in server.channels:
 					if channel.type == discord.ChannelType.voice:
 						channelList.append(channel)
-			responses = self.callLogger.UpdateStatuses(channelList)
+			responses = []#self.callLogger.UpdateStatuses(channelList)
 
 			for response in responses:
 				channel = response[0]
