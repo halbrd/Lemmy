@@ -141,7 +141,7 @@ class LemmyConfig:
 			},
 			"fusion": {
 				"function": Lcmds.fusion,
-				"enabled": True,
+				"enabled": False,
 				"moderator": False,
 				"description": "Get a Pokemon fusion"
 			}
