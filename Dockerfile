@@ -5,10 +5,11 @@ RUN apk add --no-cache imagemagick-dev
 RUN apk add --no-cache git
 RUN apk add --no-cache gcc
 RUN apk add --no-cache musl-dev
+RUN pip install pipenv
 
 WORKDIR /app
 COPY . .
 
-RUN pip install --user -r requirements.txt
+RUN pipenv install
 
-CMD python lemmy.py
+CMD pipenv run python lemmy.py

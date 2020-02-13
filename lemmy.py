@@ -122,7 +122,7 @@ class Lemmy:
         self.logger = logging.getLogger('lemmy')
         self.logger.setLevel(logging.INFO)
 
-        if self.config['log_file']:
+        if self.config.get('log_file'):
             self.logger.addHandler(logging.FileHandler(self.config['log_file']))
 
     async def shutdown(self):
