@@ -9,6 +9,6 @@
             "symbol": "$"
         }
     },
-    "default_manifest": [ "Core", "Lenny", "Translate", "Jebrim", "CustomCommands", "Memes", "Info", "Emoters", "CallLogger" ],
+    "default_manifest": [ "Core", "Lenny", "Translate", "Jebrim", "CustomCommands", "Memes", "Info", "Emoters", "CallLogger", "Neet" ],
     "notify_admins_about_errors": true
 }
