@@ -224,6 +224,9 @@ class Lemmy:
         file = self.to_discord_file(body, file_name)
         await destination.send(comment, file=file)
 
+    async def get_webhook(self, channel, webhook_name='Lemmy'):
+        return discord.utils.find(lambda x: x.name == webhook_name, await channel.webhooks()) or await channel.create_webhook(name=webhook_name)
+
 
 
 if __name__ == '__main__':

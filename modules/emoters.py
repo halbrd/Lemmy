@@ -8,7 +8,6 @@ import io
 from wand.image import Image, Color
 import re
 
-WEBHOOK_NAME = 'Lemmy Emotes'
 EMOTE_MAX_SIZE = 64
 STICKER_MAX_SIZE = 128
 OPERATION_DELIMITER = '/'
@@ -21,7 +20,6 @@ OPERATION_PARAM_DELIMITER = ':'
 # TODO: optimise and/or cache image processing
 # TODO: switch out original-resolution emoters
 # TODO: replace control strings with constants (eg. emoter_type = 'emote' or 'sticker')
-# TODO: freeze wand version
 # TODO: comment this file more -_-
 # TODO: tilt command
 
@@ -195,11 +193,8 @@ class Emoters(Module):
                 'static': emoter_details[2]
             }
 
-    async def get_webhook(self, channel, webhook_name):
-        return discord.utils.find(lambda x: x.name == webhook_name, await channel.webhooks()) or await channel.create_webhook(name=webhook_name)
-
     async def send_image(self, discord_file, destination, vanity_username=None, vanity_avatar_url=None):
-        webhook = await self.get_webhook(destination, WEBHOOK_NAME)
+        webhook = await self.lemmy.get_webhook(destination)
         await webhook.send(username=vanity_username, avatar_url=vanity_avatar_url, file=discord_file)
 
     def _scale_frame(frame, side_length, preserve_aspect_ratio):
