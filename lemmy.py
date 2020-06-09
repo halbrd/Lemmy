@@ -122,7 +122,7 @@ class Lemmy:
         self.logger = logging.getLogger('lemmy')
         self.logger.setLevel(logging.INFO)
 
-        if self.config['log_file']:
+        if self.config.get('log_file'):
             self.logger.addHandler(logging.FileHandler(self.config['log_file']))
 
     async def shutdown(self):
@@ -223,6 +223,9 @@ class Lemmy:
     async def send_text_file(self, body, destination, file_name='text.txt', comment=None):
         file = self.to_discord_file(body, file_name)
         await destination.send(comment, file=file)
+
+    async def get_webhook(self, channel, webhook_name='Lemmy'):
+        return discord.utils.find(lambda x: x.name == webhook_name, await channel.webhooks()) or await channel.create_webhook(name=webhook_name)
 
 
 
