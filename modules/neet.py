@@ -23,7 +23,7 @@ class Neet(Module):
         return ''.join(replacement)
 
     async def on_message(self, message):
-        self.call_functions(message)
+        await self.call_functions(message)
 
         if not 'wish i was neet' in message.content.lower():
             return
