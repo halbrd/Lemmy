@@ -36,7 +36,6 @@ class Core(Module):
         'examples': [ 'help', 'help Core', 'help reload' ]
     }
     async def cmd_help(self, message, args, kwargs):
-        broadcast = 'broadcast' in kwargs and bool(kwargs['broadcast'])
         symbol = self.lemmy.resolve_symbol(message.channel)
 
         # general help text
@@ -46,16 +45,6 @@ class Core(Module):
 
             # construct message initially as a list of lines, for convenience
             lines = []
-
-            '''
-            Before we start getting any help text, we need to consider what the symbol should be.
-            Since, if `broadcast` is false, we will be sending the message to a different channel
-            (that is, a direct message) than the one the help command was called from, our `symbol`
-            variable might not be accurate. Therefore, if we are sending the help message directly
-            to the user, we need to call resolve_symbol again and pass None to get the default symbol.
-            '''
-            if not broadcast:
-                symbol = self.lemmy.resolve_symbol(None)
 
             for module_name in manifest.keys():
                 lines.append(self.lemmy.modules[module_name].get_help_text(symbol=symbol))
