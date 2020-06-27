@@ -54,9 +54,7 @@ class Module:
         await message.channel.send('```diff\n- An internal error occurred (this isn\'t your fault)\n```')
         if self.lemmy.config['notify_admins_about_errors']:
             for user_id in self.lemmy.config['admins']:
-                # ༼ つ ◕_◕ ༽つ GIVE ASSIGNMENT EXPRESSIONS ༼ つ ◕_◕ ༽つ
-                admin = message.channel.guild.get_member(user_id)
-                if admin:
+                if admin := message.channel.guild.get_member(user_id):
                     message = (f'Exception in {message.channel.guild.name}#{message.channel.name}:\n'
                                f'{message.author.name}: `{message.content[:50]}{"..." if len(message.content) > 50 else ""}`\n'
                                f'-> {type(exception).__name__}: {str(exception)}')

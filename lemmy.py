@@ -11,15 +11,16 @@ from itertools import zip_longest
 import logging
 import signal
 import io
+import configparser
 
 sys.path.append('modules')
 
 class Lemmy:
     class NoConfigException(Exception):
-        def __init__(self, message='config.json does not exist (create it from config.example.json)'):
-            super().__init__(message)
+        def __init__(self, missing_file):
+            super().__init__(f'config/{missing_file}.ini does not exist (create it from {missing_file}.example.ini)')
 
-    def __init__(self, token):
+    def __init__(self):
         # perform setup that should not be performed again (i.e. in a reload)
         self.client = discord.Client()
 
@@ -44,19 +45,25 @@ class Lemmy:
             self.log(f'{message.author.name} => {recipient}{extras_phrase}: {message.content}')
 
             # pass the event to the modules
-            for _, module in self.modules.items():
-                await module.on_message(message)
+            for module_name, module in self.modules.items():
+                context = self.get_context(message.channel)
+                if module_name in context['manifest']:
+                    await module.on_message(message)
 
         @self.client.event
         async def on_voice_state_update(member, before, after):
-            for _, module in self.modules.items():
-                await module.on_voice_state_update(member, before, after)
+            # pass the event to the modules
+            for module_name, module in self.modules.items():
+                context = self.get_context(member)
+                if module_name in context['manifest']:
+                    await module.on_voice_state_update(member, before, after)
 
         @self.client.event
         async def on_ready():
             # perform asynchronous setup
             await self.load_all_async()
 
+            # pass the event to the modules
             for _, module in self.modules.items():
                 await module.on_ready()
 
@@ -76,7 +83,7 @@ class Lemmy:
             pass   # Lemmy is running in Windows - nothing we can do
 
         try:
-            loop.run_until_complete(self.client.start(token))
+            loop.run_until_complete(self.client.start(self.config['token']))
         except KeyboardInterrupt:
             loop.run_until_complete(self.client.logout())
         finally:
@@ -99,22 +106,42 @@ class Lemmy:
         await self.load_playing_message()
 
     def load_config(self):
-        if not os.path.isfile('config.json'):
-            raise Lemmy.NoConfigException
+        for config_file in ['lemmy', 'contexts']:
+            if not os.path.isfile(f'config/{config_file}.ini'):
+                raise Lemmy.NoConfigException(config_file)
 
-        self.config = json.load(open('config.json', 'r'))
+        # load config
+        self.config = configparser.ConfigParser()
+        self.config.read('config/lemmy.ini')
+        self.config = dict(self.config['Lemmy'])
+
+        # post-process config
+        self.config['admins'] = [ int(id) for id in self.config['admins'].split() ]
+
+        # load contexts
+        self.contexts = configparser.ConfigParser()
+        self.contexts.read('config/contexts.ini')
+        self.contexts = dict(self.contexts)
+        for key in self.contexts.keys():
+            self.contexts[key] = dict(self.contexts[key])
+
+        # post-process contexts
+        for context in self.contexts.keys():
+            self.contexts[context]['manifest'] = self.contexts[context]['manifest'].split()
 
     def load_modules(self):
         self.modules = {}
 
-        for module_class_name in self.config['default_manifest']:
+        for module_class_name in self.contexts['DEFAULT']['manifest']:
             module = importlib.import_module(module_class_name.lower())
             importlib.reload(module)   # changes to the module will be loaded (for if this was called again while the bot is running)
             class_ = getattr(module, module_class_name)
             self.modules[module_class_name] = class_(self)
 
     async def load_playing_message(self):
-        await self.client.change_presence(activity=discord.Game(name=self.get_config_key_or_default('playing_message')))
+        await self.client.change_presence(activity=discord.Game(
+            name=self.config.get('message')
+        ))
 
     def setup_logging(self):
         logging.basicConfig(format='%(message)s', level=logging.WARNING)
@@ -129,22 +156,19 @@ class Lemmy:
         self.log('Shutting down...')
         await self.client.logout()
 
-    def get_config_key_or_default(self, *path, default=None):
-        node = self.config
-        for step in path:
-            if type(node) == dict and step in node:
-                node = node[step]
-            else:
-                return default
+    def get_context(self, context):
+        if type(context) == discord.TextChannel:
+            context = context.guild
+        elif type(context) == discord.Member:
+            context = context.guild
 
-        return node
+        context_id = str(context.id)
 
-    def resolve_symbol(self, channel):
-        default_symbol = self.config["default_symbol"]
-        try:
-            return self.get_config_key_or_default("server_config", channel.guild.id, "symbol", default=default_symbol)
-        except AttributeError:
-            return default_symbol
+        relevant_section = context_id if context_id in self.contexts else 'DEFAULT'
+        return self.contexts[relevant_section]
+
+    def resolve_symbol(self, context):
+        return self.get_context(context)['symbol']
 
     def chunk_text(self, text, chunk_length=2000, chunk_prefix='', chunk_suffix=''):
         rows = text.splitlines()
@@ -230,7 +254,4 @@ class Lemmy:
 
 
 if __name__ == '__main__':
-    if not os.path.isfile('config.json'):
-        raise Lemmy.NoConfigException
-
-    lemmy = Lemmy(json.load(open('config.json', 'r'))['token'])
+    lemmy = Lemmy()
