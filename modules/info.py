@@ -85,9 +85,11 @@ class Info(Module):
             await self.send_error(message)
             return
 
-        if len(args) == 0:
+        if len(args) == 0:  # author provided no args - inspect author
             user = message.author
-        elif len(args) == 1:
+        elif len(message.mentions) > 0:  # author mentioned a user - inspect that member
+            user = message.mentions[0]
+        else:  # author typed something else - let's figure out what it is
             search_term = args[0]
             user = Info.resolve_member(message.guild, search_term)
 
