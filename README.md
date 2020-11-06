@@ -11,11 +11,10 @@ pipenv install
 ## Configure
 
 ```bash
-cp config.example.json config.json
-# edit config.json
+cp config/lemmy.example.ini config/lemmy.ini
+cp config/contexts.example.ini config/contexts.ini
+# edit lemmy.ini and contexts.ini as required
 ```
-
-The config attributes `token` and `default_manifest` are mandatory.
 
 ## Run
 
