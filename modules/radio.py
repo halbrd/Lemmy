@@ -44,29 +44,3 @@ class Radio(Module):
             return
 
         await voice_clients[message.guild.id].disconnect()
-
-    docs_radio_queue = {
-        # TODO
-    }
-    async def cmd_radio_queue(self, message, args, kwargs):
-        voice_clients = self.get_voice_clients()
-        if not message.guild.id in voice_clients:
-            await self.send_error(message, 'no radio in this server')
-            return
-
-        empty_queue = '{ "index": null, "tracks": [] }'
-        queue = self.load_data('queue_' + str(message.guild.id), default=empty_queue)
-        await message.channel.send(self.stringify_queue(queue))
-
-    def stringify_queue(self, queue):
-        if len(queue['tracks']) == 0:
-            return 'nothing playing right now'
-
-        tracks = []
-        for i, track in enumerate(queue['tracks']):
-            prefix = '=> ' if queue['index'] == i else '   '
-            tracks.append(prefix + track['title'])
-
-        track_list = '\n'.join(tracks)
-
-        return '```\n' + track_list + '\n```'
