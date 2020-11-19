@@ -9,7 +9,7 @@ verify_ssl = true
 googletrans = "*"
 emoji = "*"
 requests = "*"
-"discord.py" = "*"
+"discord.py" = {extras = ["voice"], version = "*"}
 Wand = "*"
 
 [requires]
