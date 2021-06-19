@@ -104,6 +104,7 @@ class Lemmy:
 
     async def load_all_async(self):
         await self.load_playing_message()
+        await self.announce_servers()
 
     def load_config(self):
         for config_file in ['lemmy', 'contexts']:
@@ -142,6 +143,11 @@ class Lemmy:
         await self.client.change_presence(activity=discord.Game(
             name=self.config.get('message')
         ))
+
+    async def announce_servers(self):
+        servers = await self.client.fetch_guilds(limit=None).flatten()
+        servers = sorted([ server.name for server in servers ])
+        self.log('\n'.join(['Logging in to servers:'] + servers))
 
     def setup_logging(self):
         logging.basicConfig(format='%(message)s', level=logging.WARNING)
