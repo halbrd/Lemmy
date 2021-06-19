@@ -8,7 +8,7 @@ Type=simple
 Restart=always
 RestartSec=1
 User=will
-WorkingDirectory=/opt/Lemmy
+WorkingDirectory=/opt/lemmy
 ExecStart=/usr/local/bin/pipenv run python lemmy.py
 
 [Install]
