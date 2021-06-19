@@ -1,0 +1,15 @@
+[Unit]
+Description=Lemmy, your friendly neighbourhood Discord bot
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=will
+WorkingDirectory=/opt/Lemmy
+ExecStart=/usr/local/bin/pipenv run python lemmy.py
+
+[Install]
+WantedBy=multi-user.target
