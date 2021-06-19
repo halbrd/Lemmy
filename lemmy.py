@@ -160,7 +160,7 @@ class Lemmy:
 
     async def shutdown(self):
         self.log('Shutting down...')
-        await self.client.logout()
+        await self.client.close()
 
     def get_context(self, context):
         if type(context) == discord.TextChannel:
