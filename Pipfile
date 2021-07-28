@@ -9,8 +9,9 @@ verify_ssl = true
 googletrans = "*"
 emoji = "*"
 requests = "*"
-"discord.py" = "*"
+"discord.py" = {extras = ["voice"], version = "*"}
 Wand = "*"
+youtube-dl = "*"
 
 [requires]
 python_version = "3.8"

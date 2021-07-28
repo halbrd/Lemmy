@@ -5,6 +5,7 @@ RUN apk add --no-cache imagemagick-dev
 RUN apk add --no-cache git
 RUN apk add --no-cache gcc
 RUN apk add --no-cache musl-dev
+# TODO: install ffmpeg
 RUN pip install pipenv
 
 WORKDIR /app

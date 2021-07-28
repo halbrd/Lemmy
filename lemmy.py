@@ -105,6 +105,7 @@ class Lemmy:
     async def load_all_async(self):
         await self.load_playing_message()
         await self.announce_servers()
+        await self.disconnect_all_voice()
 
     def load_config(self):
         for config_file in ['lemmy', 'contexts']:
@@ -147,7 +148,13 @@ class Lemmy:
     async def announce_servers(self):
         servers = await self.client.fetch_guilds(limit=None).flatten()
         servers = sorted([ server.name for server in servers ])
-        self.log('\n'.join(['Logging in to servers:'] + servers))
+        self.log('Connected to servers: ' + ', '.join(servers))
+
+    async def disconnect_all_voice(self):
+        for vc in self.client.voice_clients:
+            if vc.is_playing():
+                vc.stop()
+            await vc.disconnect()
 
     def setup_logging(self):
         logging.basicConfig(format='%(message)s', level=logging.WARNING)
@@ -160,6 +167,7 @@ class Lemmy:
 
     async def shutdown(self):
         self.log('Shutting down...')
+        await self.disconnect_all_voice()
         await self.client.close()
 
     def get_context(self, context):

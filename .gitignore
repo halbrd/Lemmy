@@ -1,7 +1,10 @@
+# Lemmy components to ignore
 config/*
 !config/*.example.ini
 data
-venv
+cache
+
+
 .vscode
 
 # Byte-compiled / optimized / DLL files
