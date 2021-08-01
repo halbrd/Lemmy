@@ -35,7 +35,7 @@ class CallLogger(Module):
         ]
 
         return {
-            str(channel.id): len(channel.members)  # TODO: don't count Lemmy in this
+            str(channel.id): len([member for member in channel.members if member != self.client.user])
             for channel in voice_channels
         }
 
