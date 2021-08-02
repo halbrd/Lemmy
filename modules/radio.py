@@ -107,6 +107,7 @@ class Radio(Module):
             return
 
         for url in args:
+            url = url.lstrip('<').rstrip('>')
             domain = urlparse(url).netloc
             if not domain in ['youtube.com', 'www.youtube.com', 'youtu.be']:
                 await self.send_error(message, comment='Only YouTube videos are supported at this time')
