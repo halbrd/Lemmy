@@ -60,12 +60,28 @@ class Radio(Module):
         'description': '[Alpha Testing] Plays sound in voice'
     }
 
-    def __init__(self, lemmy):
-        Module.__init__(self, lemmy)
-
+    def clear_cache(self):
         if os.path.exists(CACHE_LOC):
             shutil.rmtree(CACHE_LOC)
 
+    def clear_queue(server_id):
+        if not server_id in self.queues:
+            return
+
+        queue = self.queues[server_id]
+        del self.queues[server_id]
+
+        if not os.path.exists(CACHE_LOC):
+            return
+
+        for source in queue:
+            os.path.remove(source.filename)
+
+
+    def __init__(self, lemmy):
+        Module.__init__(self, lemmy)
+
+        self.clear_cache()
         self.queues = {}
 
     docs_radio_play = {
@@ -143,14 +159,20 @@ class Radio(Module):
         # unfortunately we can't pass the voice client or other details so we have to figure out which voice client
         # needs to be started on the next track
         for vc in self.client.voice_clients:
-            if not vc.is_playing():
-                os.remove(self.queues[vc.guild.id][0].filename)
-                del self.queues[vc.guild.id][0]
+            if vc.is_playing():
+                # don't wanna mess with radios that are playing
+                continue
 
-                if len(self.queues[vc.guild.id]) > 0:
-                    player = self.queues[vc.guild.id][0]
-                    self.log_play(vc, player.title)
-                    vc.play(player, after=self.play_next)
+            os.remove(self.queues[vc.guild.id][0].filename)
+            del self.queues[vc.guild.id][0]
+
+            if len(self.queues[vc.guild.id]) == 0:
+                # end of queue, nothing to do
+                continue
+
+            player = self.queues[vc.guild.id][0]
+            self.log_play(vc, player.title)
+            vc.play(player, after=self.play_next)
 
     def queue_to_text(queue):
         if len(queue) == 0:
@@ -172,6 +194,10 @@ class Radio(Module):
         'usage': 'radio_queue',
     }
     async def cmd_radio_queue(self, message, args, kwargs):
+        if len(args) > 0:
+            await self.send_error(message)
+            return
+
         if message.guild.voice_client is None:
             await self.send_error(message)
             return
@@ -192,14 +218,18 @@ class Radio(Module):
 
         if len(lemmy_voice.channel.members) == 1:
             # Lemmy is alone, time to leave
-            self.queues[lemmy_voice.guild.id] = []
             await lemmy_voice.disconnect()
+            self.clear_queue(member.guild.id)
 
     docs_radio_off = {
         'description': 'Disconnects the radio',
         'usage': 'radio_off',
     }
     async def cmd_radio_off(self, message, args, kwargs):
+        if len(args) > 0:
+            await self.send_error(message)
+            return
+
         vc = message.guild.voice_client
 
         if vc is None:
@@ -207,8 +237,10 @@ class Radio(Module):
             return
 
         if vc.is_playing():
-            vc.stop()
+            vc.stop()  # this will trigger play_next, but it won't matter because we're disconnecting
         await vc.disconnect()
+
+        self.clear_queue(message.guild.id)
 
         await self.send_success(message)
 
@@ -235,7 +267,6 @@ class Radio(Module):
 
     docs_radio_prev = {
         'description': '<not implemented>',
-        'usage': 'radio_',
     }
     async def cmd_radio_prev(self, message, args, kwargs):
         pass
