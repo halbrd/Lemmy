@@ -245,25 +245,107 @@ class Radio(Module):
         await self.send_success(message)
 
     docs_radio_pause = {
-        'description': '<not implemented>',
-        'usage': 'radio_',
+        'description': 'Pauses playback',
+        'usage': 'radio_pause',
     }
     async def cmd_radio_pause(self, message, args, kwargs):
-        pass
+        if len(args) > 0:
+            await self.send_error(message)
+            return
+
+        vc = message.guild.voice_client
+
+        if vc is None:
+            await self.send_error(message)
+            return
+
+        user_voice = message.author.voice
+        user_in_voice = user_voice is not None
+        user_with_lemmy = user_in_voice and user_voice.channel == vc.channel
+
+        if not user_with_lemmy:
+            await self.send_error(message, comment='You need to be in the call to control the radio')
+            return
+
+        if not vc.is_playing() and not vc.is_paused():
+            await self.send_error(message, comment='Nothing is playing')
+            return
+
+        if vc.is_paused():
+            await self.send_success(message)
+            return
+
+        vc.pause()
+        await self.send_success(message)
 
     docs_radio_resume = {
-        'description': '<not implemented>',
-        'usage': 'radio_',
+        'description': 'Resumes paused playback',
+        'usage': 'radio_resume',
     }
     async def cmd_radio_resume(self, message, args, kwargs):
-        pass
+        if len(args) > 0:
+            await self.send_error(message)
+            return
+
+        vc = message.guild.voice_client
+
+        if vc is None:
+            await self.send_error(message)
+            return
+
+        user_voice = message.author.voice
+        user_in_voice = user_voice is not None
+        user_with_lemmy = user_in_voice and user_voice.channel == vc.channel
+
+        if not user_with_lemmy:
+            await self.send_error(message, comment='You need to be in the call to control the radio')
+            return
+
+        if not vc.is_playing() and not vc.is_paused():
+            await self.send_error(message, comment='Nothing is playing')
+            return
+
+        if not vc.is_paused():
+            await self.send_success(message)
+            return
+
+        vc.resume()
+        await self.send_success(message)
 
     docs_radio_next = {
-        'description': '<not implemented>',
-        'usage': 'radio_',
+        'description': 'Skips to the next track',
+        'usage': 'radio_next',
     }
     async def cmd_radio_next(self, message, args, kwargs):
-        pass
+        if len(args) > 0:
+            await self.send_error(message)
+            return
+
+        vc = message.guild.voice_client
+
+        if vc is None:
+            await self.send_error(message)
+            return
+
+        user_voice = message.author.voice
+        user_in_voice = user_voice is not None
+        user_with_lemmy = user_in_voice and user_voice.channel == vc.channel
+
+        if not user_with_lemmy:
+            await self.send_error(message, comment='You need to be in the call to control the radio')
+            return
+
+        if not vc.is_playing() and not vc.is_paused():
+            await self.send_error(message, comment='Nothing is playing')
+            return
+
+        if len(self.queues[vc.guild.id]) == 0:
+            await self.send_error(message, comment='The queue is empty')
+            return
+
+        vc.stop()  # this will trigger play_next
+        await self.send_success(message)
+        await message.channel.send(Radio.queue_to_text(self.queues[message.guild.id]))
 
     docs_radio_prev = {
         'description': '<not implemented>',
