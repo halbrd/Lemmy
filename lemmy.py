@@ -161,6 +161,7 @@ class Lemmy:
 
         self.logger = logging.getLogger('lemmy')
         self.logger.setLevel(logging.INFO)
+        self.logger.handlers = []
 
         if self.config.get('log_file'):
             self.logger.addHandler(logging.FileHandler(self.config['log_file']))
