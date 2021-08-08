@@ -164,7 +164,12 @@ class Radio(Module):
                 # don't wanna mess with radios that are playing
                 continue
 
-            os.remove(self.queues[vc.guild.id][0].filename)
+            # delete track cache file, unless it's coming up again in the queue
+            cache_file = self.queues[vc.guild.id][0].filename
+            if not cache_file in [track.filename for track in self.queues[vc.guild.id]]:
+                os.remove(self.queues[vc.guild.id][0].filename)
+
+            # delete the queue item
             del self.queues[vc.guild.id][0]
 
             if len(self.queues[vc.guild.id]) == 0:
