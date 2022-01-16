@@ -13,8 +13,6 @@ class CustomCommands(Module):
         'description': 'Posts custom-defined commands'
     }
 
-    BLACKLISTED_EMOJI = set(emoji.UNICODE_EMOJI)
-
     ALREADY_EXISTS_MESSAGE = lambda name: f'`{name}` is already a command'
     DOES_NOT_EXIST_MESSAGE = lambda name: f'`{name}` is not a command'
     INVALID_NAME_MESSAGE = lambda name: f'`{name}` is an invalid name (must be 20 characters or fewer, no emojis or whitespace)'
@@ -34,7 +32,7 @@ class CustomCommands(Module):
 
         # no emojis or fun allowed
         for character in name:
-            if character in CustomCommands.BLACKLISTED_EMOJI:
+            if emoji.is_emoji(character):
                 return False
 
         # no whitespace
