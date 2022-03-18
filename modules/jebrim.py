@@ -50,23 +50,6 @@ class Jebrim(Module):
         else:
             await message.channel.send(random.choice(tweets))
 
-    docs_is_jebrim_suspended = {
-        'description': 'Checks if Jebrim is suspended on Twitter'
-    }
-    async def cmd_is_jebrim_suspended(self, message, args, kwargs):
-        accounts = ['Jebrim', 'The1Jebrim', 'mirbeJ', 'FakeJebrim', 'Agilitism']
-        account_lines = []
-
-        for account in accounts:
-            suspended = 'This account has been suspended' in requests.get('https://twitter.com/' + account).text
-            indicator = '💔' if suspended else '💚'
-            line = f'{indicator} [@{account}](https://twitter.com/{account})'
-            account_lines.append(line)
-
-        embed = discord.Embed()
-        embed.description = '\n'.join(account_lines)
-        await message.channel.send(embed=embed)
-
     docs_jebrim_dump = {
         'description': 'Sends a file containing the entire Jebrim database'
     }
