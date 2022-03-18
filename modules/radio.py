@@ -352,9 +352,3 @@ class Radio(Module):
         vc.stop()  # this will trigger play_next
         await self.send_success(message)
         await message.channel.send(Radio.queue_to_text(self.queues[message.guild.id]))
-
-    docs_radio_prev = {
-        'description': '<not implemented>',
-    }
-    async def cmd_radio_prev(self, message, args, kwargs):
-        pass
