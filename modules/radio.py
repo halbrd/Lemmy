@@ -3,7 +3,7 @@ sys.path.append('..')
 from module import Module
 
 import discord
-import youtube_dl
+import yt_dlp
 import os
 import shutil
 from urllib.parse import urlparse
@@ -29,7 +29,7 @@ ffmpeg_options = {
     'options': '-vn'
 }
 
-ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
+ytdl = yt_dlp.YoutubeDL(ytdl_format_options)
 
 class YTDLSource(discord.PCMVolumeTransformer):
     def __init__(self, source, *, data, volume=0.25):
