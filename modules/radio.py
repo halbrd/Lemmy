@@ -57,7 +57,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
 class Radio(Module):
     docs = {
-        'description': '[Alpha Testing] Plays sound in voice'
+        'description': 'Plays sound in voice'
     }
 
     def clear_cache(self):
