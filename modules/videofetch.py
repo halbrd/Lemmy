@@ -14,6 +14,7 @@ import os
 import re
 
 CACHE_LOC = 'cache/VideoFetch/'
+ATTEMPTS = 3
 
 def clean_filename(filename):
     for c in ['<', '>', ':', '"', '/', '\\', '|', '?', '*']:
@@ -22,7 +23,16 @@ def clean_filename(filename):
 
 async def send_tiktok(url, channel):
     filename = CACHE_LOC + clean_filename(url) + '.mp4'
-    subprocess.run(['yt-dlp', '-S', 'vcodec:h264', '-o', filename, url])
+
+    success = False
+    for i in range(ATTEMPTS):
+        r = subprocess.run(['yt-dlp', '-S', 'vcodec:h264', '-o', filename, url])
+        if r.returncode == 0:
+            success = True
+            break
+
+    if not success:
+        return
 
     with open(filename, 'rb') as f:
       await channel.send(file=discord.File(f))
