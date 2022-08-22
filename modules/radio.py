@@ -64,7 +64,7 @@ class Radio(Module):
         if os.path.exists(CACHE_LOC):
             shutil.rmtree(CACHE_LOC)
 
-    def clear_queue(server_id):
+    def clear_queue(self, server_id):
         if not server_id in self.queues:
             return
 
