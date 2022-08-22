@@ -75,7 +75,7 @@ class Radio(Module):
             return
 
         for source in queue:
-            os.path.remove(source.filename)
+            os.remove(source.filename)
 
 
     def __init__(self, lemmy):
