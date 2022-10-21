@@ -50,5 +50,5 @@ class VideoFetch(Module):
             # just in case
             return
 
-        for match in re.findall('https?://vt.tiktok.com/[A-Za-z0-9]+', message.content):
+        for match in re.findall('https?://\w+.tiktok.com/[^ ]+', message.content):
             await send_tiktok(match, message.channel)
