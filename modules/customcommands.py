@@ -156,7 +156,7 @@ class CustomCommands(Module):
             await self.send_error(message)
             return
 
-        commands = filter(lambda command: args[0] in command, self.commands.keys())
+        commands = filter(lambda command: args[0].lower() in command.lower(), self.commands.keys())
         commands = sorted(commands, key=lambda command: (len(command), command))
 
         # if the search term is matched exactly, highlight it (needs `md` syntax highlighting)
