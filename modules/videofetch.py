@@ -72,6 +72,14 @@ class VideoFetch(Module):
             # just in case
             return
 
+        hourglass_added = False
         for pattern in DOWNLOAD_PATTERNS:
             for match in re.findall(pattern, message.content):
+                if not hourglass_added:
+                    await message.add_reaction('⏳')
+                    hourglass_added = True
+
                 await download_and_send(match, message.channel)
+
+        if hourglass_added:
+            await message.remove_reaction('⏳', self.client.user)
