@@ -9,7 +9,7 @@ from module import Module
 # work through the ytdl_opts method.
 
 import discord
-import subprocess
+import asyncio
 import os
 import re
 
@@ -38,7 +38,8 @@ async def download_and_send(url, channel):
 
     success = False
     for i in range(ATTEMPTS):
-        r = subprocess.run(['yt-dlp', '-S', 'vcodec:h264', '-o', base_file_loc + '.%(ext)s', url])
+        r = await asyncio.create_subprocess_shell(f'yt-dlp -S vcodec:h264 -o "{base_file_loc}.%(ext)s" {url}')
+        await r.wait()
         if r.returncode == 0:
             success = True
             break
