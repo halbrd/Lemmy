@@ -22,7 +22,7 @@ class Lemmy:
 
     def __init__(self):
         # perform setup that should not be performed again (i.e. in a reload)
-        self.client = discord.Client()
+        self.client = discord.Client(intents=discord.Intents.all())
 
         # perform synchronous setup
         self.load_all_sync()
@@ -146,7 +146,7 @@ class Lemmy:
         ))
 
     async def announce_servers(self):
-        servers = await self.client.fetch_guilds(limit=None).flatten()
+        servers = [ server async for server in self.client.fetch_guilds(limit=None) ]
         servers = sorted([ server.name for server in servers ])
         self.log('Connected to servers: ' + ', '.join(servers))
 
