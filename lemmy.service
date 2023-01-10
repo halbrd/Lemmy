@@ -9,8 +9,8 @@ Restart=always
 RestartSec=1
 User=will
 WorkingDirectory=/opt/lemmy
-ExecStartPre=/usr/bin/pipenv install
-ExecStart=/usr/bin/pipenv run python lemmy.py
+ExecStartPre=/home/will/.local/bin/pipenv install
+ExecStart=/home/will/.local/bin/pipenv run python lemmy.py
 
 [Install]
 WantedBy=multi-user.target
