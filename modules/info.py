@@ -55,7 +55,7 @@ class Info(Module):
         # server icon
         embed.set_image(url=server.icon_url)
         # creator
-        embed.set_footer(text=f'Created by @{server.owner.nick or server.owner.name}', icon_url=server.owner.avatar_url)
+        embed.set_footer(text=f'Created by @{server.owner.nick or server.owner.name}', icon_url=server.owner.avatar.url)
         # created at
         embed.timestamp = server.created_at
 
@@ -100,7 +100,7 @@ class Info(Module):
         embed = discord.Embed()
 
         # username, discriminator, nickname, default avatar
-        embed.set_author(name=f'{user.name}#{user.discriminator}' + (f' ({user.nick})' if user.nick else '') + (' [🤖]' if user.bot else ''), icon_url=user.default_avatar_url)
+        embed.set_author(name=f'{user.name}#{user.discriminator}' + (f' ({user.nick})' if user.nick else '') + (' [🤖]' if user.bot else ''), icon_url=user.default_avatar.url)
         # online status
         status_colors = {
             'online': discord.Color.green(),
@@ -135,7 +135,7 @@ class Info(Module):
             embed.add_field(name=f'Currently {state}', value=user.voice.channel.name, inline=True)
 
         # avatar
-        embed.set_image(url=user.avatar_url)
+        embed.set_image(url=user.avatar.url)
         # joined Discord at
         embed.set_footer(text=f'Joined Discord:')
         embed.timestamp = user.created_at
