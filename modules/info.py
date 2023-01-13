@@ -4,10 +4,6 @@ from module import Module
 
 import discord
 import datetime
-import requests
-import os
-import shutil
-import re
 
 CACHE_LOC = 'cache/Info/'
 
@@ -142,36 +138,19 @@ class Info(Module):
 
         # avatar
         embed.set_image(url=user.avatar.url)
-        # server-specific avatar
-        if user.guild_avatar:
-            embed.add_field(name=f'{message.channel.guild.name} avatar', value=f'[Click here]({user.guild_avatar.url})')
         # joined Discord at
         embed.set_footer(text=f'Joined Discord:')
         embed.timestamp = user.created_at
 
-        await message.channel.send(embed=embed)
-
+        embeds = [embed]
         # server-specific avatar
         if user.guild_avatar:
-            image = requests.get(user.guild_avatar.url, stream=True)
+            embed2 = discord.Embed()
+            embed2.set_image(url=user.guild_avatar.url)
+            embed2.add_field(name=f'{message.channel.guild.name} avatar', value='')
+            embeds.append(embed2)
 
-            # I'm so mad that I have to write this to disk
-
-            if not os.path.isdir(CACHE_LOC):
-                os.makedirs(CACHE_LOC)
-
-            with open(CACHE_LOC + user.name, 'wb') as f:
-                image.raw.decode_content = True
-                shutil.copyfileobj(image.raw, f)
-
-            extension = re.search(r'/avatars/\w+\.(\w+)\b', user.guild_avatar.url).group(1)
-            with open(CACHE_LOC + user.name, 'rb') as f:
-                attachment = discord.File(f, filename=f'{user.name}\'s {message.channel.guild.name} avatar.{extension}')
-
-            os.remove(CACHE_LOC + user.name)
-
-            await message.channel.send(files=[attachment])
-
+        await message.channel.send(embeds=embeds)
 
     def resolve_channel(server, term):
         try_attrs = [ 'id', 'mention', 'name' ]
