@@ -107,7 +107,7 @@ class Emoters(Module):
         file_name = ''.join([ emoter['name'] for emoter in emoters ]) + ('.gif' if base_image.format.lower() == 'gif' else '.png')
         discord_file = self.lemmy.to_discord_file(base_image.make_blob(), file_name)
         await self.send_image(discord_file, message.channel, vanity_username=message.author.name,
-            vanity_avatar_url=message.author.avatar_url)
+            vanity_avatar_url=message.author.avatar.url)
 
         await message.delete()
 
