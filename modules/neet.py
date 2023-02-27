@@ -36,5 +36,5 @@ class Neet(Module):
         )
 
         webhook = await self.lemmy.get_webhook(message.channel)
-        await webhook.send(body, username=message.author.name, avatar_url=message.author.avatar_url)
+        await webhook.send(body, username=message.author.name, avatar_url=message.author.avatar.url)
         await message.delete()
