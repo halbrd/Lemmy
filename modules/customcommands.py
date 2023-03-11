@@ -7,6 +7,7 @@ import re
 import io
 import json
 import discord
+import random
 
 class CustomCommands(Module):
     docs = {
@@ -245,3 +246,10 @@ class CustomCommands(Module):
     async def cmd_ccomm_dump(self, message, args, kwargs):
         f = io.StringIO(json.dumps(self.commands, indent='\t'))
         await message.channel.send(file=discord.File(f, 'customcommands.json'))
+
+    docs_ccomm_random = {
+        'description': 'Posts a random custom command'
+    }
+    async def cmd_ccomm_random(self, message, args, kwargs):
+        command = random.choice(self.commands.items())
+        await message.channel.send(command)
