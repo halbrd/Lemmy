@@ -81,6 +81,7 @@ class VideoFetch(Module):
                     hourglass_added = True
 
                 await download_and_send(match, message.channel)
+                await message.edit(suppress=True)
 
         if hourglass_added:
             await message.remove_reaction('⏳', self.client.user)
