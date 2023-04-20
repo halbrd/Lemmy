@@ -45,7 +45,7 @@ async def download_and_send(url, channel):
             break
 
     if not success:
-        return
+        return False
 
     matching_files = [
         f for f in os.listdir(CACHE_LOC)
@@ -61,6 +61,8 @@ async def download_and_send(url, channel):
 
     for f in matching_files:
         os.remove(CACHE_LOC + f)
+
+    return True
 
 
 class VideoFetch(Module):
@@ -80,8 +82,9 @@ class VideoFetch(Module):
                     await message.add_reaction('⏳')
                     hourglass_added = True
 
-                await download_and_send(match, message.channel)
-                await message.edit(suppress=True)
+                previewed = await download_and_send(match, message.channel)
+                if previewed:
+                    await message.edit(suppress=True)
 
         if hourglass_added:
             await message.remove_reaction('⏳', self.client.user)
