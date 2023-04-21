@@ -18,6 +18,12 @@ class Imgur(Module):
         'description': 'Uploads imgur links to Discord and gives you the new links'
     }
     async def cmd_imgur_rehost(self, message, args, kwargs):
+        text_files = [ file for file in message.attachments if file.filename.endswith('.txt') ]
+
+        for file in text_files:
+            contents = (await file.read()).decode()
+            args += contents.strip().split('\n')
+
         results = []
         files = []
 
@@ -52,4 +58,4 @@ class Imgur(Module):
 
             os.remove(cache_dest)
 
-        await message.channel.send('\n'.join(results))
+        await self.lemmy.send_text_file('\n'.join(results), message.channel, file_name='discord-links.txt')
