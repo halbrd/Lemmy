@@ -190,7 +190,7 @@ class Info(Module):
 
         if type(channel) == discord.TextChannel:
             # name, icon
-            embed.set_author(name='#' + channel.name, icon_url='https://i.imgur.com/zcaLaDF.png')
+            embed.set_author(name='#' + channel.name, icon_url='https://cdn.discordapp.com/attachments/166125798611353600/1098791449400705097/zcaLaDF.png')
             # slow mode delay
             embed.add_field(name='Slow mode delay', value=f'{channel.slowmode_delay} seconds', inline=True)
             # recent messages
@@ -211,7 +211,7 @@ class Info(Module):
             embed.add_field(name=f'{messages_in_last_day} messages in the past day', value=f'{messages_in_last_month} messages in the past month')
         elif type(channel) == discord.VoiceChannel:
             # name, icon
-            embed.set_author(name=channel.name, icon_url='https://i.imgur.com/htsk1oy.png')
+            embed.set_author(name=channel.name, icon_url='https://cdn.discordapp.com/attachments/166125798611353600/1098791538135404636/htsk1oy.png')
             # bitrate
             embed.add_field(name='Bitrate', value=f'{channel.bitrate / 1000} kbps')
             # user limit
