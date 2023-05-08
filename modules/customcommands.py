@@ -251,5 +251,5 @@ class CustomCommands(Module):
         'description': 'Posts a random custom command'
     }
     async def cmd_ccomm_random(self, message, args, kwargs):
-        command = random.choice(self.commands.items())
-        await message.channel.send(command)
+        command = random.choice(list(self.commands.keys()))
+        await message.channel.send(self.commands[command])
