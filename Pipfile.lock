@@ -391,11 +391,11 @@
                 "voice"
             ],
             "hashes": [
-                "sha256:792bdcfe71cfe013c446cf379b2e83e08b5050604322ad6fb592864e63511abd",
-                "sha256:f9df95795c6f52c5db43b7ab43634993e12ef233288636a759166dd9c134d077"
+                "sha256:149652f24da299706270bf8c03c2fcf80cf1caf3a480744c61d5b001688b380d",
+                "sha256:8eb4fe66b5d503da6de3a8425e23012711dc2fbcd7a782107a92beac15ee3459"
             ],
             "index": "pypi",
-            "version": "==2.2.3"
+            "version": "==2.3.1"
         },
         "emoji": {
             "hashes": [
@@ -724,11 +724,11 @@
         },
         "urllib3": {
             "hashes": [
-                "sha256:61717a1095d7e155cdb737ac7bb2f4324a858a1e2e6466f6d03ff630ca68d3cc",
-                "sha256:d055c2f9d38dc53c808f6fdc8eab7360b6fdbbde02340ed25cfbcd817c62469e"
+                "sha256:48e7fafa40319d358848e1bc6809b208340fafe2096f1725d05d67443d0483d1",
+                "sha256:bee28b5e56addb8226c96f7f13ac28cb4c301dd5ea8a6ca179c0b9835e032825"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==2.0.2"
+            "version": "==2.0.3"
         },
         "wand": {
             "hashes": [
@@ -896,11 +896,11 @@
         },
         "yt-dlp": {
             "hashes": [
-                "sha256:3b2df037c80922f0f83f63ee2f9253496b4a8668c0fe8d2a836ba9040f853b07",
-                "sha256:9af92de5effc193bdb51216d9ebf28874d96180d202fae752b0d9f2a63380f3a"
+                "sha256:b33b3f68751f33dd8290f1f61f7a011679b3b512aa223df3bff496688bc0bd19",
+                "sha256:cb58373869c8ccb5034746f91cfccd6d25ea697090dfd6f93e9034d51eb4aed2"
             ],
             "index": "pypi",
-            "version": "==2023.2.17"
+            "version": "==2023.7.6"
         }
     },
     "develop": {}
