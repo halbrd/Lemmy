@@ -37,11 +37,16 @@ class Core(Module):
     }
     async def cmd_help(self, message, args, kwargs):
         symbol = self.lemmy.resolve_symbol(message.channel)
+        enabled_modules = self.lemmy.get_context(message.author)['manifest']
 
         # general help text
         if len(args) == 0:
             # get our module manifest
-            manifest = { module_name: [ command_name for command_name, command in module._commands.items() ] for module_name, module in self.lemmy.modules.items() }
+            manifest = {
+                module_name: [ command_name for command_name, command in module._commands.items() ]
+                for module_name, module in self.lemmy.modules.items()
+                if module_name in enabled_modules
+            }
 
             # construct message initially as a list of lines, for convenience
             lines = []
