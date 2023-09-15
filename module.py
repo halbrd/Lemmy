@@ -38,9 +38,11 @@ class Module:
                 comment = f'```diff\n+ {comment}\n```'
             await message.channel.send(comment)
 
-    async def send_not_allowed(self, message, comment=None):
+    async def send_not_allowed(self, message, comment=None, comment_wrapping=True):
         await message.add_reaction('🔒')
         if comment:
+            if comment_wrapping:
+                comment = f'```diff\n- {comment}\n```'
             await message.channel.send(comment)
 
     async def send_dm(self, message, direct_message, public_message=None):
@@ -94,6 +96,8 @@ class Module:
                 # check if the user is permitted to use this command
                 if self.get_docs_attr(command, 'admin_only', default=False) and not message.author.id in self.lemmy.config['admins']:
                     await self.send_not_allowed(message)
+                elif self.get_docs_attr(command, 'moderator_only', default=False) and not await self.lemmy.user_has_mod_privs(message.author.id):
+                    await self.send_not_allowed(message, comment='you must be a Lemmy moderator to use this command')
                 else:
                     try:
                         await self._commands[command](message, args[1:], kwargs)

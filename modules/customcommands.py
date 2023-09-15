@@ -175,7 +175,8 @@ class CustomCommands(Module):
     docs_ccomm_create = {
         'description': 'Adds a new custom command',
         'usage': 'ccomm_create <command name> <contents>',
-        'examples': [ 'ccomm_create jeffs https://cdn.discordapp.com/attachments/166125798611353600/1098791702556315728/biWAU5b.png', 'ccomm_create shards "Shards are the secret ingredient in the web scale sauce."' ]
+        'examples': [ 'ccomm_create jeffs https://cdn.discordapp.com/attachments/166125798611353600/1098791702556315728/biWAU5b.png', 'ccomm_create shards "Shards are the secret ingredient in the web scale sauce."' ],
+        'moderator_only': True
     }
     async def cmd_ccomm_create(self, message, args, kwargs):
         if len(args) != 2:
@@ -192,7 +193,8 @@ class CustomCommands(Module):
     docs_ccomm_edit = {
         'description': 'Edits the value an existing custom command',
         'usage': 'ccomm_edit <command name> <new contents>',
-        'examples': [ 'ccomm_edit graph https://www.youtube.com/watch?v=sIlNIVXpIns' ]
+        'examples': [ 'ccomm_edit graph https://www.youtube.com/watch?v=sIlNIVXpIns' ],
+        'moderator_only': True
     }
     async def cmd_ccomm_edit(self, message, args, kwargs):
         if len(args) != 2:
@@ -209,7 +211,8 @@ class CustomCommands(Module):
     docs_ccomm_delete = {
         'description': 'Deletes an existing custom command',
         'usage': 'ccomm_delete <command name>',
-        'examples': [ 'ccomm_delete lenny' ]
+        'examples': [ 'ccomm_delete lenny' ],
+        'moderator_only': True
     }
     async def cmd_ccomm_delete(self, message, args, kwargs):
         if len(args) != 1:
@@ -226,7 +229,8 @@ class CustomCommands(Module):
     docs_ccomm_rename = {
         'description': 'Renames an existing custom command',
         'usage': 'ccomm_rename <current name> <new name>',
-        'examples': [ 'ccomm_rename kappa greyface' ]
+        'examples': [ 'ccomm_rename kappa greyface' ],
+        'moderator_only': True
     }
     async def cmd_ccomm_rename(self, message, args, kwargs):
         if len(args) != 2:

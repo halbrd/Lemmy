@@ -266,6 +266,17 @@ class Lemmy:
     async def get_webhook(self, channel, webhook_name='Lemmy'):
         return discord.utils.find(lambda x: x.token is not None and x.name == webhook_name, await channel.webhooks()) or await channel.create_webhook(name=webhook_name)
 
+    async def user_has_mod_privs(self, user_id):
+        mod_server_id = self.config.get('moderator_server', None)
+
+        if not mod_server_id:
+            return True
+
+        mod_server = self.client.get_guild(int(mod_server_id))
+        member = mod_server.get_member(user_id)
+
+        return member is not None
+
 
 
 if __name__ == '__main__':
