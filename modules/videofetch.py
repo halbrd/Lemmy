@@ -22,6 +22,7 @@ DOWNLOAD_PATTERNS = [
     re.compile('https?://\w+.reddit.com/r/\w+/comments/\w+.*'),
     re.compile('https?://v.redd.it/\w+'),
     re.compile('https?://redd.it/\w+'),
+    re.compile('https?://reddit.com/r/\w+/s/\w+.*'),
 ]
 
 def clean_filename(filename):
