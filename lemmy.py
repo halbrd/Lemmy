@@ -37,7 +37,9 @@ class Lemmy:
             elif type(channel) == discord.channel.GroupChannel:   # bot users can't be in these (yet)
                 recipient = channel.name or ', '.join( list( { user.name for user in message.channel.recipients }.union({ self.client.user.name }) - { message.author.name } ) )
             elif type(channel) == discord.channel.TextChannel:
-                recipient = f'{channel.guild}#{channel.name}'
+                recipient = f'{channel.guild.name}#{channel.name}'
+            elif type(channel) == discord.threads.Thread:
+                recipient = f'{channel.guild.name}#{channel.parent.name}.{channel.name}'
 
             extras_phrase = '📎' * len(message.attachments) + '📊' * len(message.embeds)
             extras_phrase = f' +{extras_phrase}' if extras_phrase else ''
