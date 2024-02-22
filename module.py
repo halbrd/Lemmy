@@ -78,6 +78,9 @@ class Module:
     async def on_voice_state_update(self, member, before, after):
         pass
 
+    async def on_reaction_add(self, reaction, user):
+        pass
+
     async def call_functions(self, message):
         # get parsed message
         terms = Module.deconstruct_message(message)

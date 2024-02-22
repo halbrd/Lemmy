@@ -61,6 +61,14 @@ class Lemmy:
                     await module.on_voice_state_update(member, before, after)
 
         @self.client.event
+        async def on_reaction_add(reaction, user):
+            # pass the event to the modules
+            for module_name, module in self.modules.items():
+                context = self.get_context(user)
+                if module_name in context['manifest']:
+                    await module.on_reaction_add(reaction, user)
+
+        @self.client.event
         async def on_ready():
             # perform asynchronous setup
             await self.load_all_async()
