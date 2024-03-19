@@ -5,7 +5,7 @@ StartLimitIntervalSec=0
 
 [Service]
 Type=simple
-Restart=always
+Restart=unless-stopped
 RestartSec=1
 User=will
 WorkingDirectory=/opt/lemmy
