@@ -41,6 +41,12 @@ class YTDLSource(discord.PCMVolumeTransformer):
         self.url = data.get('url')
         self.filename = data.get('filename')
 
+        seconds_long = data.get('duration')
+        if seconds_long >= 3600:
+            self.duration = f'{seconds_long // 3600}:{(seconds_long % 3600) // 60:02}:{seconds_long % 60:02}'
+        else:
+            self.duration = f'{seconds_long // 60}:{seconds_long % 60:02}'
+
     @classmethod
     async def from_url(cls, url, *, loop=None, stream=False):
         loop = loop or asyncio.get_event_loop()
@@ -189,7 +195,7 @@ class Radio(Module):
         tracks = []
         for i, player in enumerate(queue):
             index = i + 1
-            tracks.append(f'{index:{digits}}. {player.title}')
+            tracks.append(f'{index:{digits}}. [{player.duration}] {player.title}')
 
         text = '```\n' + '\n'.join(tracks) + '\n```'
 
