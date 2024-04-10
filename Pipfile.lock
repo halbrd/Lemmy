@@ -768,10 +768,13 @@
                 "sha256:942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1"
             ],
             "index": "pypi",
+            "markers": "python_version >= '3.7'",
             "version": "==2.31.0"
         },
         "rfc3986": {
-            "extras": [],
+            "extras": [
+
+            ],
             "hashes": [
                 "sha256:270aaf10d87d0d4e095063c65bf3ddbc6ee3d0b226328ce21e036f946e421835",
                 "sha256:a86d6e1f5b1dc238b218b012df0aa79409667bb209e58da56d0b94704e712a97"
@@ -985,11 +988,12 @@
         },
         "yt-dlp": {
             "hashes": [
-                "sha256:6e74cb14a69dbeb872c8ef4e0b8bbed2ee846ec633513cf3124a74c1faedc07b",
-                "sha256:bbe66b9a3aa23b6378ccca3ea20f5aadf385fa21a993513a105d73c827a86ed4"
+                "sha256:7ee90572b4d313b582b99c89e4eccf779b57ff54edc331873c6b3fba77faa8b0",
+                "sha256:d6ff6798bd114cc48763564fcb2f296464ec1604f731e69b07a8814c89b170a2"
             ],
             "index": "pypi",
-            "version": "==2024.3.10"
+            "markers": "python_version >= '3.8'",
+            "version": "==2024.4.9"
         }
     },
     "develop": {}
