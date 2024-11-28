@@ -105,7 +105,7 @@ class Lemmy:
         # at this point the bot has shut down
         self.log('Shut down.')
 
-    def log(self, message, log_to_file=False):
+    def log(self, message, log_to_file=True):
         output = '[{}] {}'.format(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), message)
 
         self.logger.info(output)
