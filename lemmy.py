@@ -44,7 +44,10 @@ class Lemmy:
             extras_phrase = '📎' * len(message.attachments) + '📊' * len(message.embeds)
             extras_phrase = f' +{extras_phrase}' if extras_phrase else ''
 
-            self.log(f'{message.author.name} => {recipient}{extras_phrase}: {message.content}')
+            self.log(
+                f'{message.author.name} => {recipient}{extras_phrase}: {message.content}',
+                log_to_file=self.get_context(channel)['do_log'],
+            )
 
             # pass the event to the modules
             for module_name, module in self.modules.items():
@@ -102,10 +105,13 @@ class Lemmy:
         # at this point the bot has shut down
         self.log('Shut down.')
 
-    def log(self, message):
+    def log(self, message, log_to_file=False):
         output = '[{}] {}'.format(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), message)
 
         self.logger.info(output)
+
+        if log_to_file:
+            self.logger_file.info(output)
 
     def load_all_sync(self):
         self.load_config()
@@ -138,8 +144,14 @@ class Lemmy:
             self.contexts[key] = dict(self.contexts[key])
 
         # post-process contexts
+        def boolparse(string):
+            if not string.lower() in ['true', 'false']:
+                raise ValueError(f'`{string}` is not \'true\' or \'false\'')
+            return string.lower() == 'true'
+
         for context in self.contexts.keys():
             self.contexts[context]['manifest'] = self.contexts[context]['manifest'].split()
+            self.contexts[context]['do_log'] = boolparse(self.contexts[context]['do_log'])
 
     def load_modules(self):
         self.modules = {}
@@ -167,14 +179,17 @@ class Lemmy:
             await vc.disconnect()
 
     def setup_logging(self):
-        logging.basicConfig(format='%(message)s', level=logging.WARNING)
-
-        self.logger = logging.getLogger('lemmy')
+        self.logger = logging.getLogger('console')
         self.logger.setLevel(logging.INFO)
         self.logger.handlers = []
+        self.logger.addHandler(logging.StreamHandler(sys.stdout))
+
+        self.logger_file = logging.getLogger('file')
+        self.logger_file.setLevel(logging.INFO)
+        self.logger_file.handlers = []
 
         if self.config.get('log_file'):
-            self.logger.addHandler(logging.FileHandler(self.config['log_file']))
+            self.logger_file.addHandler(logging.FileHandler(self.config['log_file']))
 
     async def shutdown(self):
         self.log('Shutting down...')
