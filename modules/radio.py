@@ -12,6 +12,7 @@ CACHE_LOC = 'cache/Radio/'
 
 # copied from https://github.com/Rapptz/discord.py/blob/master/examples/basic_voice.py
 ytdl_format_options = {
+    'cookiefile': 'data/Radio/cookies.txt',
     'format': 'bestaudio/best',
     'outtmpl': CACHE_LOC + '%(extractor)s-%(id)s-%(title)s.%(ext)s',
     'restrictfilenames': True,
