@@ -79,6 +79,10 @@ class MassEffect(Module):
 
         await reaction.message.edit(content=new_message)
 
+        if new_class == '💩':
+            await reaction.message.remove_reaction('🎲', self.client.user)
+
+
     docs_me3class = {
         'description': 'Picks a Mass Effect 3 multiplayer class for you',
         'usage': 'me3class <class/class/...>',
