@@ -57,6 +57,10 @@ class MassEffect(Module):
         if author_id != str(user.id):
             return
 
+        # don't respond to reactions other than the dice
+        if not reaction.emoji == '🎲':
+            return
+
         last_used_class = lines[-1]
 
         previous_used_classes = [ x[2:-2] for x in lines[1:-1] ]
