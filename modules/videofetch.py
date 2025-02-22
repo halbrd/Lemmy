@@ -31,7 +31,7 @@ def clean_filename(filename):
     return filename
 
 async def download_and_send(url, channel):
-    base_filename = clean_filename(url)
+    base_filename = clean_filename(str(channel.id) + url)
     base_file_loc = CACHE_LOC + base_filename
 
     expected_filename = base_filename + '.mp4'
