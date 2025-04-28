@@ -15,6 +15,7 @@ import re
 
 CACHE_LOC = 'cache/VideoFetch/'
 ATTEMPTS = 3
+TIMEOUT = 30
 
 DOWNLOAD_PATTERNS = [
     re.compile('https?://\w+.tiktok.com/[^ ]+'),
@@ -38,12 +39,18 @@ async def download_and_send(url, channel):
     expected_file_loc = CACHE_LOC + base_filename + '.mp4'
 
     success = False
-    for i in range(ATTEMPTS):
-        r = await asyncio.create_subprocess_shell(f'yt-dlp -S vcodec:h264 -o "{base_file_loc}.%(ext)s" {url}')
-        await r.wait()
-        if r.returncode == 0:
-            success = True
-            break
+
+    try:
+        async with asyncio.timeout(TIMEOUT):
+            for i in range(ATTEMPTS):
+                r = await asyncio.create_subprocess_shell(f'yt-dlp -S vcodec:h264 -o "{base_file_loc}.%(ext)s" {url}')
+                await r.wait()
+                if r.returncode == 0:
+                    success = True
+                    break
+
+    except asyncio.TimeoutError:
+        r.kill()
 
     if not success:
         return False
