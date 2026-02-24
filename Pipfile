@@ -11,7 +11,7 @@ emoji = "*"
 requests = "*"
 "discord.py" = {extras = ["voice"], version = "*"}
 Wand = "*"
-yt-dlp = "2026.1.19.233146.dev0"
+yt-dlp = "2026.2.21"
 
 [requires]
 python_version = "3.12"
