@@ -4,6 +4,8 @@ from module import Module
 
 import random
 import re
+import datetime
+import hashlib
 
 class MassEffect(Module):
     docs = {
@@ -117,3 +119,20 @@ class MassEffect(Module):
 
         response = await message.channel.send(mention_types_slug + '\n' + choice)
         await response.add_reaction('🎲')
+
+    docs_yearpls = {
+        'description': 'Gives you the Wikipedia article of a year to rate between 1000 AD and last year',
+    }
+    async def cmd_yearpls(self, message, args, kwargs):
+        minimum_year = 1000
+
+        today = datetime.date.today()
+        last_year = today.year - 1
+
+        # create a hash from today's date
+        hash_bytes = hashlib.md5(str(today).encode()).digest()
+        hash_int = int.from_bytes(hash_bytes, 'big')
+
+        # map to range [minimum_year, last_year]
+        result = minimum_year + (hash_int % (last_year - minimum_year + 1))
+        await message.channel.send(f'https://en.wikipedia.org/wiki/{result}')
