@@ -6,6 +6,7 @@ import random
 import re
 import datetime
 import hashlib
+import calendar
 
 class MassEffect(Module):
     docs = {
@@ -136,3 +137,36 @@ class MassEffect(Module):
         # map to range [minimum_year, last_year]
         result = minimum_year + (hash_int % (last_year - minimum_year + 1))
         await message.channel.send(f'https://en.wikipedia.org/wiki/{result}')
+
+    docs_gamespls = {
+        'description': 'Gives you a month between January 1990 and now, and the Wikipedia article with the list of games released in that month'
+    }
+    async def cmd_gamespls(self, message, args, kwargs):
+        minimum_year = 1992
+
+        today = datetime.date.today()
+        last_year = today.year - 1
+
+        # create a hash from today's date
+        hash_bytes = hashlib.md5(str(today).encode()).digest()
+        hash_int = int.from_bytes(hash_bytes, 'big')
+
+        # pick year and month
+        year = minimum_year + (hash_int % (last_year - minimum_year + 1))
+        month = 1 + (hash_int % 12)
+        month_name = calendar.month_name[month]
+
+        # load data
+        ranges = [
+            (range.split(' ', 1)[0], range.split(' ', 1)[1])
+            for range in self.load_data('gamesmonths', static=True)
+        ]
+
+        key = f'{year}-{month:02d}'
+
+        # find matching interval
+        i = 0
+        while key >= ranges[i][0]:
+            i += 1
+
+        await message.channel.send(f'# {month_name} {year}\n\n{ranges[i - 1][1]}')
