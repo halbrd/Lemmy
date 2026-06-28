@@ -30,7 +30,7 @@ class Emoters(Module):
 
     MODIFIERS = {
         'rotate': {
-            'validate': lambda x: bool(re.fullmatch('-?\d+', x)),
+            'validate': lambda x: bool(re.fullmatch(r'-?\d+', x)),
             'transform': lambda x: int(x),
             'apply': lambda image, x: image.rotate(x)
         },

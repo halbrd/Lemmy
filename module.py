@@ -151,7 +151,7 @@ class Module:
         while len(terms) > 0 and terms[-1] == '':
             del terms[-1]
 
-        kwarg_match = re.compile('([a-z]+)=(\S+)|[\'"`](.+)[\'"`]')
+        kwarg_match = re.compile(r'([a-z]+)=(\S+)|[\'"`](.+)[\'"`]')
         args = [ term for term in terms if not re.fullmatch(kwarg_match, term) ]
         kwargs = { match.group(1): match.group(2) for match in filter(lambda match: match is not None, map(lambda term: re.fullmatch(kwarg_match, term), terms)) }
 

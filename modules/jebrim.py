@@ -26,7 +26,7 @@ class Jebrim(Module):
             await self.send_error(message)
             return
 
-        if not re.match('https://cdn\.discordapp\.com/attachments/[0-9]+/[0-9]+/.+\.(png|jpg)/?', args[0]):
+        if not re.match(r'https://cdn\.discordapp\.com/attachments/[0-9]+/[0-9]+/.+\.(png|jpg)/?', args[0]):
             await self.send_error(message, comment='link must be a Discord direct link')
             return
 

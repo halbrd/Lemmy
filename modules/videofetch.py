@@ -18,12 +18,12 @@ ATTEMPTS = 3
 TIMEOUT = 30
 
 DOWNLOAD_PATTERNS = [
-    re.compile('https?://\w+.tiktok.com/[^ ]+'),
+    re.compile(r'https?://\w+.tiktok.com/[^ ]+'),
 
-    re.compile('https?://\w+.reddit.com/r/\w+/comments/\w+.*'),
-    re.compile('https?://v.redd.it/\w+'),
-    re.compile('https?://redd.it/\w+'),
-    re.compile('https?://reddit.com/r/\w+/s/\w+.*'),
+    re.compile(r'https?://\w+.reddit.com/r/\w+/comments/\w+.*'),
+    re.compile(r'https?://v.redd.it/\w+'),
+    re.compile(r'https?://redd.it/\w+'),
+    re.compile(r'https?://reddit.com/r/\w+/s/\w+.*'),
 ]
 
 def clean_filename(filename):

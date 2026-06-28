@@ -41,7 +41,7 @@ class MassEffect(Module):
             return
 
         # don't reply unless it looks like a me3class invokation
-        matches_pattern = re.fullmatch('<@\d+>( [\w/]+)?\n(~~[A-Za-z \-37]+~~\n)*[A-Za-z \-37]+', reaction.message.content)
+        matches_pattern = re.fullmatch(r'<@\d+>( [\w/]+)?\n(~~[A-Za-z \-37]+~~\n)*[A-Za-z \-37]+', reaction.message.content)
         if not matches_pattern:
             return
 

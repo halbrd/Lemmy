@@ -86,7 +86,8 @@ class Lemmy:
         self.log('Logging in...')
 
         # run the bot
-        loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
 
         # enable the bot to respond to SIGINT/SIGTERM (Unix only)
         try:
@@ -100,6 +101,14 @@ class Lemmy:
         except KeyboardInterrupt:
             loop.run_until_complete(self.client.logout())
         finally:
+            pending = asyncio.all_tasks(loop)
+            for task in pending:
+                task.cancel()
+            if pending:
+                loop.run_until_complete(asyncio.gather(*pending, return_exceptions=True))
+            connector = getattr(self.client.http, 'connector', None)
+            if connector and not connector.closed:
+                loop.run_until_complete(connector.close())
             loop.close()
 
         # at this point the bot has shut down

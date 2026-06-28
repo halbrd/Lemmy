@@ -36,7 +36,7 @@ class Memes(Module):
         page = requests.get('https://mobile.twitter.com/search?q=ted%20OR%20cruz%20OR%20tedcruz%20from%3Acommentiquette').text
 
         while page:
-            links = { 'https://twitter.com' + link for link in re.findall('/commentiquette/status/\d+', page) }
+            links = { 'https://twitter.com' + link for link in re.findall(r'/commentiquette/status/\d+', page) }
             found_existing_link = any([ link in tweets for link in links ])
             tweets = tweets.union(links)
 
