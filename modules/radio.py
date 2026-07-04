@@ -6,9 +6,14 @@ import discord
 import yt_dlp
 import os
 import shutil
+import asyncio
+import time
 from urllib.parse import urlparse
 
 CACHE_LOC = 'cache/Radio/'
+
+IDLE_TIMEOUT = 60      # seconds of no playback before Lemmy leaves the call
+IDLE_CHECK_INTERVAL = 5  # how often to check for idleness, in seconds
 
 # copied from https://github.com/Rapptz/discord.py/blob/master/examples/basic_voice.py
 ytdl_format_options = {
@@ -89,6 +94,40 @@ class Radio(Module):
 
         self.clear_cache()
         self.queues = {}
+        self.last_active = {}   # guild_id -> monotonic timestamp of last playback activity
+        self._idle_task = None
+
+    async def on_ready(self):
+        # start the idle watcher once; on_ready can fire again on reconnects
+        if self._idle_task is None or self._idle_task.done():
+            self._idle_task = self.client.loop.create_task(self._idle_check_loop())
+
+    async def _idle_check_loop(self):
+        while True:
+            await asyncio.sleep(IDLE_CHECK_INTERVAL)
+            now = time.monotonic()
+
+            for vc in list(self.client.voice_clients):
+                guild_id = vc.guild.id
+
+                if self.queues.get(guild_id):
+                    # something is queued (playing or paused), keep the timer fresh
+                    self.last_active[guild_id] = now
+                    continue
+
+                last = self.last_active.get(guild_id)
+                if last is None:
+                    # first time we've seen this idle client - start its timer
+                    self.last_active[guild_id] = now
+                    continue
+
+                if now - last >= IDLE_TIMEOUT:
+                    try:
+                        await vc.disconnect()
+                    except Exception:
+                        pass
+                    self.clear_queue(guild_id)
+                    self.last_active.pop(guild_id, None)
 
     docs_radio_play = {
         'description': 'Plays YouTube videos',
