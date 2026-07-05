@@ -122,10 +122,10 @@ class MassEffect(Module):
         await response.add_reaction('🎲')
 
     docs_yearpls = {
-        'description': 'Gives you the Wikipedia article of a year to rate between 1000 AD and last year',
+        'description': 'Gives you the Wikipedia article of a year to rate between 1300 AD and last year',
     }
     async def cmd_yearpls(self, message, args, kwargs):
-        minimum_year = 1000
+        minimum_year = 1300
 
         today = datetime.date.today()
         last_year = today.year - 1
